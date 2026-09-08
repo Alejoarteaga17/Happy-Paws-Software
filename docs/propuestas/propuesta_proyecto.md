@@ -39,7 +39,7 @@
 ### Objetivos
 - **Digitalizar los Registros Principales:** Centralizar los perfiles de propietarios y mascotas para permitir búsquedas inmediatas y eliminar la dependencia de carpetas físicas.
 - **Mejorar la Continuidad de la Atención:** Implementar el seguimiento de las fechas de vacunación y resúmenes claros de las citas para evitar controles posteriores pendientes.
-- **Garantizar la Calidad Funcional y las Pruebas:** Establecer casos de prueba estructurados y escenarios operativos para evaluar exhaustivamente la confiabilidad del sistema y los flujos de usuario para recepcionistas, veterinarios y administradores de la clínica.
+- **Garantizar la Calidad Funcional y las Pruebas:** Establecer casos de prueba estructurados y escenarios operativos para evaluar exhaustivamente la confiabilidad del sistema y los flujos de usuario para clientes, recepcionistas, veterinarios y administradores de la clínica.
 - **Entregar una Herramienta Interna Ligera:** Desarrollar una interfaz fácil de usar y sin complejidad innecesaria, diseñada exclusivamente para el personal interno y sin introducir una carga operativa adicional.
 
 ## 3.3 Alcance del Trabajo
@@ -48,7 +48,8 @@ El alcance del trabajo para **Happy Paws Care Central** se centra en entregar un
 * **Gestión de Perfiles de Mascotas y Propietarios:** Sistema centralizado para crear, actualizar y buscar registros de clientes y perfiles de mascotas vinculados mediante los datos del propietario.
 * **Registro de Citas y Notas Clínicas:** Registro de las consultas diarias, motivos de las citas y notas clínicas de los veterinarios en un formato estructurado.
 * **Seguimiento de Vacunación y Cuidados:** Módulo dedicado para registrar el historial de vacunaciones y destacar las próximas acciones de cuidado o aquellas que se encuentren vencidas.
-* **Control de Acceso Basado en Roles:** Vistas y permisos diferenciados para Recepcionistas, Veterinarios y Administradores de la Clínica.
+* **Portal de Consulta para Propietarios:** Acceso autenticado para propietarios registrados donde podrán visualizar información básica de sus mascotas, historial de visitas, estado de vacunaciones e información clínica autorizada.
+* **Control de Acceso Basado en Roles:** Vistas y permisos diferenciados para clientes, Recepcionistas, Veterinarios y Administradores de la Clínica.
 * **Documentación Operativa y Casos de Prueba:** Guía operativa completa, políticas documentadas para el manejo de datos sensibles y casos de prueba para validar los flujos de trabajo principales.
 
 ## 3.4 Fuera del Alcance
@@ -65,6 +66,7 @@ Para garantizar límites claros del proyecto y mantener un MVP enfocado, las sig
 * **Wi-Fi Limitado e Inestabilidad de la Conectividad:** Las interrupciones intermitentes de la conexión de red local dentro de la clínica podrían afectar el acceso en tiempo real a los archivos de pacientes y registros de citas durante la atención.
 * **Crecimiento del Alcance Relacionado con las Notificaciones a Clientes:** Las partes interesadas podrían solicitar recordatorios activos por SMS o correo electrónico, lo que podría ampliar el proyecto más allá de la arquitectura de marcadores de posición inicialmente prevista.
 * **Privacidad de Datos y Manejo de Registros Sensibles:** El manejo o exposición inadecuados de los datos de contacto de los propietarios y las notas médicas de los pacientes requieren una documentación cuidadosa de los protocolos operativos sin añadir herramientas complejas de cumplimiento normativo.
+* **Control de Acceso para Propietarios:** Será necesario garantizar que cada propietario únicamente pueda visualizar la información asociada a sus propias mascotas y no acceder a registros pertenecientes a terceros.
 
 ## 3.6 Cronograma/Hitos
 
@@ -88,7 +90,7 @@ El desarrollo de **Happy Paws Care Central** sigue un ciclo Agile iterativo estr
 * **Actividades Principales:**
     * **(Semanas 3–4):** Módulo de Gestión de Mascotas y Propietarios (crear, editar y buscar propietarios/mascotas).
     * **(Semanas 5–6):** Interfaz de Registro de Citas y Notas Clínicas.
-    * **(Semanas 7–8):** Panel Automatizado de Seguimiento del Estado de Vacunaciones e interfaz de recordatorios estáticos.
+    * **(Semanas 7–8):** Panel Automatizado de Seguimiento del Estado de Vacunaciones y desarrollo del Portal de Propietarios.
     * **(Semana 9):** Implementación del Control de Acceso Basado en Roles (RBAC) (Recepcionista, Veterinario, Administrador).
 
 #### Fase 3: Pruebas, QA y Despliegue en Staging (Semanas 10–11 | 09 de octubre – 23 de octubre)
@@ -108,12 +110,12 @@ El desarrollo de **Happy Paws Care Central** sigue un ciclo Agile iterativo estr
 ---
 
 ### Hitos Principales del Proyecto
-
 | ID del Hito | Fecha Objetivo | Nombre del Hito | Descripción y Entregable Principal |
 | :---: | :---: | :--- | :--- |
 | **M1** | **20 de agosto de 2026** | **Configuración y Arquitectura** | Repositorio inicializado, ERD finalizado y plantilla `.env` configurada. |
-| **M2** | **03 de septiembre de 2026** | **Módulo de Mascotas y Propietarios** | Registro de propietarios y búsqueda dinámica completamente funcional ($< 2$s). |
+| **M2** | **03 de septiembre de 2026** | **Módulo de Mascotas y Propietarios** | Registro de propietarios y búsqueda dinámica completamente funcional (< 2 s). |
 | **M3** | **17 de septiembre de 2026** | **Registro de Consultas Clínicas** | Interfaz estandarizada para notas de citas completada y vinculada a los perfiles de las mascotas. |
-| **M4** | **01 de octubre de 2026** | **Seguimiento de Cuidados y RBAC** | Panel de vacunación con indicadores de estado y permisos RBAC integrados. |
-| **M5** | **23 de octubre de 2026** | **Staging y Finalización de QA** | Aplicación desplegada en una URL de staging con una tasa de aprobación de casos de prueba E2E de $>95\%$. |
-| **M6** | **05 de noviembre de 2026** | **Entrega Final del Proyecto** | Documentación operativa entregada, UAT aprobada y contrato finalizado. |
+| **M4** | **01 de octubre de 2026** | **Seguimiento de Vacunaciones** | Panel de vacunación con indicadores de estado completamente funcional. |
+| **M5** | **08 de octubre de 2026** | **Portal de Propietarios y RBAC** | Portal autenticado para propietarios y permisos diferenciados para todos los roles del sistema. |
+| **M6** | **23 de octubre de 2026** | **Staging y Finalización de QA** | Aplicación desplegada en una URL de staging con una tasa de aprobación de casos de prueba E2E superior al 95%. |
+| **M7** | **05 de noviembre de 2026** | **Entrega Final del Proyecto** | Documentación operativa entregada, UAT aprobada y proyecto finalizado. |
