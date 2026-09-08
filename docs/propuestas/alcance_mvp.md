@@ -10,6 +10,7 @@ Características y entregables esenciales para reemplazar los flujos de trabajo 
 * **Registro de Citas y Notas Clínicas:** Formularios estandarizados para registrar los motivos de las consultas, diagnósticos clínicos, historial de tratamientos y notas del veterinario.
 * **Módulo de Seguimiento de Vacunación y Cuidados:** Interfaz de panel de control que destaca las vacunas próximas, vigentes y vencidas, así como las acciones clínicas de seguimiento pendientes.
 * **Control de Acceso Basado en Roles (RBAC):** Vistas y conjuntos de permisos adaptados para Recepcionistas, Veterinarios y Administradores de la Clínica.
+* **Portal de Propietarios de Mascotas:** Acceso autenticado para propietarios donde puedan consultar información relacionada con sus mascotas, incluyendo datos básicos del perfil, historial de citas, información clínica autorizada y estado de vacunaciones.
 * **Documentación Operativa y de QA:** Casos de prueba completos, guías operativas y protocolos para el manejo de datos sensibles destinados a la validación del sistema.
 
 ---
@@ -30,7 +31,6 @@ Funcionalidades que quedan estrictamente excluidas del alcance actual para mante
 Características aplazadas para ciclos de desarrollo posteriores, una vez se haya completado el despliegue y validación del MVP principal con las partes interesadas:
 
 * **Recordatorios Automatizados para Clientes:** Servicio activo de notificaciones por SMS y correo electrónico para próximas citas y vacunas pendientes.
-* **Portal Web para Propietarios de Mascotas:** Portal externo dedicado para que los propietarios puedan consultar el historial médico, verificar el estado de las vacunas y solicitar citas.
 * **Herramientas de Migración de Datos Históricos:** Herramientas de importación masiva o utilidades de OCR para digitalizar automáticamente los archivos físicos existentes.
 * **Analítica Operativa Avanzada:** Informes sobre la productividad de la clínica, tendencias en el volumen de pacientes y tasas de cumplimiento de los cuidados.
 * **Soporte para Múltiples Sedes:** Ampliación de la arquitectura del sistema para soportar operaciones de múltiples clínicas y una gestión centralizada.
