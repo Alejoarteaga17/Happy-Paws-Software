@@ -14,4 +14,6 @@ Happy Paws Care Central es una aplicación web interna, ligera y optimizada, dis
 
 * **Seguimiento de Vacunación y Cuidados:** Un módulo automatizado de seguimiento de estados que destaca las vacunas próximas o vencidas y las acciones de seguimiento en un panel de control claro para el personal.
 
+* **Portal para Propietarios:** Acceso autenticado para propietarios donde podrán consultar información básica de sus mascotas, revisar historiales de atención autorizados, verificar estados de vacunación y acceder a información relevante sobre el cuidado de sus animales.
+
 * **Flujos de Trabajo Basados en Roles:** Interfaces adaptadas para facilitar los registros rápidos por parte de los recepcionistas, las actualizaciones clínicas por parte de los veterinarios y la supervisión operativa por parte del administrador de la clínica.
