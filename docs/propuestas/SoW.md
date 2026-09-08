@@ -37,13 +37,19 @@
 **Declaración de Trabajo para la Aplicación Web Interna Happy Paws Care Central**
 
 ### Resumen
-Esta Declaración de Trabajo (SOW) establece los objetivos, alcance, entregables, roles y cronograma para el diseño, desarrollo e implementación de **Happy Paws Care Central**, una aplicación web interna para **Happy Paws Veterinary Clinic**. El proyecto busca eliminar los flujos de trabajo dependientes del papel, centralizar los perfiles de propietarios y mascotas, agilizar el registro de citas y automatizar el seguimiento de vacunaciones. El proveedor, **AACCode**, será responsable del ciclo completo de desarrollo de software, incluyendo la arquitectura del sistema, el desarrollo del MVP principal, los flujos de trabajo basados en roles, las pruebas unitarias y del sistema, la documentación operativa y la entrega final. El proyecto tendrá una duración de 13 semanas (del 6 de agosto de 2026 al 5 de noviembre de 2026), con hitos principales vinculados a entregas iterativas. El presupuesto y las condiciones de pago acordadas garantizan una responsabilidad clara y una calidad funcional antes del despliegue final.
+Esta Declaración de Trabajo (SOW) establece los objetivos, alcance, entregables, roles y cronograma para el diseño, desarrollo e implementación de **Happy Paws Care Central**, una aplicación web para **Happy Paws Veterinary Clinic**. El proyecto busca eliminar los flujos de trabajo dependientes del papel, centralizar los perfiles de propietarios y mascotas, agilizar el registro de citas y automatizar el seguimiento de vacunaciones. Adicionalmente, el sistema incluirá un portal para propietarios de mascotas que les permitirá acceder de manera segura a la información de sus mascotas, incluyendo historiales de atención y estados de vacunación.
+
+El proveedor, **AACCode**, será responsable del ciclo completo de desarrollo de software, incluyendo la arquitectura del sistema, el desarrollo del MVP principal, los flujos de trabajo basados en roles, el portal de propietarios, las pruebas unitarias y del sistema, la documentación operativa y la entrega final. El proyecto tendrá una duración de 13 semanas (del 6 de agosto de 2026 al 5 de noviembre de 2026), con hitos principales vinculados a entregas iterativas. El presupuesto y las condiciones de pago acordadas garantizan una responsabilidad clara y una calidad funcional antes del despliegue final.
 
 ### Valor
 El valor estimado del trabajo descrito en esta SOW se basa en un presupuesto fijo diseñado para el desarrollo personalizado del MVP de **Happy Paws Care Central**. Este cubre el análisis de requisitos, la arquitectura de software, el diseño UI/UX, el desarrollo de los módulos principales (Gestión de Mascotas/Propietarios, Registro de Citas y Seguimiento de Vacunaciones), la implementación del Control de Acceso Basado en Roles (RBAC), las pruebas de QA, la documentación operativa y la entrega posterior al despliegue. Los pagos se distribuirán de acuerdo con los principales hitos del proyecto para alinear los gastos con el progreso verificado. Cualquier adición al alcance o ampliación de funcionalidades posteriores al MVP más allá de este acuerdo estará sujeta a una Solicitud de Cambio independiente y será facturada de acuerdo con lo establecido.
 
 ### Alcance
-El alcance de este proyecto comprende el desarrollo y despliegue de extremo a extremo de una aplicación web interna y ligera para Happy Paws Veterinary Clinic. El trabajo incluye la centralización de los perfiles de mascotas y propietarios para realizar búsquedas rápidas, el establecimiento de un registro estructurado de citas y notas clínicas, la creación de un panel para el seguimiento del estado de cuidados y vacunaciones, y la implementación de vistas basadas en roles para Recepcionistas, Veterinarios y Administradores de la Clínica. El proyecto requiere colaboración entre el equipo de desarrollo de AACCode y las partes interesadas principales de la clínica (Pepito Perez y el personal interno). Quedan excluidos de esta fase el comercio electrónico, el procesamiento de pagos, los portales orientados a clientes, las notificaciones activas por SMS/correo electrónico y las herramientas complejas de auditoría de cumplimiento normativo. El trabajo se entregará de forma iterativa siguiendo prácticas Agile y DataOps durante un período de 13 semanas.
+El alcance de este proyecto comprende el desarrollo y despliegue de extremo a extremo de una aplicación web para Happy Paws Veterinary Clinic. El trabajo incluye la centralización de los perfiles de mascotas y propietarios para realizar búsquedas rápidas, el establecimiento de un registro estructurado de citas y notas clínicas, la creación de un panel para el seguimiento del estado de cuidados y vacunaciones, y la implementación de vistas basadas en roles para Recepcionistas, Veterinarios y Administradores de la Clínica.
+
+Además, el sistema incluirá un portal orientado a propietarios de mascotas que permitirá autenticarse y consultar información relevante de sus mascotas, incluyendo datos básicos del perfil, historial de citas, historial clínico autorizado y estado de vacunaciones.
+
+El proyecto requiere colaboración entre el equipo de desarrollo de AACCode y las partes interesadas principales de la clínica (Pepito Perez y el personal interno). Quedan excluidos de esta fase el comercio electrónico, el procesamiento de pagos, las notificaciones activas por SMS/correo electrónico, las herramientas complejas de auditoría de cumplimiento normativo y cualquier funcionalidad que permita a los propietarios modificar registros clínicos. El trabajo se entregará de forma iterativa siguiendo prácticas Agile y DataOps durante un período de 13 semanas.
 
 ### Pago
 El valor total del proyecto será pagado en cuotas vinculadas directamente a cuatro hitos principales del proyecto. Un anticipo inicial del 20% deberá pagarse al momento de la aprobación y firma del contrato para iniciar la recopilación de requisitos y la configuración de la arquitectura. Los pagos posteriores se estructuran de la siguiente manera: 30% al completar y aprobar los módulos principales del MVP (Gestión de Mascotas/Propietarios y Registro de Consultas), 30% al entregar el Seguimiento de Vacunaciones, RBAC y los casos de prueba del sistema de QA, y el 20% final tras la entrega exitosa del sistema, la aprobación de la documentación operativa y la firma de aceptación. Las facturas se emitirán tras la aceptación de cada hito y deberán pagarse mediante transferencia bancaria electrónica dentro de los 15 días hábiles siguientes.
@@ -68,6 +74,10 @@ El objetivo principal de este proyecto es diseñar, desarrollar y desplegar una 
 * **Objetivo 3: Entregar Alta Calidad y Confiabilidad Funcional**
     * *KR 3.1:* Completar el 100% de la ejecución de los casos de prueba predefinidos en todos los flujos de trabajo principales antes de la entrega final.
     * *KR 3.2:* Lograr cero vulnerabilidades críticas de seguridad o de manejo de datos durante las pruebas internas de aceptación.
+  
+* **Objetivo 4: Mejorar la Transparencia y Accesibilidad de la Información para los Propietarios**
+    * *KR 4.1:* Permitir que el 100% de los propietarios registrados puedan acceder a la información de sus mascotas mediante autenticación segura.
+    * *KR 4.2:* Reducir la necesidad de consultas telefónicas relacionadas con historiales médicos y estados de vacunación mediante acceso digital directo a la información.
 
 ---
 
@@ -78,15 +88,22 @@ El objetivo principal de este proyecto es diseñar, desarrollar y desplegar una 
 El rendimiento del proyecto será monitoreado mediante reuniones periódicas de seguimiento, revisiones de entregables y evaluaciones técnicas de acuerdo con las siguientes métricas:
 
 #### Métricas Empresariales y Operativas
-* **Eficiencia en la Búsqueda de Registros:** Los resultados de búsqueda de pacientes/propietarios deberán mostrarse en $< 2$ segundos dentro de la red interna.
+
+* **Eficiencia en la Búsqueda de Registros:** Los resultados de búsqueda de pacientes/propietarios deberán mostrarse en < 2 segundos dentro de la red interna.
 * **Tasa de Adopción del Personal:** Al menos el 85% del personal objetivo (recepcionistas y veterinarios) deberá completar correctamente los flujos de trabajo diarios simulados sin necesidad de asistencia durante las pruebas.
 * **Tasa de Integridad de los Datos:** 100% de cumplimiento de las estructuras de datos definidas durante el registro de información y creación de perfiles de pacientes.
 
-#### Métricas Técnicas y de Rendimiento del Sistema
-* **Disponibilidad del Sistema / Uptime:** Objetivo de 99.5% de disponibilidad durante el horario de funcionamiento de la clínica.
-* **Tiempo de Carga de las Páginas:** El panel de control y las páginas de perfiles de pacientes deberán cargar en $< 3$ segundos bajo una carga operativa estándar.
-* **Tasa de Aprobación de Casos de Prueba:** Mínimo de 95% de aprobación en todos los escenarios de prueba documentados antes de la aprobación final.
+#### Métricas de Experiencia del Propietario
 
+* **Accesibilidad del Portal de Propietarios:** El portal deberá estar disponible desde navegadores modernos en dispositivos móviles y escritorio.
+* **Tiempo de Consulta de Información:** Los propietarios deberán poder acceder a la información de sus mascotas en menos de 3 segundos después de autenticarse.
+* **Control de Acceso Seguro:** Cada propietario únicamente podrá visualizar información asociada a sus propias mascotas.
+
+#### Métricas Técnicas y de Rendimiento del Sistema
+
+* **Disponibilidad del Sistema / Uptime:** Objetivo de 99.5% de disponibilidad durante el horario de funcionamiento de la clínica.
+* **Tiempo de Carga de las Páginas:** El panel de control y las páginas de perfiles de pacientes deberán cargar en < 3 segundos bajo una carga operativa estándar.
+* **Tasa de Aprobación de Casos de Prueba:** Mínimo de 95% de aprobación en todos los escenarios de prueba documentados antes de la aprobación final.
 ---
 
 ## 4. Quién Hace Qué
@@ -117,6 +134,7 @@ El rendimiento del proyecto será monitoreado mediante reuniones periódicas de 
 * **Líder de Desarrollo de Software (Alejandro Arteaga):** Gestiona la ejecución técnica general, la comunicación con el cliente, la arquitectura y la entrega del proyecto.
 * **Desarrolladoras de Software / Ingenieras de QA (Camila Vélez, Alejandra Suarez):** Responsables de la implementación de funcionalidades frontend/backend, modelado de bases de datos, integración de la interfaz de usuario, creación de casos de prueba y documentación técnica.
 * **Usuarios Finales de la Clínica (Recepcionistas, Veterinarios, Administradores de la Clínica):** Participan en la validación de los flujos de trabajo, proporcionan comentarios durante las revisiones operativas y ejecutan las pruebas de aceptación.
+* **Usuarios Finales del Sistema (Recepcionistas, Veterinarios, Administradores de la Clínica y Propietarios de Mascotas):** Participan en la validación de los flujos de trabajo, proporcionan comentarios durante las revisiones operativas y ejecutan las pruebas de aceptación correspondientes a sus funcionalidades.
 
 ---
 
@@ -164,13 +182,14 @@ AACCode completará las siguientes tareas y entregará los hitos asociados:
 
 | Entregable / Tarea | Descripción y Criterios de Finalización | Método de Aceptación |
 | :--- | :--- | :--- |
-| **D1: Requisitos y Diseño del Sistema** | Arquitectura funcional detallada, esquemas de base de datos y wireframes para las interfaces RBAC. | Aprobación escrita del Líder del Cliente. |
+| **D1: Requisitos y Diseño del Sistema** | Arquitectura funcional detallada, esquemas de base de datos y wireframes para las interfaces RBAC y portal de propietarios. | Aprobación escrita del Líder del Cliente. |
 | **D2: Gestión de Mascotas y Propietarios** | Módulo para crear, actualizar y buscar perfiles de clientes y mascotas mediante nombre, teléfono o placa de identificación. | Demostración de la funcionalidad y ejecución de pruebas. |
 | **D3: Registro de Citas y Notas** | Módulo estructurado para registrar motivos de las consultas, notas de los veterinarios y registros médicos. | Demostración de la funcionalidad y ejecución de pruebas. |
 | **D4: Panel de Seguimiento de Vacunaciones** | Panel que destaca las vacunas y seguimientos próximos o vencidos mediante indicadores de estado. | Demostración de la funcionalidad y ejecución de pruebas. |
-| **D5: Integración de RBAC y Seguridad** | Implementación de permisos y vistas diferenciadas para los roles de Recepcionista, Veterinario y Administrador. | Verificación de seguridad y ejecución de pruebas. |
-| **D6: Casos de Prueba y Manual Operativo** | Suite de pruebas de QA documentada, protocolos operativos de privacidad de datos y guía para usuarios finales. | Revisión del documento y aprobación. |
-| **D7: Entrega y Despliegue Final** | Despliegue en el entorno de staging/hosting acordado y verificación de los flujos principales de usuario. | Firma del Documento de Aprobación Final. |
+| **D5: Integración de RBAC y Seguridad** | Implementación de permisos y vistas diferenciadas para los roles de Recepcionista, Veterinario, Administrador y Propietario. | Verificación de seguridad y ejecución de pruebas. |
+| **D6: Portal de Propietarios** | Portal autenticado para consulta de perfiles de mascotas, historial de visitas y estado de vacunaciones. | Demostración funcional y validación de acceso seguro. |
+| **D7: Casos de Prueba y Manual Operativo** | Suite de pruebas de QA documentada, protocolos operativos de privacidad de datos y guía para usuarios finales. | Revisión del documento y aprobación. |
+| **D8: Entrega y Despliegue Final** | Despliegue en el entorno de staging/hosting acordado y verificación de los flujos principales de usuario. | Firma del Documento de Aprobación Final. |
 
 ---
 
