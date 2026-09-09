@@ -1,0 +1,10 @@
+{
+  "name": "happy-paws-care-central",
+  "private": true,
+  "scripts": {
+    "install:all": "npm install --prefix back && npm install --prefix front",
+    "test": "npm test --prefix back && npm test --prefix front",
+    "dev:back": "npm run dev --prefix back",
+    "dev:front": "npm run dev --prefix front"
+  }
+}
