@@ -8,9 +8,11 @@ API Express para el seguimiento de vacunaciones. Expone `GET` y `POST` en `/api/
 SUPABASE_URL=https://cuaqjycqzyfjdpilklkl.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=<service-role-key-secreta>
 PORT=4000
+ALLOW_ANONYMOUS_READS=true
 ```
 
 La clave `SUPABASE_SERVICE_ROLE_KEY` nunca debe enviarse al frontend ni commitearse.
+Mientras se implementa el login, `ALLOW_ANONYMOUS_READS=true` permite consultar el dashboard de vacunaciones sin sesión. Solo aplica a `GET /api/v1/vaccinations`; los `POST` siguen requiriendo un token de Supabase. Cambia este valor a `false` o elimínalo cuando el login esté listo.
 
 ## Comandos
 

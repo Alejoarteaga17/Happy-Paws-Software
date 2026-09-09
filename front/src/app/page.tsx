@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { getVaccinations } from '../services/vaccination-service';
-import { getSupabaseClient } from '../services/supabase-client';
+import { getSupabaseClient, isSupabaseConfigured } from '../services/supabase-client';
 import { Vaccination, VaccinationStatus } from '../types/vaccination';
 
 const statusLabels: Record<VaccinationStatus, string> = {
@@ -44,11 +44,13 @@ export default function VaccinationDashboard() {
   useEffect(() => {
     const loadDashboard = async () => {
       try {
-        const [{ data: userData }, data] = await Promise.all([
-          getSupabaseClient().auth.getUser(),
-          getVaccinations()
-        ]);
-        setUserEmail(userData.user?.email ?? 'Usuario autenticado');
+        const data = await getVaccinations();
+        if (isSupabaseConfigured) {
+          const { data: userData } = await getSupabaseClient().auth.getUser();
+          setUserEmail(userData.user?.email ?? 'Modo sin login');
+        } else {
+          setUserEmail('Modo sin login');
+        }
         setVaccinations(data);
       } catch (error) {
         setErrorMessage(error instanceof Error ? error.message : 'No se pudieron cargar los datos');

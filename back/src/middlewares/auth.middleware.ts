@@ -18,3 +18,15 @@ export async function requireAuth(request: Request, response: Response, next: Ne
 
   next();
 }
+
+export async function allowAnonymousRead(request: Request, response: Response, next: NextFunction): Promise<void> {
+  const authorization = request.header('authorization');
+  const token = authorization?.startsWith('Bearer ') ? authorization.slice(7) : undefined;
+
+  if (!token && process.env.ALLOW_ANONYMOUS_READS === 'true') {
+    next();
+    return;
+  }
+
+  await requireAuth(request, response, next);
+}
