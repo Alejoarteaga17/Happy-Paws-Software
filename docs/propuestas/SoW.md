@@ -178,18 +178,24 @@ Aunque el MVP inicial se centra estrictamente en los flujos de trabajo internos 
 
 ### Requisitos
 
-AACCode completará las siguientes tareas y entregará los hitos asociados:
 
-| Entregable / Tarea | Descripción y Criterios de Finalización | Método de Aceptación |
-| :--- | :--- | :--- |
-| **D1: Requisitos y Diseño del Sistema** | Arquitectura funcional detallada, esquemas de base de datos y wireframes para las interfaces RBAC y portal de propietarios. | Aprobación escrita del Líder del Cliente. |
-| **D2: Gestión de Mascotas y Propietarios** | Módulo para crear, actualizar y buscar perfiles de clientes y mascotas mediante nombre, teléfono o placa de identificación. | Demostración de la funcionalidad y ejecución de pruebas. |
-| **D3: Registro de Citas y Notas** | Módulo estructurado para registrar motivos de las consultas, notas de los veterinarios y registros médicos. | Demostración de la funcionalidad y ejecución de pruebas. |
-| **D4: Panel de Seguimiento de Vacunaciones** | Panel que destaca las vacunas y seguimientos próximos o vencidos mediante indicadores de estado. | Demostración de la funcionalidad y ejecución de pruebas. |
-| **D5: Integración de RBAC y Seguridad** | Implementación de permisos y vistas diferenciadas para los roles de Recepcionista, Veterinario, Administrador y Propietario. | Verificación de seguridad y ejecución de pruebas. |
-| **D6: Portal de Propietarios** | Portal autenticado para consulta de perfiles de mascotas, historial de visitas y estado de vacunaciones. | Demostración funcional y validación de acceso seguro. |
-| **D7: Casos de Prueba y Manual Operativo** | Suite de pruebas de QA documentada, protocolos operativos de privacidad de datos y guía para usuarios finales. | Revisión del documento y aprobación. |
-| **D8: Entrega y Despliegue Final** | Despliegue en el entorno de staging/hosting acordado y verificación de los flujos principales de usuario. | Firma del Documento de Aprobación Final. |
+| ID | Requisito Funcional | Descripción |
+|----|--------------------|-------------|
+| **RF-01** | Gestión de Propietarios | El sistema deberá permitir registrar, consultar, actualizar y administrar la información de los propietarios de mascotas, incluyendo datos de contacto y la relación con las mascotas registradas en la clínica. |
+| **RF-02** | Gestión de Mascotas | El sistema deberá permitir crear, consultar, actualizar y administrar perfiles de mascotas, almacenando información relevante como nombre, especie, raza, fecha de nacimiento, sexo, peso e historial asociado. |
+| **RF-03** | Búsqueda de Propietarios y Mascotas | El sistema deberá proporcionar un mecanismo de búsqueda rápida que permita localizar propietarios y mascotas mediante diferentes criterios, como nombre, número de teléfono o identificador de la mascota. |
+| **RF-04** | Gestión de Citas Veterinarias | El sistema deberá permitir registrar, consultar, modificar y administrar citas veterinarias, asociándolas a una mascota y almacenando información como fecha, hora, motivo de consulta y estado de la cita. |
+| **RF-05** | Registro de Notas Clínicas | El sistema deberá permitir a los veterinarios registrar y consultar observaciones clínicas, diagnósticos, tratamientos y recomendaciones realizadas durante una consulta médica. |
+| **RF-06** | Gestión y Seguimiento de Vacunaciones | El sistema deberá registrar las vacunas aplicadas a cada mascota y realizar el seguimiento de próximas dosis, vacunas vigentes y vacunas vencidas para facilitar el control preventivo. |
+| **RF-07** | Control de Acceso Basado en Roles (RBAC) | El sistema deberá gestionar permisos y restricciones de acceso según el rol asignado a cada usuario, garantizando que únicamente pueda acceder a las funcionalidades correspondientes a sus responsabilidades. |
+| **RF-08** | Autenticación de Usuarios | El sistema deberá permitir que los usuarios se autentiquen mediante credenciales seguras para acceder a las funcionalidades autorizadas según su rol. |
+| **RF-09** | Portal de Propietarios | El sistema deberá proporcionar un portal web para propietarios de mascotas donde puedan acceder de forma segura a la información relacionada con sus animales registrados. |
+| **RF-10** | Consulta de Historial Clínico por Propietarios | El sistema deberá permitir que los propietarios visualicen la información clínica autorizada de sus mascotas, incluyendo consultas previas, tratamientos registrados y observaciones compartidas por la clínica. |
+| **RF-11** | Consulta de Estado de Vacunaciones por Propietarios | El sistema deberá permitir que los propietarios consulten el historial de vacunación de sus mascotas, incluyendo vacunas aplicadas, próximas dosis y estados de seguimiento. |
+| **RF-12** | Dashboard Principal del Sistema | El sistema deberá proporcionar paneles de visualización adaptados a cada rol, mostrando información relevante, accesos rápidos y resúmenes operativos según el tipo de usuario. |
+| **RF-13** | Auditoría Básica de Operaciones | El sistema deberá registrar eventos relevantes del sistema, como inicios de sesión, creación o actualización de registros y acciones críticas, con el fin de facilitar el seguimiento y control de actividades. |
+| **RF-14** | Gestión de Usuarios Internos | El sistema deberá permitir a los administradores crear, modificar, activar o desactivar cuentas de usuarios internos, así como asignarles roles y permisos correspondientes. |
+| **RF-15** | Gestión de Cuentas de Propietarios | El sistema deberá permitir la creación y administración de cuentas para propietarios de mascotas, garantizando que cada cuenta quede asociada únicamente a las mascotas correspondientes. |
 
 ---
 
