@@ -4,7 +4,7 @@ Plataforma interna para digitalizar la operación de Happy Paws Veterinary Clini
 
 ## Vacunaciones
 
-- `supabase/migrations/20260909000000_create_vaccinations.sql`: entidad `vaccinations`, estados, índices y RLS. Debe aplicarse después de las migraciones que creen `pets`, `owners` y `profiles`.
+- `supabase/migrations/20260909000000_create_happy_paws_schema.sql`: esquema inicial completo, relaciones, índices, datos base y políticas RLS.
 - `back/`: API Express con `GET` y `POST /api/v1/vaccinations`.
 - `front/`: dashboard Next.js con próximas dosis, vencimientos, métricas y filtros.
 

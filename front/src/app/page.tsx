@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { getVaccinations } from '../services/vaccination-service';
+import { getSupabaseClient } from '../services/supabase-client';
 import { Vaccination, VaccinationStatus } from '../types/vaccination';
 
 const statusLabels: Record<VaccinationStatus, string> = {
@@ -36,9 +37,27 @@ function VaccinationRow({ vaccination }: { vaccination: Vaccination }) {
 export default function VaccinationDashboard() {
   const [vaccinations, setVaccinations] = useState<Vaccination[]>([]);
   const [filter, setFilter] = useState<'ALL' | VaccinationStatus>('ALL');
+  const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState('Usuario autenticado');
 
   useEffect(() => {
-    getVaccinations().then(setVaccinations);
+    const loadDashboard = async () => {
+      try {
+        const [{ data: userData }, data] = await Promise.all([
+          getSupabaseClient().auth.getUser(),
+          getVaccinations()
+        ]);
+        setUserEmail(userData.user?.email ?? 'Usuario autenticado');
+        setVaccinations(data);
+      } catch (error) {
+        setErrorMessage(error instanceof Error ? error.message : 'No se pudieron cargar los datos');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void loadDashboard();
   }, []);
 
   const filtered = useMemo(() => filter === 'ALL' ? vaccinations : vaccinations.filter(({ status }) => status === filter), [filter, vaccinations]);
@@ -60,8 +79,11 @@ export default function VaccinationDashboard() {
       </aside>
 
       <section className="content" id="vacunaciones">
-        <header className="topbar"><div><span className="eyebrow">Miércoles, 9 de septiembre de 2026</span><h1>Panel de vacunaciones</h1></div><div className="user-chip"><span className="user-avatar">DR</span><span><strong>Dr. Ramírez</strong><small>Veterinario</small></span></div></header>
+        <header className="topbar"><div><span className="eyebrow">{new Intl.DateTimeFormat('es-CO', { dateStyle: 'full' }).format(new Date())}</span><h1>Panel de vacunaciones</h1></div><div className="user-chip"><span className="user-avatar">HP</span><span><strong>{userEmail}</strong><small>Sesión de Supabase</small></span></div></header>
         <section className="intro"><div><p className="eyebrow">Control preventivo</p><h2>Vacunas al día, pacientes protegidos.</h2><p>Revisa las próximas dosis y atiende los vencimientos de la clínica.</p></div><div className="intro-icon" aria-hidden="true">✚</div></section>
+
+        {loading && <p className="empty">Cargando datos desde Supabase...</p>}
+        {errorMessage && <p className="empty">{errorMessage}</p>}
 
         <div className="stats" aria-label="Resumen de vacunaciones">
           <article><span className="stat-label">Próximas dosis</span><strong>{vaccinations.filter(({ status }) => status === 'PENDING').length}</strong><small>requieren seguimiento</small></article>

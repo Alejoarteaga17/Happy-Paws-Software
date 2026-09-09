@@ -9,7 +9,7 @@ npm install
 npm run dev
 ```
 
-El dashboard usa datos de demostración si `NEXT_PUBLIC_API_URL` no está definida. Para conectarlo al backend y preparar el cliente Supabase:
+El dashboard consulta el backend, que a su vez consulta Supabase. Para conectarlo y autenticar las peticiones:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://cuaqjycqzyfjdpilklkl.supabase.co
