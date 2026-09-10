@@ -15,8 +15,9 @@ export const listVaccinations = async (_request: Request, response: Response): P
 };
 
 export const createVaccination = async (request: Request, response: Response): Promise<void> => {
-  const { petId, vaccineName, administeredAt, nextDueDate } = request.body as Record<string, unknown>;
-  if (typeof petId !== 'number' || typeof vaccineName !== 'string' || typeof administeredAt !== 'string' || typeof nextDueDate !== 'string') {
+  const { petId: rawPetId, vaccineName, administeredAt, nextDueDate } = request.body as Record<string, unknown>;
+  const petId = typeof rawPetId === 'number' ? rawPetId : NaN;
+  if (!Number.isInteger(petId) || petId < 1 || typeof vaccineName !== 'string' || !vaccineName.trim() || typeof administeredAt !== 'string' || typeof nextDueDate !== 'string' || !administeredAt || !nextDueDate) {
     response.status(400).json({ success: false, data: null, error: { code: 'INVALID_VACCINATION', message: 'Datos de vacunación inválidos' } });
     return;
   }
@@ -25,10 +26,19 @@ export const createVaccination = async (request: Request, response: Response): P
     const data = await VaccinationService.create({ petId, vaccineName, administeredAt, nextDueDate });
     response.status(201).json({ success: true, data, error: null });
   } catch (error) {
-    response.status(500).json({
+    const errorCode = error instanceof Error ? error.message : 'VACCINATION_CREATE_FAILED';
+    const knownErrors: Record<string, { status: number; message: string }> = {
+      PET_NOT_FOUND: { status: 404, message: 'La mascota indicada no existe. Verifica el ID antes de guardar la vacunación.' },
+      PET_LOOKUP_FAILED: { status: 500, message: 'No se pudo comprobar la mascota. Intenta nuevamente.' },
+      VACCINATION_CREATE_FAILED: { status: 500, message: 'No se pudo registrar la vacunación. Intenta nuevamente.' }
+    };
+    const mappedError = knownErrors[errorCode] ?? knownErrors.VACCINATION_CREATE_FAILED;
+    const responseCode = knownErrors[errorCode] ? errorCode : 'VACCINATION_CREATE_FAILED';
+
+    response.status(mappedError.status).json({
       success: false,
       data: null,
-      error: { code: 'VACCINATION_CREATE_FAILED', message: error instanceof Error ? error.message : 'Error interno' }
+      error: { code: responseCode, message: mappedError.message }
     });
   }
 };

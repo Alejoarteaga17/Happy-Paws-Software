@@ -8,6 +8,22 @@ export interface CreateVaccinationInput {
   nextDueDate: string;
 }
 
+interface ApiError {
+  code?: string;
+  message?: string;
+}
+
+const getApiErrorMessage = (error: ApiError | null, fallback: string): string => {
+  switch (error?.code) {
+    case 'PET_NOT_FOUND':
+      return 'La mascota indicada no existe. Verifica el ID antes de guardar la vacunación.';
+    case 'INVALID_VACCINATION':
+      return 'Completa los datos de la vacunación con valores válidos.';
+    default:
+      return error?.message ?? fallback;
+  }
+};
+
 export async function getVaccinations(): Promise<Vaccination[]> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   if (!apiUrl) throw new Error('NEXT_PUBLIC_API_URL is required');
@@ -28,11 +44,11 @@ export async function getVaccinations(): Promise<Vaccination[]> {
   const payload = (await response.json()) as {
     success: boolean;
     data: Vaccination[] | null;
-    error: { message?: string } | null;
+    error: ApiError | null;
   };
 
   if (!response.ok || !payload.success || !payload.data) {
-    throw new Error(payload.error?.message ?? 'No se pudieron cargar las vacunaciones');
+    throw new Error(getApiErrorMessage(payload.error, 'No se pudieron cargar las vacunaciones'));
   }
 
   return payload.data;
@@ -60,11 +76,11 @@ export async function createVaccination(input: CreateVaccinationInput): Promise<
   const payload = (await response.json()) as {
     success: boolean;
     data: Vaccination | null;
-    error: { message?: string } | null;
+    error: ApiError | null;
   };
 
   if (!response.ok || !payload.success || !payload.data) {
-    throw new Error(payload.error?.message ?? 'No se pudo registrar la vacunación');
+    throw new Error(getApiErrorMessage(payload.error, 'No se pudo registrar la vacunación'));
   }
 
   return payload.data;

@@ -6,8 +6,17 @@ const statuses: AppointmentStatus[] = ['SCHEDULED', 'COMPLETED', 'CANCELLED'];
 
 const sendError = (response: Response, error: unknown, fallbackCode: string): void => {
   const message = error instanceof Error ? error.message : 'Error interno';
-  const notFound = message === 'APPOINTMENT_NOT_FOUND';
-  response.status(notFound ? 404 : 500).json({ success: false, data: null, error: { code: notFound ? 'APPOINTMENT_NOT_FOUND' : fallbackCode, message: notFound ? 'La cita no existe' : message } });
+  const errors: Record<string, { status: number; message: string }> = {
+    APPOINTMENT_NOT_FOUND: { status: 404, message: 'La cita no existe.' },
+    VET_NOT_FOUND: { status: 400, message: 'No hay un veterinario disponible. Configura un perfil con rol VET en Supabase.' },
+    VET_LOOKUP_FAILED: { status: 500, message: 'No se pudo comprobar la disponibilidad de veterinarios. Intenta nuevamente.' }
+  };
+  const mappedError = errors[message];
+  response.status(mappedError?.status ?? 500).json({
+    success: false,
+    data: null,
+    error: { code: mappedError ? message : fallbackCode, message: mappedError?.message ?? 'No se pudo completar la operación. Intenta nuevamente.' }
+  });
 };
 
 export const listAppointments = async (_request: Request, response: Response): Promise<void> => {

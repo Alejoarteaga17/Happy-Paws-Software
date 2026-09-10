@@ -36,7 +36,22 @@ export class VaccinationService {
   }
 
   static async create(input: CreateVaccinationInput): Promise<Vaccination> {
-    const { data, error } = await getSupabaseClient()
+    const supabase = getSupabaseClient();
+    const { data: pet, error: petLookupError } = await supabase
+      .from('pets')
+      .select('id')
+      .eq('id', input.petId)
+      .maybeSingle();
+
+    if (petLookupError) {
+      throw new Error('PET_LOOKUP_FAILED');
+    }
+
+    if (!pet) {
+      throw new Error('PET_NOT_FOUND');
+    }
+
+    const { data, error } = await supabase
       .from('vaccinations')
       .insert({
         pet_id: input.petId,
@@ -49,7 +64,11 @@ export class VaccinationService {
       .single();
 
     if (error || !data) {
-      throw new Error(`VACCINATION_CREATE_FAILED: ${error?.message ?? 'empty response'}`);
+      if (error?.code === '23503') {
+        throw new Error('PET_NOT_FOUND');
+      }
+
+      throw new Error('VACCINATION_CREATE_FAILED');
     }
 
     return toVaccination(data as VaccinationRow);

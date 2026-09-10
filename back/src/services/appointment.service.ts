@@ -49,13 +49,40 @@ export class AppointmentService {
   }
 
   static async create(input: CreateAppointmentInput): Promise<Appointment> {
-    const { data, error } = await getSupabaseClient()
+    const supabase = getSupabaseClient();
+    let vetId = input.vetId;
+
+    if (!vetId) {
+      const { data: vet, error: vetLookupError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('role', 'VET')
+        .order('created_at', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+
+      if (vetLookupError) throw new Error('VET_LOOKUP_FAILED');
+      if (!vet) throw new Error('VET_NOT_FOUND');
+      vetId = vet.id as string;
+    }
+
+    const { data, error } = await supabase
       .from('appointments')
-      .insert({ pet_id: input.petId, vet_id: input.vetId ?? null, scheduled_at: input.scheduledAt, reason: input.reason, status: 'SCHEDULED' })
+      .insert({ pet_id: input.petId, vet_id: vetId, scheduled_at: input.scheduledAt, reason: input.reason, status: 'SCHEDULED' })
       .select(appointmentSelect)
       .single();
 
-    if (error || !data) throw new Error(`APPOINTMENT_CREATE_FAILED: ${error?.message ?? 'empty response'}`);
+    if (error || !data) {
+      if (error?.code === '23503' && error.message.includes('vet_id')) {
+        throw new Error('VET_NOT_FOUND');
+      }
+
+      if (error?.code === '23502' && error.message.includes('vet_id')) {
+        throw new Error('VET_NOT_FOUND');
+      }
+
+      throw new Error('APPOINTMENT_CREATE_FAILED');
+    }
     return toAppointment(data as AppointmentRow);
   }
 

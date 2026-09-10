@@ -34,3 +34,64 @@ nav { display: grid; gap: 8px; margin-top: 74px; } nav a { padding: 12px 14px; b
 .list-title { padding-bottom: 18px; border-bottom: 1px solid var(--line); }.list-title h2 { margin-bottom: 0; }.list-title > span { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: #eaf0eb; color: var(--green); font-size: 12px; }.appointment-item { display: flex; justify-content: space-between; gap: 18px; padding: 19px 0; border-bottom: 1px solid #edf0ee; }.appointment-item:last-child { border-bottom: 0; }.appointment-item strong, .appointment-item span { display: block; }.appointment-item strong { font: 17px Georgia, serif; }.appointment-item span { margin-top: 5px; color: var(--muted); font-size: 12px; }.appointment-actions { min-width: 110px; text-align: right; }.appointment-actions .status { display: inline-block; }.text-button { display: inline-block; margin: 12px 0 0 11px; padding: 0; border: 0; background: transparent; cursor: pointer; }.danger-button { color: var(--red); }.notice { padding: 10px 12px; margin: 16px 0 0; border-radius: 8px; background: #eaf0eb; color: var(--green); font-size: 12px; }
 @media (max-width: 760px) { .appointment-shell { padding: 30px 16px 50px; }.appointment-header { display: block; }.back-link { display: inline-block; margin-top: 14px; }.appointment-layout { grid-template-columns: 1fr; }.appointment-form, .appointment-list { padding: 21px; }.appointment-item { display: block; }.appointment-actions { margin-top: 13px; text-align: left; }.text-button { margin-left: 0; margin-right: 13px; } }
 @media (max-width: 620px) { .login-panel { padding: 28px 22px; }.login-brand { margin-bottom: 45px; } }
+
+/* Visual language from the Happy Paws dashboard reference. */
+:root { --ink: #2a2e35; --muted: #6b7280; --line: #e5e8ec; --paper: #ffffff; --primary: #7c90b0; --primary-deep: #697d9c; --background: #f4f6f9; --rose: #fbe4e1; --red: #b0463f; --gold: #a9770f; --blue-soft: #e9eef5; }
+body { color: var(--ink); background: var(--background); font-family: "Avenir Next", "Segoe UI", sans-serif; }
+.shell { background: var(--background); }
+.sidebar { width: 246px; padding: 31px 20px; background: var(--primary); color: #fff; box-shadow: 8px 0 28px rgba(42, 46, 53, .06); }
+.brand { font-family: Georgia, serif; }
+.brand small, .user-chip small { color: #e2e8f0; font-family: "Avenir Next", "Segoe UI", sans-serif; }
+.brand-mark, .user-avatar { border-radius: 50%; background: #fff; color: var(--primary-deep); }
+nav { margin-top: 62px; }
+nav a { color: #edf1f7; border-radius: 12px; }
+nav a.active, nav a:hover { background: rgba(255, 255, 255, .18); color: #fff; }
+.sidebar-note { border-color: rgba(255, 255, 255, .28); color: #e2e8f0; }
+.sidebar-note strong { color: #fff; }
+.content { width: min(1280px, 100%); padding: 42px clamp(28px, 5vw, 76px) 72px; }
+.topbar { align-items: center; padding-bottom: 26px; border-bottom: 1px solid var(--line); }
+.eyebrow { color: var(--primary-deep); }
+h1, h2, h3, .vaccination-copy strong, .appointment-item strong { font-family: Georgia, serif; color: var(--ink); }
+h1 { font-size: 38px; }
+.user-chip small { color: var(--muted); }
+.intro { margin-top: 30px; padding: 31px 35px; border: 1px solid #dce4ef; border-radius: 20px; background: #e9eef5; }
+.intro p:last-child { color: #66748a; }
+.intro-icon { background: #fff; color: var(--primary-deep); }
+.intro-icon:hover { color: #fff; background: var(--primary); }
+.stats { gap: 18px; margin: 22px 0 46px; }
+.stats article, .list-panel, .appointment-form, .appointment-list { border: 0; border-radius: 18px; background: var(--paper); box-shadow: 0 8px 24px rgba(42, 46, 53, .045); }
+.stats article { padding: 22px 24px; }
+.stats article.stat-alert { border: 0; background: #fff; }
+.stats strong { color: var(--ink); }
+.stat-alert strong { color: var(--red); }
+.filters { border-color: var(--line); border-radius: 12px; }
+.filter.active { background: var(--blue-soft); color: var(--primary-deep); }
+.list-panel { padding: 24px; }
+.overdue-panel { border-top: 3px solid #e7aaa2; }
+.list-title { border-color: var(--line); }
+.list-title span { background: var(--blue-soft); color: var(--primary-deep); }
+.overdue-panel .list-title span { background: var(--rose); color: var(--red); }
+.vaccination-row, .appointment-item { border-color: #edf0f4; }
+.pet-avatar { background: var(--blue-soft); color: var(--primary-deep); }
+.status-pending { background: #fbefd6; color: var(--gold); }
+.status-overdue { background: var(--rose); color: var(--red); }
+.status-administered, .notice { background: #e7e9ed; color: #4b4f58; }
+.modal-backdrop { background: rgba(42, 46, 53, .42); }
+.vaccination-modal, .login-panel { border: 0; border-radius: 20px; background: var(--paper); }
+.close-button { background: var(--blue-soft); color: var(--primary-deep); }
+.form-field input, .appointment-form input, .appointment-form textarea { border-color: #dce1e8; background: #fff; font-family: "Avenir Next", "Segoe UI", sans-serif; }
+.primary-button { border-radius: 999px; background: var(--primary); }
+.primary-button:hover { background: var(--primary-deep); }
+.secondary-button { border-radius: 999px; background: var(--blue-soft); color: var(--primary-deep); }
+.back-link { border: 0; border-radius: 999px; background: var(--blue-soft); color: var(--primary-deep); }
+.text-button, .back-link { color: var(--primary-deep); }
+.appointment-shell { padding: 42px clamp(28px, 7vw, 96px) 80px; background: var(--background); }
+.appointment-header { max-width: 1180px; margin-bottom: 30px; }
+.appointment-layout { gap: 24px; }
+.appointment-form, .appointment-list { padding: 29px; }
+.login-shell { background: radial-gradient(circle at 15% 15%, #e7edf5 0, transparent 34%), var(--background); }
+.login-brand { color: var(--ink); }
+.login-button { border-radius: 999px; }
+.logout-button { color: #b0463f; }
+@media (max-width: 850px) { .sidebar { width: 205px; } .content { padding-inline: 25px; } }
+@media (max-width: 620px) { .sidebar { background: var(--primary); } .content { padding: 25px 16px 45px; } .topbar { border-bottom: 0; } .intro { border-radius: 16px; } .stats { grid-template-columns: 1fr; } .stats article { padding: 18px 20px; } .appointment-shell { padding: 28px 16px 50px; } }

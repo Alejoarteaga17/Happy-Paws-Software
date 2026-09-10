@@ -17,8 +17,13 @@ const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
   const normalizedApiUrl = apiUrl.trim().replace(/\/$/, '');
   if (!URL.canParse(normalizedApiUrl)) throw new Error('NEXT_PUBLIC_API_URL no es una URL válida');
   const response = await fetch(`${normalizedApiUrl}/api/v1/appointments${path}`, { cache: 'no-store', ...init, headers: { ...(await getHeaders()), ...init?.headers } });
-  const payload = (await response.json()) as { success: boolean; data: T | null; error: { message?: string } | null };
-  if (!response.ok || !payload.success || payload.data === null) throw new Error(payload.error?.message ?? 'No se pudo completar la operación');
+  const payload = (await response.json()) as { success: boolean; data: T | null; error: { code?: string; message?: string } | null };
+  if (!response.ok || !payload.success || payload.data === null) {
+    const message = payload.error?.code === 'VET_NOT_FOUND'
+      ? 'No hay un veterinario disponible para asignar la cita. Configura un perfil VET en Supabase.'
+      : payload.error?.message ?? 'No se pudo completar la operación';
+    throw new Error(message);
+  }
   return payload.data;
 };
 
