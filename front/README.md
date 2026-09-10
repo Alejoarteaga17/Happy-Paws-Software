@@ -19,6 +19,16 @@ NEXT_PUBLIC_API_URL=http://localhost:4000
 
 Estas variables son públicas por diseño. Nunca coloques aquí `SUPABASE_SERVICE_ROLE_KEY`.
 
+La ruta `/login` usa el inicio de sesión de Supabase con correo y contraseña. Crea el usuario desde **Authentication > Users** y asígnale el rol `VET` en `public.profiles` para permitir el registro de vacunas:
+
+```sql
+update public.profiles
+set role = 'VET'
+where email = 'vet@happypaws.com';
+```
+
+El token de la sesión se envía automáticamente al backend en la cabecera `Authorization: Bearer ...`.
+
 La pantalla de citas consume el backend mediante JSON en `/api/v1/appointments` y envía el token de sesión en la cabecera `Authorization`.
 
 ## Pruebas

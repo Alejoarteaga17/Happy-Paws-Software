@@ -38,6 +38,7 @@ export default function VaccinationDashboard() {
   const [vaccinations, setVaccinations] = useState<Vaccination[]>([]);
   const [filter, setFilter] = useState<'ALL' | VaccinationStatus>('ALL');
   const [loading, setLoading] = useState(true);
+  const [authLoading, setAuthLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState('Usuario autenticado');
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -48,23 +49,35 @@ export default function VaccinationDashboard() {
   useEffect(() => {
     const loadDashboard = async () => {
       try {
-        const data = await getVaccinations();
-        if (isSupabaseConfigured) {
-          const { data: userData } = await getSupabaseClient().auth.getUser();
-          setUserEmail(userData.user?.email ?? 'Modo sin login');
-        } else {
-          setUserEmail('Modo sin login');
+        if (!isSupabaseConfigured) {
+          throw new Error('Configura Supabase para iniciar sesión y consultar las vacunaciones');
         }
+
+        const { data: userData } = await getSupabaseClient().auth.getUser();
+        if (!userData.user) {
+          window.location.href = '/login';
+          return;
+        }
+
+        setUserEmail(userData.user.email ?? 'Usuario autenticado');
+        setAuthLoading(false);
+        const data = await getVaccinations();
         setVaccinations(data);
       } catch (error) {
         setErrorMessage(error instanceof Error ? error.message : 'No se pudieron cargar los datos');
       } finally {
         setLoading(false);
+        setAuthLoading(false);
       }
     };
 
     void loadDashboard();
   }, []);
+
+  const signOut = async () => {
+    await getSupabaseClient().auth.signOut();
+    window.location.href = '/login';
+  };
 
   const filtered = useMemo(() => filter === 'ALL' ? vaccinations : vaccinations.filter(({ status }) => status === filter), [filter, vaccinations]);
   const upcoming = filtered.filter(({ status }) => status === 'PENDING');
@@ -116,10 +129,10 @@ export default function VaccinationDashboard() {
       </aside>
 
       <section className="content" id="vacunaciones">
-        <header className="topbar"><div><span className="eyebrow">{new Intl.DateTimeFormat('es-CO', { dateStyle: 'full' }).format(new Date())}</span><h1>Panel de vacunaciones</h1></div><div className="user-chip"><span className="user-avatar">HP</span><span><strong>{userEmail}</strong><small>Sesión de Supabase</small></span></div></header>
+        <header className="topbar"><div><span className="eyebrow">{new Intl.DateTimeFormat('es-CO', { dateStyle: 'full' }).format(new Date())}</span><h1>Panel de vacunaciones</h1></div><div className="user-chip"><span className="user-avatar">HP</span><span><strong>{userEmail}</strong><small>Sesión de Supabase</small></span><button className="text-button logout-button" type="button" onClick={() => void signOut()}>Salir</button></div></header>
         <section className="intro"><div><p className="eyebrow">Control preventivo</p><h2>Vacunas al día, pacientes protegidos.</h2><p>Revisa las próximas dosis y atiende los vencimientos de la clínica.</p></div><button className="intro-icon" type="button" aria-label="Registrar vacunación" title="Registrar vacunación" onClick={openForm}>✚</button></section>
 
-        {loading && <p className="empty">Cargando datos desde Supabase...</p>}
+        {(loading || authLoading) && <p className="empty">Cargando datos desde Supabase...</p>}
         {errorMessage && <p className="empty">{errorMessage}</p>}
 
         <div className="stats" aria-label="Resumen de vacunaciones">
