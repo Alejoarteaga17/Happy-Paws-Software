@@ -14,7 +14,9 @@ const getHeaders = async (): Promise<HeadersInit> => {
 const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   if (!apiUrl) throw new Error('NEXT_PUBLIC_API_URL is required');
-  const response = await fetch(`${apiUrl}/api/v1/appointments${path}`, { cache: 'no-store', ...init, headers: { ...(await getHeaders()), ...init?.headers } });
+  const normalizedApiUrl = apiUrl.trim().replace(/\/$/, '');
+  if (!URL.canParse(normalizedApiUrl)) throw new Error('NEXT_PUBLIC_API_URL no es una URL válida');
+  const response = await fetch(`${normalizedApiUrl}/api/v1/appointments${path}`, { cache: 'no-store', ...init, headers: { ...(await getHeaders()), ...init?.headers } });
   const payload = (await response.json()) as { success: boolean; data: T | null; error: { message?: string } | null };
   if (!response.ok || !payload.success || payload.data === null) throw new Error(payload.error?.message ?? 'No se pudo completar la operación');
   return payload.data;
