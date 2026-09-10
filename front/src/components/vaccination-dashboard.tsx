@@ -58,8 +58,14 @@ export default function VaccinationDashboard() {
   const saveVaccination = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault(); setFormError(null); setIsSaving(true);
     try {
-      await createVaccination({ petId: Number(form.petId), vaccineName: form.vaccineName.trim(), administeredAt: form.administeredAt, nextDueDate: form.nextDueDate, status: form.status });
-      setVaccinations(await getVaccinations()); setForm(emptyVaccinationForm); setIsFormOpen(false);
+      const createdVaccination = await createVaccination({ petId: Number(form.petId), vaccineName: form.vaccineName.trim(), administeredAt: form.administeredAt, nextDueDate: form.nextDueDate, status: form.status });
+      const refreshedVaccinations = await getVaccinations();
+      setVaccinations(refreshedVaccinations);
+      setFilter('ALL');
+      if (createdVaccination.status !== form.status) {
+        throw new Error(`El backend guardó la vacuna como ${statusLabels[createdVaccination.status]} en lugar de ${statusLabels[form.status]}.`);
+      }
+      setForm(emptyVaccinationForm); setIsFormOpen(false);
     } catch (error) { setFormError(error instanceof Error ? error.message : 'No se pudo guardar la vacuna'); }
     finally { setIsSaving(false); }
   };

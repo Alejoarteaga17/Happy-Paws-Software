@@ -60,7 +60,7 @@ export class VaccinationService {
         vaccine_name: input.vaccineName,
         administered_at: input.administeredAt,
         next_due_date: input.nextDueDate,
-        status: input.status ?? getVaccinationStatus(input.administeredAt, input.nextDueDate)
+        status: input.status
       })
       .select('id, pet_id, vaccine_name, administered_at, next_due_date, status, pets(name)')
       .single();
