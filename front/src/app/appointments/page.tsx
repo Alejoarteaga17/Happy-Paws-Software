@@ -5,6 +5,7 @@ import { cancelAppointment, createAppointment, getAppointments, updateAppointmen
 import { getPets } from '../../services/pet-service';
 import { Appointment, AppointmentInput, AppointmentStatus } from '../../types/appointment';
 import { Pet } from '../../types/pet';
+import AppHeader from '../../components/app-header';
 
 const labels: Record<AppointmentStatus, string> = { SCHEDULED: 'Agendada', COMPLETED: 'Completada', CANCELLED: 'Cancelada' };
 const emptyForm: AppointmentInput = { petId: 0, scheduledAt: '', reason: '', status: 'SCHEDULED' };
@@ -50,7 +51,7 @@ export default function AppointmentsPage() {
     catch (error) { setMessage(error instanceof Error ? error.message : 'No se pudo cancelar la cita'); }
   };
 
-  return <main className="appointment-shell">
+  return <main className="appointment-shell"><AppHeader />
     <header className="appointment-header"><div><p className="eyebrow">RF-04 · Agenda clínica</p><h1>Gestión de citas</h1><p>Organiza la atención veterinaria y conserva el historial de cada visita.</p></div><a className="back-link" href="/">Ver vacunaciones</a></header>
     <section className="appointment-layout">
       <form className="appointment-form" onSubmit={submit}><p className="eyebrow">{editingId === null ? 'Nueva cita' : `Editando cita #${editingId}`}</p><h2>{editingId === null ? 'Agendar atención' : 'Modificar cita'}</h2>

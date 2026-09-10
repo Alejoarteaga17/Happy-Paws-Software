@@ -6,6 +6,7 @@ import { getPets } from '../services/pet-service';
 import { getSupabaseClient, isSupabaseConfigured } from '../services/supabase-client';
 import { Vaccination, VaccinationStatus } from '../types/vaccination';
 import { Pet } from '../types/pet';
+import AppHeader from '../components/app-header';
 
 const statusLabels: Record<VaccinationStatus, string> = {
   ADMINISTERED: 'Aplicada',
@@ -122,18 +123,7 @@ export default function VaccinationDashboard() {
 
   return (
     <main className="shell">
-      <aside className="sidebar">
-        <div className="brand"><span className="brand-mark">HP</span><span>Happy Paws<small>Care Central</small></span></div>
-        <nav aria-label="Navegación principal">
-          <a href="#resumen">Resumen</a>
-          <a href="/pets">Pacientes</a>
-          <a href="#agenda">Agenda</a>
-          <a href="/appointments">Gestionar citas</a>
-          <a className="active" href="#vacunaciones">Vacunaciones</a>
-        </nav>
-        <div className="sidebar-note"><span>Seguimiento preventivo</span><strong>Cuida hoy lo que importa mañana.</strong></div>
-      </aside>
-
+      <AppHeader />
       <section className="content" id="vacunaciones">
         <header className="topbar"><div><span className="eyebrow">{new Intl.DateTimeFormat('es-CO', { dateStyle: 'full' }).format(new Date())}</span><h1>Panel de vacunaciones</h1></div><div className="user-chip"><span className="user-avatar">HP</span><span><strong>{userEmail}</strong><small>Sesión de Supabase</small></span><button className="text-button logout-button" type="button" onClick={() => void signOut()}>Salir</button></div></header>
         <section className="intro"><div><p className="eyebrow">Control preventivo</p><h2>Vacunas al día, pacientes protegidos.</h2><p>Revisa las próximas dosis y atiende los vencimientos de la clínica.</p></div><button className="intro-icon" type="button" aria-label="Registrar vacunación" title="Registrar vacunación" onClick={openForm}>✚</button></section>

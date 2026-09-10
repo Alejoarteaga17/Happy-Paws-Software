@@ -5,6 +5,7 @@ import { getOwners } from '../../services/owner-service';
 import { createPet, getPets } from '../../services/pet-service';
 import { Owner } from '../../types/owner';
 import { Pet } from '../../types/pet';
+import AppHeader from '../../components/app-header';
 
 const emptyForm = { ownerId: '', petTag: '', name: '', species: '', breed: '', birthDate: '', weight: '' };
 
@@ -36,7 +37,7 @@ export default function PetsPage() {
     finally { setSaving(false); }
   };
 
-  return <main className="appointment-shell">
+  return <main className="appointment-shell"><AppHeader />
     <header className="appointment-header"><div><p className="eyebrow">RF-01 · Pacientes</p><h1>Registro de mascotas</h1><p>Vincula cada paciente con su propietario para mantener su historia clínica organizada.</p></div><a className="back-link" href="/">Volver al panel</a></header>
     <section className="appointment-layout">
       <form className="appointment-form" onSubmit={submit}><p className="eyebrow">Nueva mascota</p><h2>Registrar paciente</h2>
