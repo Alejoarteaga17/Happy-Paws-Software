@@ -1,6 +1,6 @@
 # Happy Paws Frontend
 
-Aplicación Next.js para el panel operativo de la clínica. La ruta principal muestra el dashboard de vacunaciones, con indicadores para dosis próximas y vencidas.
+Aplicación Next.js para el panel operativo de la clínica. La ruta principal muestra el dashboard de vacunaciones, con indicadores para dosis próximas y vencidas. La ruta `/appointments` permite consultar, crear, modificar y cancelar citas veterinarias.
 
 ## Desarrollo
 
@@ -18,6 +18,8 @@ NEXT_PUBLIC_API_URL=http://localhost:4000
 ```
 
 Estas variables son públicas por diseño. Nunca coloques aquí `SUPABASE_SERVICE_ROLE_KEY`.
+
+La pantalla de citas consume el backend mediante JSON en `/api/v1/appointments` y envía el token de sesión en la cabecera `Authorization`.
 
 ## Pruebas
 

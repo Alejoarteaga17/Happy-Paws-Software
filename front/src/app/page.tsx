@@ -75,6 +75,7 @@ export default function VaccinationDashboard() {
           <a href="#resumen">Resumen</a>
           <a href="#pacientes">Pacientes</a>
           <a href="#agenda">Agenda</a>
+          <a href="/appointments">Gestionar citas</a>
           <a className="active" href="#vacunaciones">Vacunaciones</a>
         </nav>
         <div className="sidebar-note"><span>Seguimiento preventivo</span><strong>Cuida hoy lo que importa mañana.</strong></div>

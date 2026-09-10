@@ -1,6 +1,18 @@
 # Happy Paws Backend
 
-API Express para el seguimiento de vacunaciones. Expone `GET` y `POST` en `/api/v1/vaccinations` y usa Supabase como fuente de datos.
+API Express para la operación clínica. Expone vacunaciones en `/api/v1/vaccinations` y gestión de citas en `/api/v1/appointments`, usando Supabase como fuente de datos.
+
+## Citas veterinarias
+
+Todas las rutas requieren `Authorization: Bearer <supabase-access-token>`:
+
+- `GET /api/v1/appointments`: consulta la agenda ordenada por fecha.
+- `GET /api/v1/appointments/:id`: consulta una cita.
+- `POST /api/v1/appointments`: crea una cita con `petId`, `scheduledAt` y `reason`.
+- `PUT /api/v1/appointments/:id`: modifica mascota, fecha/hora, motivo, veterinario o estado.
+- `PATCH /api/v1/appointments/:id/cancel`: cambia el estado a `CANCELLED`.
+
+Las respuestas usan `{ success, data, error }`. La tabla `appointments` y sus políticas RLS están definidas en la migración de Supabase existente.
 
 ## Variables de entorno
 
