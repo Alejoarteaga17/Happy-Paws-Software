@@ -15,4 +15,5 @@ export interface CreateVaccinationInput {
   vaccineName: string;
   administeredAt: string;
   nextDueDate: string;
+  status?: VaccinationStatus;
 }

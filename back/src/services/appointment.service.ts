@@ -68,7 +68,7 @@ export class AppointmentService {
 
     const { data, error } = await supabase
       .from('appointments')
-      .insert({ pet_id: input.petId, vet_id: vetId, scheduled_at: input.scheduledAt, reason: input.reason, status: 'SCHEDULED' })
+      .insert({ pet_id: input.petId, vet_id: vetId, scheduled_at: input.scheduledAt, reason: input.reason, status: input.status ?? 'SCHEDULED' })
       .select(appointmentSelect)
       .single();
 

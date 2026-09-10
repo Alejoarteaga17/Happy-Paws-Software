@@ -7,8 +7,9 @@ import { Appointment, AppointmentInput, AppointmentStatus } from '../../types/ap
 import { Pet } from '../../types/pet';
 
 const labels: Record<AppointmentStatus, string> = { SCHEDULED: 'Agendada', COMPLETED: 'Completada', CANCELLED: 'Cancelada' };
-const emptyForm: AppointmentInput = { petId: 0, scheduledAt: '', reason: '' };
+const emptyForm: AppointmentInput = { petId: 0, scheduledAt: '', reason: '', status: 'SCHEDULED' };
 const formatDate = (value: string) => new Intl.DateTimeFormat('es-CO', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
+const temporalLabel = (appointment: Appointment): string => appointment.status === 'SCHEDULED' && new Date(appointment.scheduledAt) < new Date() ? 'Ya pasó' : appointment.status === 'SCHEDULED' ? 'Pendiente' : labels[appointment.status];
 
 export default function AppointmentsPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -40,7 +41,7 @@ export default function AppointmentsPage() {
   };
 
   const edit = (appointment: Appointment) => {
-    setEditingId(appointment.id); setForm({ petId: appointment.petId, scheduledAt: appointment.scheduledAt.slice(0, 16), reason: appointment.reason });
+    setEditingId(appointment.id); setForm({ petId: appointment.petId, scheduledAt: appointment.scheduledAt.slice(0, 16), reason: appointment.reason, status: appointment.status });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -55,10 +56,11 @@ export default function AppointmentsPage() {
       <form className="appointment-form" onSubmit={submit}><p className="eyebrow">{editingId === null ? 'Nueva cita' : `Editando cita #${editingId}`}</p><h2>{editingId === null ? 'Agendar atención' : 'Modificar cita'}</h2>
         <label>Mascota asociada<select required value={form.petId || ''} onChange={(event) => setForm({ ...form, petId: Number(event.target.value) })}><option value="">Selecciona una mascota</option>{pets.map((pet) => <option key={pet.id} value={pet.id}>{pet.name} · {pet.species} · {pet.petTag}</option>)}</select></label>
         <label>Fecha y hora<input type="datetime-local" required value={form.scheduledAt} onChange={(event) => setForm({ ...form, scheduledAt: event.target.value })} /></label>
+        <label>Estado<select required value={form.status} onChange={(event) => setForm({ ...form, status: event.target.value as AppointmentStatus })}><option value="SCHEDULED">Agendada / pendiente</option><option value="COMPLETED">Completada</option><option value="CANCELLED">Cancelada</option></select></label>
         <label>Motivo de consulta<textarea required rows={4} value={form.reason} onChange={(event) => setForm({ ...form, reason: event.target.value })} placeholder="Describe el motivo de la visita" /></label>
         <div className="form-actions"><button className="primary-button" disabled={saving}>{saving ? 'Guardando...' : editingId === null ? 'Crear cita' : 'Guardar cambios'}</button>{editingId !== null && <button type="button" className="secondary-button" onClick={() => { setEditingId(null); setForm(emptyForm); }}>Cancelar edición</button>}</div>
       </form>
-      <section className="appointment-list"><div className="list-title"><div><p className="eyebrow">Agenda</p><h2>Citas registradas</h2></div><span>{appointments.length}</span></div>{message && <p className="notice">{message}</p>}{loading ? <p className="empty">Cargando citas...</p> : appointments.length === 0 ? <p className="empty">No hay citas registradas.</p> : <ul>{appointments.map((appointment) => <li className="appointment-item" key={appointment.id}><div><strong>{appointment.petName}</strong><span>{formatDate(appointment.scheduledAt)}</span><span>{appointment.reason}</span></div><div className="appointment-actions"><span className={`status status-${appointment.status.toLowerCase()}`}>{labels[appointment.status]}</span>{appointment.status !== 'CANCELLED' && <><button className="text-button" onClick={() => edit(appointment)}>Modificar</button><button className="text-button danger-button" onClick={() => void cancel(appointment.id)}>Cancelar</button></>}</div></li>)}</ul>}</section>
+      <section className="appointment-list"><div className="list-title"><div><p className="eyebrow">Agenda</p><h2>Citas registradas</h2></div><span>{appointments.length}</span></div>{message && <p className="notice">{message}</p>}{loading ? <p className="empty">Cargando citas...</p> : appointments.length === 0 ? <p className="empty">No hay citas registradas.</p> : <ul>{appointments.map((appointment) => <li className="appointment-item" key={appointment.id}><div><strong>{appointment.petName}</strong><span>{formatDate(appointment.scheduledAt)}</span><span>{appointment.reason}</span></div><div className="appointment-actions"><span className={`status status-${appointment.status.toLowerCase()}`}>{temporalLabel(appointment)}</span>{appointment.status !== 'CANCELLED' && <><button className="text-button" onClick={() => edit(appointment)}>Modificar</button><button className="text-button danger-button" onClick={() => void cancel(appointment.id)}>Cancelar</button></>}</div></li>)}</ul>}</section>
     </section>
   </main>;
 }

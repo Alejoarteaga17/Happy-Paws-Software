@@ -1,4 +1,4 @@
-import { Vaccination } from '../types/vaccination';
+import { Vaccination, VaccinationStatus } from '../types/vaccination';
 import { getSupabaseClient, isSupabaseConfigured } from './supabase-client';
 
 export interface CreateVaccinationInput {
@@ -6,6 +6,7 @@ export interface CreateVaccinationInput {
   vaccineName: string;
   administeredAt: string;
   nextDueDate: string;
+  status?: VaccinationStatus;
 }
 
 interface ApiError {

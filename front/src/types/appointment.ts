@@ -15,4 +15,5 @@ export interface AppointmentInput {
   petId: number;
   scheduledAt: string;
   reason: string;
+  status?: AppointmentStatus;
 }

@@ -12,6 +12,7 @@ const statusLabels: Record<VaccinationStatus, string> = {
   PENDING: 'Próxima',
   OVERDUE: 'Vencida'
 };
+const emptyVaccinationForm = { petId: '', vaccineName: '', administeredAt: '', nextDueDate: '', status: 'PENDING' as VaccinationStatus };
 
 const formatDate = (value: string) => new Intl.DateTimeFormat('es-CO', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(`${value}T00:00:00`));
 
@@ -47,7 +48,7 @@ export default function VaccinationDashboard() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
-  const [form, setForm] = useState({ petId: '', vaccineName: '', administeredAt: '', nextDueDate: '' });
+  const [form, setForm] = useState(emptyVaccinationForm);
 
   useEffect(() => {
     const loadDashboard = async () => {
@@ -106,10 +107,11 @@ export default function VaccinationDashboard() {
         petId: Number(form.petId),
         vaccineName: form.vaccineName.trim(),
         administeredAt: form.administeredAt,
-        nextDueDate: form.nextDueDate
+        nextDueDate: form.nextDueDate,
+        status: form.status
       });
       setVaccinations(await getVaccinations());
-      setForm({ petId: '', vaccineName: '', administeredAt: '', nextDueDate: '' });
+      setForm(emptyVaccinationForm);
       setIsFormOpen(false);
     } catch (error) {
       setFormError(error instanceof Error ? error.message : 'No se pudo guardar la vacuna');
@@ -162,6 +164,7 @@ export default function VaccinationDashboard() {
             <label className="form-field">Mascota<select required value={form.petId} onChange={(event) => setForm({ ...form, petId: event.target.value })}><option value="">Selecciona una mascota</option>{pets.map((pet) => <option key={pet.id} value={pet.id}>{pet.name} · {pet.species} · {pet.petTag}</option>)}</select></label>
             <label className="form-field">Nombre de la vacuna<input required value={form.vaccineName} onChange={(event) => setForm({ ...form, vaccineName: event.target.value })} placeholder="Ej. Rabia" /></label>
             <div className="form-grid"><label className="form-field">Fecha de aplicación<input required type="date" value={form.administeredAt} onChange={(event) => setForm({ ...form, administeredAt: event.target.value })} /></label><label className="form-field">Próxima dosis<input required type="date" min={form.administeredAt || undefined} value={form.nextDueDate} onChange={(event) => setForm({ ...form, nextDueDate: event.target.value })} /></label></div>
+            <label className="form-field">Estado<select required value={form.status} onChange={(event) => setForm({ ...form, status: event.target.value as VaccinationStatus })}><option value="PENDING">Pendiente</option><option value="ADMINISTERED">Aplicada</option><option value="OVERDUE">Vencida</option></select></label>
             {formError && <p className="form-error" role="alert">{formError}</p>}
             <div className="modal-actions"><button className="secondary-button" type="button" onClick={closeForm}>Cancelar</button><button className="primary-button" type="submit" disabled={isSaving}>{isSaving ? 'Guardando...' : 'Guardar vacunación'}</button></div>
           </form>

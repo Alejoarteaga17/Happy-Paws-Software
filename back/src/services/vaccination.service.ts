@@ -58,7 +58,7 @@ export class VaccinationService {
         vaccine_name: input.vaccineName,
         administered_at: input.administeredAt,
         next_due_date: input.nextDueDate,
-        status: getVaccinationStatus(input.nextDueDate)
+        status: input.status ?? getVaccinationStatus(input.administeredAt, input.nextDueDate)
       })
       .select('id, pet_id, vaccine_name, administered_at, next_due_date, status, pets(name)')
       .single();
@@ -75,8 +75,10 @@ export class VaccinationService {
   }
 }
 
-export const getVaccinationStatus = (nextDueDate: string, today = new Date()): VaccinationStatus => {
-  const dueDate = new Date(`${nextDueDate}T00:00:00Z`);
+export const getVaccinationStatus = (administeredAt: string, nextDueDate?: string, today = new Date()): VaccinationStatus => {
+  const administeredDate = new Date(`${administeredAt}T00:00:00Z`);
+  const dueDate = new Date(`${nextDueDate ?? administeredAt}T00:00:00Z`);
   const currentDate = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
-  return dueDate < currentDate ? 'OVERDUE' : 'PENDING';
+  if (administeredDate > currentDate) return 'PENDING';
+  return dueDate < currentDate ? 'OVERDUE' : 'ADMINISTERED';
 };

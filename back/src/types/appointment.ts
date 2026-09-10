@@ -16,6 +16,7 @@ export interface CreateAppointmentInput {
   scheduledAt: string;
   reason: string;
   vetId?: string;
+  status?: AppointmentStatus;
 }
 
 export interface UpdateAppointmentInput {

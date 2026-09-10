@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { VaccinationService } from '../services/vaccination.service';
+import { VaccinationStatus } from '../types/vaccination';
 
 export const listVaccinations = async (_request: Request, response: Response): Promise<void> => {
   try {
@@ -15,15 +16,17 @@ export const listVaccinations = async (_request: Request, response: Response): P
 };
 
 export const createVaccination = async (request: Request, response: Response): Promise<void> => {
-  const { petId: rawPetId, vaccineName, administeredAt, nextDueDate } = request.body as Record<string, unknown>;
+  const { petId: rawPetId, vaccineName, administeredAt, nextDueDate, status: rawStatus } = request.body as Record<string, unknown>;
   const petId = typeof rawPetId === 'number' ? rawPetId : NaN;
-  if (!Number.isInteger(petId) || petId < 1 || typeof vaccineName !== 'string' || !vaccineName.trim() || typeof administeredAt !== 'string' || typeof nextDueDate !== 'string' || !administeredAt || !nextDueDate) {
+  const statuses: VaccinationStatus[] = ['ADMINISTERED', 'PENDING', 'OVERDUE'];
+  const status = rawStatus === undefined ? undefined : typeof rawStatus === 'string' && statuses.includes(rawStatus as VaccinationStatus) ? rawStatus as VaccinationStatus : null;
+  if (!Number.isInteger(petId) || petId < 1 || typeof vaccineName !== 'string' || !vaccineName.trim() || typeof administeredAt !== 'string' || typeof nextDueDate !== 'string' || !administeredAt || !nextDueDate || status === null) {
     response.status(400).json({ success: false, data: null, error: { code: 'INVALID_VACCINATION', message: 'Datos de vacunación inválidos' } });
     return;
   }
 
   try {
-    const data = await VaccinationService.create({ petId, vaccineName, administeredAt, nextDueDate });
+    const data = await VaccinationService.create({ petId, vaccineName, administeredAt, nextDueDate, status: status ?? undefined });
     response.status(201).json({ success: true, data, error: null });
   } catch (error) {
     const errorCode = error instanceof Error ? error.message : 'VACCINATION_CREATE_FAILED';
