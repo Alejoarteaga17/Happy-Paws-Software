@@ -6,7 +6,7 @@ API Express para la operación clínica. Expone mascotas en `/api/v1/pets`, vacu
 
 Todas las rutas requieren `Authorization: Bearer <supabase-access-token>`:
 
-- `GET /api/v1/pets`: lista mascotas con el nombre del propietario.
+- `GET /api/v1/pets`: lista mascotas con el nombre del propietario y `createdAt` para los indicadores temporales del resumen.
 - `POST /api/v1/pets`: crea una mascota con `ownerId`, `petTag`, `name`, `species` y los campos opcionales `breed`, `birthDate` y `weight`.
 
 `ownerId` debe existir en `public.owners`; `petTag` es único y las relaciones se validan en Supabase.

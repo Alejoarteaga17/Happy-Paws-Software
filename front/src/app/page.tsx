@@ -1,165 +1,71 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { createVaccination, getVaccinations } from '../services/vaccination-service';
+import AppHeader from '../components/app-header';
+import { getAppointments } from '../services/appointment-service';
 import { getPets } from '../services/pet-service';
 import { getSupabaseClient, isSupabaseConfigured } from '../services/supabase-client';
-import { Vaccination, VaccinationStatus } from '../types/vaccination';
+import { getVaccinations } from '../services/vaccination-service';
+import { Appointment } from '../types/appointment';
 import { Pet } from '../types/pet';
-import AppHeader from '../components/app-header';
+import { Vaccination } from '../types/vaccination';
 
-const statusLabels: Record<VaccinationStatus, string> = {
-  ADMINISTERED: 'Aplicada',
-  PENDING: 'Próxima',
-  OVERDUE: 'Vencida'
-};
-const emptyVaccinationForm = { petId: '', vaccineName: '', administeredAt: '', nextDueDate: '', status: 'PENDING' as VaccinationStatus };
+const formatLongDate = (date: Date) => new Intl.DateTimeFormat('es-CO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(date);
+const formatTime = (value: string) => new Intl.DateTimeFormat('es-CO', { hour: 'numeric', minute: '2-digit' }).format(new Date(value));
+const formatShortDate = (value: string) => new Intl.DateTimeFormat('es-CO', { day: 'numeric', month: 'short' }).format(new Date(`${value}T00:00:00`));
+const startOfDay = (date: Date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());
+const getShift = (hour: number) => hour < 12 ? 'mañana' : 'tarde';
+const getGreeting = (hour: number) => hour < 12 ? 'Buenos días' : hour < 19 ? 'Buenas tardes' : 'Buenas noches';
+const appointmentLabels: Record<Appointment['status'], string> = { SCHEDULED: 'Agendada', COMPLETED: 'Completada', CANCELLED: 'Cancelada' };
 
-const formatDate = (value: string) => new Intl.DateTimeFormat('es-CO', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(`${value}T00:00:00`));
-
-function StatusBadge({ status }: { status: VaccinationStatus }) {
-  return <span className={`status status-${status.toLowerCase()}`}>{statusLabels[status]}</span>;
+function LoadingState() {
+  return <div className="summary-loading" aria-label="Cargando resumen"><span /><span /><span /></div>;
 }
 
-function VaccinationRow({ vaccination }: { vaccination: Vaccination }) {
-  return (
-    <li className="vaccination-row">
-      <div className="pet-avatar" aria-hidden="true">{vaccination.petName.slice(0, 1)}</div>
-      <div className="vaccination-copy">
-        <strong>{vaccination.petName}</strong>
-        <span>{vaccination.vaccineName}</span>
-      </div>
-      <div className="due-date">
-        <span>{vaccination.status === 'OVERDUE' ? 'Venció' : 'Próxima dosis'}</span>
-        <strong>{formatDate(vaccination.nextDueDate)}</strong>
-      </div>
-      <StatusBadge status={vaccination.status} />
-    </li>
-  );
+function AppointmentStatus({ appointment }: { appointment: Appointment }) {
+  return <span className={`status status-${appointment.status.toLowerCase()}`}>{appointmentLabels[appointment.status]}</span>;
 }
 
-export default function VaccinationDashboard() {
-  const [vaccinations, setVaccinations] = useState<Vaccination[]>([]);
+export default function SummaryPage() {
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [pets, setPets] = useState<Pet[]>([]);
-  const [filter, setFilter] = useState<'ALL' | VaccinationStatus>('ALL');
+  const [vaccinations, setVaccinations] = useState<Vaccination[]>([]);
+  const [userName, setUserName] = useState('equipo Happy Paws');
   const [loading, setLoading] = useState(true);
-  const [authLoading, setAuthLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [userEmail, setUserEmail] = useState('Usuario autenticado');
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [formError, setFormError] = useState<string | null>(null);
-  const [form, setForm] = useState(emptyVaccinationForm);
+  const today = useMemo(() => new Date(), []);
+  const todayStart = startOfDay(today);
+  const tomorrowStart = new Date(todayStart); tomorrowStart.setDate(tomorrowStart.getDate() + 1);
+  const weekEnd = new Date(todayStart); weekEnd.setDate(weekEnd.getDate() + 7);
+  const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
 
   useEffect(() => {
-    const loadDashboard = async () => {
+    const loadSummary = async () => {
       try {
-        if (!isSupabaseConfigured) {
-          throw new Error('Configura Supabase para iniciar sesión y consultar las vacunaciones');
-        }
-
+        if (!isSupabaseConfigured) throw new Error('Configura Supabase para consultar el resumen');
         const { data: userData } = await getSupabaseClient().auth.getUser();
-        if (!userData.user) {
-          window.location.href = '/login';
-          return;
-        }
-
-        setUserEmail(userData.user.email ?? 'Usuario autenticado');
-        setAuthLoading(false);
-        const [vaccinationData, petData] = await Promise.all([getVaccinations(), getPets()]);
-        setVaccinations(vaccinationData);
-        setPets(petData);
-      } catch (error) {
-        setErrorMessage(error instanceof Error ? error.message : 'No se pudieron cargar los datos');
-      } finally {
-        setLoading(false);
-        setAuthLoading(false);
-      }
+        if (!userData.user) { window.location.href = '/login'; return; }
+        setUserName(userData.user.user_metadata?.full_name ?? userData.user.email?.split('@')[0] ?? 'equipo Happy Paws');
+        const [appointmentData, petData, vaccinationData] = await Promise.all([getAppointments(), getPets(), getVaccinations()]);
+        setAppointments(appointmentData); setPets(petData); setVaccinations(vaccinationData);
+      } catch (error) { setErrorMessage(error instanceof Error ? error.message : 'No se pudo cargar el resumen'); }
+      finally { setLoading(false); }
     };
-
-    void loadDashboard();
+    void loadSummary();
   }, []);
 
-  const signOut = async () => {
-    await getSupabaseClient().auth.signOut();
-    window.location.href = '/login';
-  };
+  const todaysAppointments = appointments.filter(({ scheduledAt, status }) => { const date = new Date(scheduledAt); return date >= todayStart && date < tomorrowStart && status !== 'CANCELLED'; });
+  const upcomingCare = vaccinations.filter(({ status }) => status === 'PENDING' || status === 'OVERDUE').sort((a, b) => a.nextDueDate.localeCompare(b.nextDueDate)).slice(0, 5);
+  const activePetsThisMonth = pets.filter(({ createdAt }) => createdAt && new Date(createdAt) >= monthStart).length;
+  const weeklyFollowUps = appointments.filter(({ scheduledAt, status }) => { const date = new Date(scheduledAt); return date >= todayStart && date < weekEnd && status === 'SCHEDULED'; }).length + vaccinations.filter(({ nextDueDate, status }) => { const date = new Date(`${nextDueDate}T00:00:00`); return date >= todayStart && date < weekEnd && status === 'PENDING'; }).length;
+  const petsById = useMemo(() => new Map(pets.map((pet) => [pet.id, pet])), [pets]);
 
-  const filtered = useMemo(() => filter === 'ALL' ? vaccinations : vaccinations.filter(({ status }) => status === filter), [filter, vaccinations]);
-  const upcoming = filtered.filter(({ status }) => status === 'PENDING');
-  const overdue = filtered.filter(({ status }) => status === 'OVERDUE');
-  const administered = vaccinations.filter(({ status }) => status === 'ADMINISTERED').length;
-
-  const openForm = () => {
-    setFormError(null);
-    setIsFormOpen(true);
-  };
-
-  const closeForm = () => {
-    if (!isSaving) setIsFormOpen(false);
-  };
-
-  const saveVaccination = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setFormError(null);
-    setIsSaving(true);
-    try {
-      await createVaccination({
-        petId: Number(form.petId),
-        vaccineName: form.vaccineName.trim(),
-        administeredAt: form.administeredAt,
-        nextDueDate: form.nextDueDate,
-        status: form.status
-      });
-      setVaccinations(await getVaccinations());
-      setForm(emptyVaccinationForm);
-      setIsFormOpen(false);
-    } catch (error) {
-      setFormError(error instanceof Error ? error.message : 'No se pudo guardar la vacuna');
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  return (
-    <main className="shell">
-      <AppHeader />
-      <section className="content" id="vacunaciones">
-        <header className="topbar"><div><span className="eyebrow">{new Intl.DateTimeFormat('es-CO', { dateStyle: 'full' }).format(new Date())}</span><h1>Panel de vacunaciones</h1></div><div className="user-chip"><span className="user-avatar">HP</span><span><strong>{userEmail}</strong><small>Sesión de Supabase</small></span><button className="text-button logout-button" type="button" onClick={() => void signOut()}>Salir</button></div></header>
-        <section className="intro"><div><p className="eyebrow">Control preventivo</p><h2>Vacunas al día, pacientes protegidos.</h2><p>Revisa las próximas dosis y atiende los vencimientos de la clínica.</p></div><button className="intro-icon" type="button" aria-label="Registrar vacunación" title="Registrar vacunación" onClick={openForm}>✚</button></section>
-
-        {(loading || authLoading) && <p className="empty">Cargando datos desde Supabase...</p>}
-        {errorMessage && <p className="empty">{errorMessage}</p>}
-
-        <div className="stats" aria-label="Resumen de vacunaciones">
-          <article><span className="stat-label">Próximas dosis</span><strong>{vaccinations.filter(({ status }) => status === 'PENDING').length}</strong><small>requieren seguimiento</small></article>
-          <article className="stat-alert"><span className="stat-label">Vencidas</span><strong>{vaccinations.filter(({ status }) => status === 'OVERDUE').length}</strong><small>prioridad de atención</small></article>
-          <article><span className="stat-label">Aplicadas</span><strong>{administered}</strong><small>en el registro</small></article>
-        </div>
-
-        <div className="section-heading"><div><p className="eyebrow">Agenda preventiva</p><h2>Seguimiento de dosis</h2></div><div className="filters" role="group" aria-label="Filtrar vacunaciones">
-          {(['ALL', 'PENDING', 'OVERDUE'] as const).map((value) => <button key={value} className={filter === value ? 'filter active' : 'filter'} onClick={() => setFilter(value)}>{value === 'ALL' ? 'Todas' : statusLabels[value]}</button>)}
-        </div></div>
-
-        <div className="lists">
-          <section className="list-panel"><div className="list-title"><h3>Próximas vacunas</h3><span>{upcoming.length}</span></div>{upcoming.length ? <ul>{upcoming.map((vaccination) => <VaccinationRow key={vaccination.id} vaccination={vaccination} />)}</ul> : <p className="empty">No hay próximas dosis en este filtro.</p>}</section>
-          <section className="list-panel overdue-panel"><div className="list-title"><h3>Requieren atención</h3><span>{overdue.length}</span></div>{overdue.length ? <ul>{overdue.map((vaccination) => <VaccinationRow key={vaccination.id} vaccination={vaccination} />)}</ul> : <p className="empty">No hay vacunas vencidas. Buen trabajo.</p>}</section>
-        </div>
-      </section>
-      {isFormOpen && <div className="modal-backdrop" role="presentation" onMouseDown={closeForm}>
-        <section className="vaccination-modal" role="dialog" aria-modal="true" aria-labelledby="vaccination-form-title" onMouseDown={(event) => event.stopPropagation()}>
-          <div className="modal-header"><div><p className="eyebrow">Registro clínico</p><h2 id="vaccination-form-title">Agregar vacunación</h2></div><button className="close-button" type="button" aria-label="Cerrar formulario" onClick={closeForm}>×</button></div>
-          <p className="modal-description">Registra la dosis aplicada y la fecha de seguimiento para la mascota.</p>
-          <form onSubmit={saveVaccination}>
-            <label className="form-field">Mascota<select required value={form.petId} onChange={(event) => setForm({ ...form, petId: event.target.value })}><option value="">Selecciona una mascota</option>{pets.map((pet) => <option key={pet.id} value={pet.id}>{pet.name} · {pet.species} · {pet.petTag}</option>)}</select></label>
-            <label className="form-field">Nombre de la vacuna<input required value={form.vaccineName} onChange={(event) => setForm({ ...form, vaccineName: event.target.value })} placeholder="Ej. Rabia" /></label>
-            <div className="form-grid"><label className="form-field">Fecha de aplicación<input required type="date" value={form.administeredAt} onChange={(event) => setForm({ ...form, administeredAt: event.target.value })} /></label><label className="form-field">Próxima dosis<input required type="date" min={form.administeredAt || undefined} value={form.nextDueDate} onChange={(event) => setForm({ ...form, nextDueDate: event.target.value })} /></label></div>
-            <label className="form-field">Estado<select required value={form.status} onChange={(event) => setForm({ ...form, status: event.target.value as VaccinationStatus })}><option value="PENDING">Pendiente</option><option value="ADMINISTERED">Aplicada</option><option value="OVERDUE">Vencida</option></select></label>
-            {formError && <p className="form-error" role="alert">{formError}</p>}
-            <div className="modal-actions"><button className="secondary-button" type="button" onClick={closeForm}>Cancelar</button><button className="primary-button" type="submit" disabled={isSaving}>{isSaving ? 'Guardando...' : 'Guardar vacunación'}</button></div>
-          </form>
-        </section>
-      </div>}
-    </main>
-  );
+  return <main className="summary-page"><AppHeader /><section className="summary-content">
+    <header className="summary-hero"><div><p className="eyebrow">{formatLongDate(today)} · turno de {getShift(today.getHours())}</p><h1>{getGreeting(today.getHours())}, {userName}</h1><p className="summary-subtitle">Aquí tienes el pulso de la clínica para empezar el día.</p></div><a className="primary-button check-in-button" href="/appointments"><span className="material-symbols-outlined">add_circle</span>Nuevo check-in</a></header>
+    {errorMessage && <p className="notice summary-error" role="alert">{errorMessage}</p>}
+    {loading ? <LoadingState /> : <>
+      <section className="summary-stats" aria-label="Estadísticas de la clínica"><article><span className="summary-stat-icon"><span className="material-symbols-outlined">event</span></span><span className="stat-label">Citas de hoy</span><strong>{todaysAppointments.length}</strong><small>{todaysAppointments.length ? `${todaysAppointments.length} check-ins pendientes` : 'sin check-ins pendientes'}</small></article><article><span className="summary-stat-icon"><span className="material-symbols-outlined">pets</span></span><span className="stat-label">Mascotas activas</span><strong>{pets.length}</strong><small>+{activePetsThisMonth} este mes</small></article><article className="summary-stat-alert"><span className="summary-stat-icon"><span className="material-symbols-outlined">vaccines</span></span><span className="stat-label">Vacunas vencidas</span><strong>{vaccinations.filter(({ status }) => status === 'OVERDUE').length}</strong><small>requieren seguimiento</small></article><article><span className="summary-stat-icon"><span className="material-symbols-outlined">pending_actions</span></span><span className="stat-label">Seguimientos esta semana</span><strong>{weeklyFollowUps}</strong><small>sin asignar</small></article></section>
+      <section className="summary-columns"><section className="summary-panel summary-agenda"><div className="summary-panel-heading"><div><p className="eyebrow">Agenda clínica</p><h2>Agenda de hoy</h2></div><a href="/appointments">Ver todas</a></div>{todaysAppointments.length ? <ul>{todaysAppointments.map((appointment) => { const pet = petsById.get(appointment.petId); return <li className="summary-list-row" key={appointment.id}><time>{formatTime(appointment.scheduledAt)}</time><div><strong>{appointment.petName}</strong><span>{pet?.petTag ?? 'Sin pet tag'} · {pet?.ownerName ?? 'Propietario no disponible'}</span><span>{appointment.reason}</span></div><AppointmentStatus appointment={appointment} /></li>; })}</ul> : <div className="summary-empty"><span className="material-symbols-outlined">event_available</span><strong>No hay citas para hoy</strong><span>La agenda está libre por ahora.</span></div>}</section><section className="summary-panel summary-care"><div className="summary-panel-heading"><div><p className="eyebrow">Control preventivo</p><h2>Cuidados pendientes</h2></div><a href="/vaccinations">Módulo</a></div>{upcomingCare.length ? <ul>{upcomingCare.map((vaccination) => <li className="summary-list-row" key={vaccination.id}><span className={`care-icon ${vaccination.status === 'OVERDUE' ? 'overdue' : ''}`}><span className="material-symbols-outlined">vaccines</span></span><div><strong>{vaccination.petName}</strong><span>{vaccination.vaccineName}</span><span>{formatShortDate(vaccination.nextDueDate)}</span></div><span className={`status ${vaccination.status === 'OVERDUE' ? 'status-overdue' : 'status-pending'}`}>{vaccination.status === 'OVERDUE' ? 'Vencida' : 'Próxima'}</span></li>)}</ul> : <div className="summary-empty"><span className="material-symbols-outlined">task_alt</span><strong>Todo está al día</strong><span>No hay cuidados pendientes.</span></div>}<p className="summary-note">Los recordatorios automáticos por SMS/email quedan fuera del MVP.</p></section></section>
+    </>}
+  </section></main>;
 }

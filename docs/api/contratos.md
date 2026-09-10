@@ -102,7 +102,8 @@ Lista las mascotas ordenadas alfabéticamente por nombre e incluye el nombre del
       "species": "Perro",
       "breed": "Beagle",
       "birthDate": "2021-05-10",
-      "weight": 12.5
+      "weight": 12.5,
+      "createdAt": "2026-09-01T10:00:00.000Z"
     }
   ],
   "error": null
@@ -304,6 +305,10 @@ Registra una vacunación para una mascota existente.
 ## 6. Consumo desde el frontend
 
 Los servicios del frontend están en `front/src/services` y usan `fetch`. La URL base se normaliza quitando la barra final y cada servicio conserva el envoltorio de respuesta de la API.
+
+La pantalla de resumen (`/`) compone los datos de `GET /api/v1/appointments`, `GET /api/v1/pets` y `GET /api/v1/vaccinations` para calcular las tarjetas, la agenda del día y los cuidados pendientes. El módulo completo de vacunaciones se encuentra en `/vaccinations`.
+
+Los estados de cita vigentes siguen siendo `SCHEDULED`, `COMPLETED` y `CANCELLED`; etiquetas visuales como “Check-in” o “En consulta” no se persisten ni se agregan al enum hasta que exista un flujo de negocio para diferenciarlas.
 
 ### Obtener la sesión y crear headers
 

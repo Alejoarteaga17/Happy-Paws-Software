@@ -1,6 +1,6 @@
 # Happy Paws Frontend
 
-Aplicación Next.js para el panel operativo de la clínica. La ruta principal muestra el dashboard de vacunaciones, `/pets` permite consultar y registrar mascotas, y `/appointments` permite consultar, crear, modificar y cancelar citas veterinarias.
+Aplicación Next.js para el panel operativo de la clínica. La ruta principal (`/`) muestra el resumen de la clínica con estadísticas, agenda de hoy y cuidados pendientes. `/vaccinations` contiene el módulo completo de vacunaciones, `/pets` permite consultar y registrar mascotas, y `/appointments` permite consultar, crear, modificar y cancelar citas veterinarias.
 
 La pantalla `/pets` consume `GET/POST /api/v1/pets`, envía el token de sesión de Supabase y usa `ownerId` para vincular cada mascota con un propietario existente.
 
@@ -11,7 +11,7 @@ npm install
 npm run dev
 ```
 
-El dashboard consulta el backend, que a su vez consulta Supabase. Para conectarlo y autenticar las peticiones:
+El resumen y los módulos consultan el backend, que a su vez consulta Supabase. Para conectarlos y autenticar las peticiones:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://cuaqjycqzyfjdpilklkl.supabase.co
@@ -32,6 +32,8 @@ where email = 'vet@happypaws.com';
 El token de la sesión se envía automáticamente al backend en la cabecera `Authorization: Bearer ...`.
 
 La pantalla de citas consume el backend mediante JSON en `/api/v1/appointments` y envía el token de sesión en la cabecera `Authorization`.
+
+El resumen usa `createdAt` de las mascotas para calcular las registradas durante el mes actual. Las tarjetas y listas muestran estados vacíos y carga mientras esperan los tres endpoints.
 
 ## Pruebas
 

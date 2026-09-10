@@ -4,10 +4,10 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 const navigationItems = [
-  { href: '/', label: 'Resumen', icon: '⌂' },
-  { href: '/pets', label: 'Pacientes', icon: '♡' },
-  { href: '/appointments', label: 'Agenda', icon: '▣' },
-  { href: '/#vacunaciones', label: 'Vacunaciones', icon: '✚' }
+  { href: '/', label: 'Resumen', icon: 'contextual_token' },
+  { href: '/pets', label: 'Pacientes', icon: 'pets' },
+  { href: '/appointments', label: 'Agenda', icon: 'assignment' },
+  { href: '/vaccinations', label: 'Vacunaciones', icon: 'vaccines' }
 ];
 
 export default function AppHeader() {
@@ -34,7 +34,7 @@ export default function AppHeader() {
 
           return (
             <a className={`header-nav-link${isActive ? ' active' : ''}`} href={item.href} key={item.label}>
-              <span className="header-nav-icon" aria-hidden="true">{item.icon}</span>
+              <span className="material-symbols-outlined header-nav-icon" aria-hidden="true">{item.icon}</span>
               <span className="header-nav-label">{item.label}</span>
             </a>
           );

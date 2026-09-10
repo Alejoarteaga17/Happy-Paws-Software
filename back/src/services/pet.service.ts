@@ -3,6 +3,7 @@ import { CreatePetInput, Pet } from '../types/pet';
 
 interface PetRow {
   id: number;
+  created_at: string;
   owner_id: number;
   pet_tag: string;
   name: string;
@@ -13,10 +14,11 @@ interface PetRow {
   owners: { full_name: string }[] | null;
 }
 
-const petSelect = 'id, owner_id, pet_tag, name, species, breed, birth_date, weight, owners(full_name)';
+const petSelect = 'id, owner_id, pet_tag, name, species, breed, birth_date, weight, created_at, owners(full_name)';
 
 const toPet = (row: PetRow): Pet => ({
   id: row.id,
+  createdAt: row.created_at,
   ownerId: row.owner_id,
   ownerName: row.owners?.[0]?.full_name ?? 'Propietario sin nombre',
   petTag: row.pet_tag,

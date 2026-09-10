@@ -1,5 +1,6 @@
 export interface Pet {
   id: number;
+  createdAt: string;
   ownerId: number;
   ownerName: string;
   petTag: string;
