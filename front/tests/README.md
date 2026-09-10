@@ -1,16 +1,12 @@
 ## Pruebas del frontend
 
-La suite verifica los servicios que conectan la interfaz con la API: mascotas, citas y vacunaciones. Se mockean `fetch` y la sesión de Supabase, por lo que no se necesitan servicios externos para ejecutarla.
+La suite usa Vitest y cubre los servicios de mascotas, citas y vacunaciones, además de las pantallas de recuperación para rutas inexistentes y errores inesperados. Se mockean `fetch`, Supabase y `next/link`, por lo que no se necesitan servicios externos.
 
 Desde `front/`:
 
 ```bash
 npm test
+npm test -- --run tests/error-pages.test.tsx
 ```
 
-Se cubren autenticación, construcción de URLs, payloads de creación y actualización, cancelación de citas y traducción de errores para el usuario.
-# Pruebas del frontend
-
-Esta carpeta queda reservada para pruebas de componentes y flujos del dashboard con Vitest y React Testing Library.
-
-Ejecutar con `npm test` desde `front/`.
+Las pruebas de `error-pages.test.tsx` renderizan las pantallas con `react-dom/server` y verifican sus mensajes y enlaces de recuperación.
