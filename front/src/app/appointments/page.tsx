@@ -52,7 +52,7 @@ export default function AppointmentsPage() {
   };
 
   return <main className="appointment-shell"><AppHeader />
-    <header className="appointment-header"><div><p className="eyebrow">RF-04 · Agenda clínica</p><h1>Gestión de citas</h1><p>Organiza la atención veterinaria y conserva el historial de cada visita.</p></div><a className="back-link" href="/">Ver vacunaciones</a></header>
+    <header className="appointment-header"><div><p className="eyebrow">RF-04 · Agenda clínica</p><h1>Gestión de citas</h1><p>Organiza la atención veterinaria y conserva el historial de cada visita.</p></div><a className="back-link" href="/vaccinations">Ver vacunaciones</a></header>
     <section className="appointment-layout">
       <form className="appointment-form" onSubmit={submit}><p className="eyebrow">{editingId === null ? 'Nueva cita' : `Editando cita #${editingId}`}</p><h2>{editingId === null ? 'Agendar atención' : 'Modificar cita'}</h2>
         <label>Mascota asociada<select required value={form.petId || ''} onChange={(event) => setForm({ ...form, petId: Number(event.target.value) })}><option value="">Selecciona una mascota</option>{pets.map((pet) => <option key={pet.id} value={pet.id}>{pet.name} · {pet.species} · {pet.petTag}</option>)}</select></label>

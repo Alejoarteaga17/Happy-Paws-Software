@@ -2,7 +2,10 @@ import './globals.css';
 
 export const metadata = {
   title: 'Happy Paws | Vacunaciones',
-  description: 'Seguimiento preventivo de pacientes'
+  description: 'Seguimiento preventivo de pacientes',
+  icons: {
+    icon: '/icon.svg'
+  }
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

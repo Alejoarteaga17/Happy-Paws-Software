@@ -174,6 +174,16 @@ h1 { font-size: 38px; }
 @media (max-width: 900px) { .summary-stats { grid-template-columns: repeat(2, 1fr); } .summary-columns { grid-template-columns: 1fr; } }
 @media (max-width: 620px) { .summary-content { padding: 98px 16px 48px; } .summary-hero { display: block; margin-bottom: 25px; } .summary-hero h1 { font-size: 31px; } .check-in-button { margin-top: 18px; } .summary-stats { gap: 10px; } .summary-stats article { padding: 15px; } .summary-stats strong { font-size: 29px; } .summary-panel { padding: 19px 16px; } .summary-list-row { grid-template-columns: 52px minmax(0, 1fr); gap: 10px; } .summary-list-row > .status { grid-column: 2; justify-self: start; } .summary-care .summary-list-row { grid-template-columns: 32px minmax(0, 1fr); } .summary-care .summary-list-row > .status { grid-column: 2; } .summary-loading { grid-template-columns: 1fr; } }
 
+.not-found-shell, .error-shell { display: grid; place-items: center; min-height: 100vh; padding: 24px; background: radial-gradient(circle at 15% 15%, #e7edf5 0, transparent 34%), var(--background); }
+.not-found-panel, .error-panel { width: min(100%, 560px); padding: clamp(28px, 6vw, 54px); border-radius: 20px; background: var(--paper); box-shadow: 0 20px 55px rgba(42, 46, 53, .1); text-align: center; }
+.not-found-mark { display: grid; place-items: center; width: 64px; height: 64px; margin: 0 auto 24px; border-radius: 50%; background: var(--blue-soft); color: var(--primary-deep); font-size: 30px; }
+.not-found-code { margin-bottom: 8px; color: var(--primary-deep); font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+.not-found-panel h1, .error-panel h1 { margin-bottom: 12px; font-size: clamp(30px, 6vw, 42px); }
+.not-found-copy, .error-copy { margin: 0 auto 25px; max-width: 410px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+.not-found-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
+.not-found-actions a { text-decoration: none; }
+.error-panel .primary-button { margin-top: 4px; }
+
 /* Vaccination module aligned with the shared summary and management views. */
 .vaccination-page { min-height: 100vh; background: var(--background); }
 .vaccination-content { width: min(1280px, 100%); margin: 0 auto; padding: 128px clamp(20px, 5vw, 76px) 72px; }
@@ -181,6 +191,8 @@ h1 { font-size: 38px; }
 .vaccination-content .topbar h1 { margin-bottom: 0; font-size: clamp(30px, 4vw, 42px); }
 .vaccination-content .intro { margin-top: 30px; border: 0; border-radius: 18px; background: var(--blue-soft); box-shadow: 0 8px 24px rgba(42, 46, 53, .035); }
 .vaccination-content .intro h2 { margin-bottom: 8px; }
+.vaccination-add-button { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.vaccination-add-button .material-symbols-outlined { font-size: 19px; }
 .vaccination-content .intro-icon { background: var(--paper); color: var(--primary-deep); }
 .vaccination-content .intro-icon:hover { background: var(--primary); color: #fff; }
 .vaccination-content .stats { grid-template-columns: repeat(3, 1fr); margin-bottom: 34px; }

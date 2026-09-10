@@ -55,6 +55,11 @@ Prepara las variables de entorno una vez:
 Copy-Item .env.example .env
 Copy-Item back/.env.example back/.env
 ```
+o en mac 
+```bash
+cp .env.example .env
+cp back/.env.example back/.env
+```
 
 Completa `back/.env` con la `SUPABASE_SERVICE_ROLE_KEY` y `.env` con las variables públicas del frontend. Después levanta el stack desde la raíz:
 
