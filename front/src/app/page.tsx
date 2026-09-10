@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { getVaccinations } from '../services/vaccination-service';
+import { createVaccination, getVaccinations } from '../services/vaccination-service';
 import { getSupabaseClient, isSupabaseConfigured } from '../services/supabase-client';
 import { Vaccination, VaccinationStatus } from '../types/vaccination';
 
@@ -40,6 +40,10 @@ export default function VaccinationDashboard() {
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState('Usuario autenticado');
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [form, setForm] = useState({ petId: '', vaccineName: '', administeredAt: '', nextDueDate: '' });
 
   useEffect(() => {
     const loadDashboard = async () => {
@@ -67,6 +71,36 @@ export default function VaccinationDashboard() {
   const overdue = filtered.filter(({ status }) => status === 'OVERDUE');
   const administered = vaccinations.filter(({ status }) => status === 'ADMINISTERED').length;
 
+  const openForm = () => {
+    setFormError(null);
+    setIsFormOpen(true);
+  };
+
+  const closeForm = () => {
+    if (!isSaving) setIsFormOpen(false);
+  };
+
+  const saveVaccination = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setFormError(null);
+    setIsSaving(true);
+    try {
+      await createVaccination({
+        petId: Number(form.petId),
+        vaccineName: form.vaccineName.trim(),
+        administeredAt: form.administeredAt,
+        nextDueDate: form.nextDueDate
+      });
+      setVaccinations(await getVaccinations());
+      setForm({ petId: '', vaccineName: '', administeredAt: '', nextDueDate: '' });
+      setIsFormOpen(false);
+    } catch (error) {
+      setFormError(error instanceof Error ? error.message : 'No se pudo guardar la vacuna');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <main className="shell">
       <aside className="sidebar">
@@ -83,7 +117,7 @@ export default function VaccinationDashboard() {
 
       <section className="content" id="vacunaciones">
         <header className="topbar"><div><span className="eyebrow">{new Intl.DateTimeFormat('es-CO', { dateStyle: 'full' }).format(new Date())}</span><h1>Panel de vacunaciones</h1></div><div className="user-chip"><span className="user-avatar">HP</span><span><strong>{userEmail}</strong><small>Sesión de Supabase</small></span></div></header>
-        <section className="intro"><div><p className="eyebrow">Control preventivo</p><h2>Vacunas al día, pacientes protegidos.</h2><p>Revisa las próximas dosis y atiende los vencimientos de la clínica.</p></div><div className="intro-icon" aria-hidden="true">✚</div></section>
+        <section className="intro"><div><p className="eyebrow">Control preventivo</p><h2>Vacunas al día, pacientes protegidos.</h2><p>Revisa las próximas dosis y atiende los vencimientos de la clínica.</p></div><button className="intro-icon" type="button" aria-label="Registrar vacunación" title="Registrar vacunación" onClick={openForm}>✚</button></section>
 
         {loading && <p className="empty">Cargando datos desde Supabase...</p>}
         {errorMessage && <p className="empty">{errorMessage}</p>}
@@ -103,6 +137,19 @@ export default function VaccinationDashboard() {
           <section className="list-panel overdue-panel"><div className="list-title"><h3>Requieren atención</h3><span>{overdue.length}</span></div>{overdue.length ? <ul>{overdue.map((vaccination) => <VaccinationRow key={vaccination.id} vaccination={vaccination} />)}</ul> : <p className="empty">No hay vacunas vencidas. Buen trabajo.</p>}</section>
         </div>
       </section>
+      {isFormOpen && <div className="modal-backdrop" role="presentation" onMouseDown={closeForm}>
+        <section className="vaccination-modal" role="dialog" aria-modal="true" aria-labelledby="vaccination-form-title" onMouseDown={(event) => event.stopPropagation()}>
+          <div className="modal-header"><div><p className="eyebrow">Registro clínico</p><h2 id="vaccination-form-title">Agregar vacunación</h2></div><button className="close-button" type="button" aria-label="Cerrar formulario" onClick={closeForm}>×</button></div>
+          <p className="modal-description">Registra la dosis aplicada y la fecha de seguimiento para la mascota.</p>
+          <form onSubmit={saveVaccination}>
+            <label className="form-field">ID de la mascota<input required min="1" type="number" value={form.petId} onChange={(event) => setForm({ ...form, petId: event.target.value })} placeholder="Ej. 1" /></label>
+            <label className="form-field">Nombre de la vacuna<input required value={form.vaccineName} onChange={(event) => setForm({ ...form, vaccineName: event.target.value })} placeholder="Ej. Rabia" /></label>
+            <div className="form-grid"><label className="form-field">Fecha de aplicación<input required type="date" value={form.administeredAt} onChange={(event) => setForm({ ...form, administeredAt: event.target.value })} /></label><label className="form-field">Próxima dosis<input required type="date" min={form.administeredAt || undefined} value={form.nextDueDate} onChange={(event) => setForm({ ...form, nextDueDate: event.target.value })} /></label></div>
+            {formError && <p className="form-error" role="alert">{formError}</p>}
+            <div className="modal-actions"><button className="secondary-button" type="button" onClick={closeForm}>Cancelar</button><button className="primary-button" type="submit" disabled={isSaving}>{isSaving ? 'Guardando...' : 'Guardar vacunación'}</button></div>
+          </form>
+        </section>
+      </div>}
     </main>
   );
 }
