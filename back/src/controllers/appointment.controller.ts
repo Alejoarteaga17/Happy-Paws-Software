@@ -29,7 +29,7 @@ export const createAppointment = async (request: Request, response: Response): P
     typeof body.reason === 'string' && body.reason.trim().length > 0 &&
     (body.vetId === undefined || typeof body.vetId === 'string');
   if (!validCreate) { response.status(400).json({ success: false, data: null, error: { code: 'INVALID_APPOINTMENT', message: 'Datos de cita inválidos' } }); return; }
-  try { response.status(201).json({ success: true, data: await AppointmentService.create(body as CreateAppointmentInput), error: null }); }
+  try { response.status(201).json({ success: true, data: await AppointmentService.create(body as unknown as CreateAppointmentInput), error: null }); }
   catch (error) { sendError(response, error, 'APPOINTMENT_CREATE_FAILED'); }
 };
 

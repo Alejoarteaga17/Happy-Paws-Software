@@ -46,6 +46,32 @@ npm run dev
 
 El frontend usa datos de demostración si `NEXT_PUBLIC_API_URL` no está definida. Para conectar la API, define `NEXT_PUBLIC_API_URL=http://localhost:4000` en `front/.env.local`.
 
+## Docker
+
+Supabase sigue siendo un servicio remoto: Docker solo ejecuta `back` y `front`.
+Prepara las variables de entorno una vez:
+
+```bash
+Copy-Item .env.example .env
+Copy-Item back/.env.example back/.env
+```
+
+Completa `back/.env` con la `SUPABASE_SERVICE_ROLE_KEY` y `.env` con las variables públicas del frontend. Después levanta el stack desde la raíz:
+
+```bash
+docker compose up --build
+```
+
+La API queda en `http://localhost:4000` y el frontend en `http://localhost:3000`. El servicio `back` incluye un healthcheck contra `/health`; `front` espera a que esté saludable. No se expone ninguna clave `service_role` al frontend.
+
+Para detenerlo:
+
+```bash
+docker compose down
+```
+
+El desarrollo sin Docker continúa usando `npm run dev` dentro de `back` y `front`, con sus respectivos archivos de entorno.
+
 Las rutas de vacunaciones requieren `Authorization: Bearer <supabase-access-token>`.
 
 Para cargar datos simulados directamente en Supabase, después de aplicar las migraciones y crear al menos cuatro mascotas:

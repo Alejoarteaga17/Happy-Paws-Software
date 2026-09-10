@@ -36,3 +36,13 @@ npm run seed:vaccinations
 ```
 
 `npm run seed:vaccinations` consulta las primeras cuatro mascotas existentes y guarda cuatro vacunaciones simuladas directamente en Supabase. Es idempotente para esos registros: repetirlo no crea duplicados.
+
+## Docker
+
+Desde la raíz del repositorio, copia `back/.env.example` a `back/.env` y completa la clave secreta. El servicio se construye y ejecuta junto con el frontend mediante:
+
+```bash
+docker compose up --build back
+```
+
+La imagen compila TypeScript en una etapa de build y ejecuta `dist/app.js` con dependencias de producción. Supabase no se levanta localmente.

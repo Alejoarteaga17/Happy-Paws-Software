@@ -27,3 +27,14 @@ La pantalla de citas consume el backend mediante JSON en `/api/v1/appointments` 
 npm test
 npm run build
 ```
+
+## Docker
+
+El frontend usa una imagen Next.js standalone multi-stage. Las variables `NEXT_PUBLIC_*` se inyectan durante el build desde el `.env` de la raíz, porque Next las incorpora al bundle del navegador:
+
+```bash
+docker compose build front
+docker compose up front
+```
+
+`NEXT_PUBLIC_API_URL` debe ser `http://localhost:4000` cuando el navegador accede al stack publicado por Docker. No coloques `SUPABASE_SERVICE_ROLE_KEY` en este archivo ni en la imagen del frontend.
