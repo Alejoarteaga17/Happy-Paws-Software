@@ -1,7 +1,9 @@
 ## promt 1
+### puntaje: 1/8
 Haz el sistema de gestión de citas, mascotas y vacunación para la clínica veterinaria Happy Paws Care Central.
 
 ## promt 2
+### puntaje: 4/8
 Actúa como un Desarrollador Full Stack Senior experto en Node.js, Express, PostgreSQL, Next.js y React.
 
 # Objetivo
@@ -19,6 +21,7 @@ El proyecto está organizado en un monorepo con dos carpetas principales:
 - NO modificar la estructura de las tablas de la base de datos sin autorización previa.
 
 ## prompt 3
+### puntaje: 7/8
 Actúa como un Desarrollador Full Stack Senior experto en Node.js, Express, PostgreSQL, Next.js y React.
 
 # Objetivo
@@ -52,6 +55,7 @@ El trabajo se dará por concluido únicamente si cumple estos 8 criterios de eva
 4. Incluye al final una breve explicación de los archivos creados y las instrucciones para probar el código.
 
 ## promt 4
+### puntaje: 8/8
 Actúa como un Desarrollador Full Stack Senior experto en Node.js, Express, PostgreSQL, Next.js y React.
 
 # Objetivo
