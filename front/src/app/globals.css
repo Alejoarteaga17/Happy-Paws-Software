@@ -95,3 +95,5 @@ h1 { font-size: 38px; }
 .logout-button { color: #b0463f; }
 @media (max-width: 850px) { .sidebar { width: 205px; } .content { padding-inline: 25px; } }
 @media (max-width: 620px) { .sidebar { background: var(--primary); } .content { padding: 25px 16px 45px; } .topbar { border-bottom: 0; } .intro { border-radius: 16px; } .stats { grid-template-columns: 1fr; } .stats article { padding: 18px 20px; } .appointment-shell { padding: 28px 16px 50px; } }
+
+.form-field select, .appointment-form select { width: 100%; padding: 11px 12px; border: 1px solid #dce1e8; border-radius: 8px; color: var(--ink); background: #fff; font: 14px "Avenir Next", "Segoe UI", sans-serif; }

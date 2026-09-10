@@ -2,7 +2,9 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 import { cancelAppointment, createAppointment, getAppointments, updateAppointment } from '../../services/appointment-service';
+import { getPets } from '../../services/pet-service';
 import { Appointment, AppointmentInput, AppointmentStatus } from '../../types/appointment';
+import { Pet } from '../../types/pet';
 
 const labels: Record<AppointmentStatus, string> = { SCHEDULED: 'Agendada', COMPLETED: 'Completada', CANCELLED: 'Cancelada' };
 const emptyForm: AppointmentInput = { petId: 0, scheduledAt: '', reason: '' };
@@ -10,6 +12,7 @@ const formatDate = (value: string) => new Intl.DateTimeFormat('es-CO', { dateSty
 
 export default function AppointmentsPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [pets, setPets] = useState<Pet[]>([]);
   const [form, setForm] = useState<AppointmentInput>(emptyForm);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
@@ -17,7 +20,10 @@ export default function AppointmentsPage() {
   const [message, setMessage] = useState<string | null>(null);
 
   const loadAppointments = async () => {
-    try { setAppointments(await getAppointments()); setMessage(null); }
+    try {
+      const [loadedAppointments, loadedPets] = await Promise.all([getAppointments(), getPets()]);
+      setAppointments(loadedAppointments); setPets(loadedPets); setMessage(null);
+    }
     catch (error) { setMessage(error instanceof Error ? error.message : 'No se pudieron cargar las citas'); }
     finally { setLoading(false); }
   };
@@ -47,7 +53,7 @@ export default function AppointmentsPage() {
     <header className="appointment-header"><div><p className="eyebrow">RF-04 · Agenda clínica</p><h1>Gestión de citas</h1><p>Organiza la atención veterinaria y conserva el historial de cada visita.</p></div><a className="back-link" href="/">Ver vacunaciones</a></header>
     <section className="appointment-layout">
       <form className="appointment-form" onSubmit={submit}><p className="eyebrow">{editingId === null ? 'Nueva cita' : `Editando cita #${editingId}`}</p><h2>{editingId === null ? 'Agendar atención' : 'Modificar cita'}</h2>
-        <label>Mascota asociada<input type="number" min="1" required value={form.petId || ''} onChange={(event) => setForm({ ...form, petId: Number(event.target.value) })} placeholder="ID de la mascota" /></label>
+        <label>Mascota asociada<select required value={form.petId || ''} onChange={(event) => setForm({ ...form, petId: Number(event.target.value) })}><option value="">Selecciona una mascota</option>{pets.map((pet) => <option key={pet.id} value={pet.id}>{pet.name} · {pet.species} · {pet.petTag}</option>)}</select></label>
         <label>Fecha y hora<input type="datetime-local" required value={form.scheduledAt} onChange={(event) => setForm({ ...form, scheduledAt: event.target.value })} /></label>
         <label>Motivo de consulta<textarea required rows={4} value={form.reason} onChange={(event) => setForm({ ...form, reason: event.target.value })} placeholder="Describe el motivo de la visita" /></label>
         <div className="form-actions"><button className="primary-button" disabled={saving}>{saving ? 'Guardando...' : editingId === null ? 'Crear cita' : 'Guardar cambios'}</button>{editingId !== null && <button type="button" className="secondary-button" onClick={() => { setEditingId(null); setForm(emptyForm); }}>Cancelar edición</button>}</div>

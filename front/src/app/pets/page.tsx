@@ -1,20 +1,26 @@
 'use client';
 
 import { FormEvent, useEffect, useState } from 'react';
+import { getOwners } from '../../services/owner-service';
 import { createPet, getPets } from '../../services/pet-service';
+import { Owner } from '../../types/owner';
 import { Pet } from '../../types/pet';
 
 const emptyForm = { ownerId: '', petTag: '', name: '', species: '', breed: '', birthDate: '', weight: '' };
 
 export default function PetsPage() {
   const [pets, setPets] = useState<Pet[]>([]);
+  const [owners, setOwners] = useState<Owner[]>([]);
   const [form, setForm] = useState(emptyForm);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
   const loadPets = async () => {
-    try { setPets(await getPets()); setMessage(null); }
+    try {
+      const [loadedPets, loadedOwners] = await Promise.all([getPets(), getOwners()]);
+      setPets(loadedPets); setOwners(loadedOwners); setMessage(null);
+    }
     catch (error) { setMessage(error instanceof Error ? error.message : 'No se pudieron cargar las mascotas'); }
     finally { setLoading(false); }
   };
@@ -34,7 +40,7 @@ export default function PetsPage() {
     <header className="appointment-header"><div><p className="eyebrow">RF-01 · Pacientes</p><h1>Registro de mascotas</h1><p>Vincula cada paciente con su propietario para mantener su historia clínica organizada.</p></div><a className="back-link" href="/">Volver al panel</a></header>
     <section className="appointment-layout">
       <form className="appointment-form" onSubmit={submit}><p className="eyebrow">Nueva mascota</p><h2>Registrar paciente</h2>
-        <label>ID del propietario<input required min="1" type="number" value={form.ownerId} onChange={(event) => setForm({ ...form, ownerId: event.target.value })} placeholder="Ej. 1" /></label>
+        <label>Propietario<select required value={form.ownerId} onChange={(event) => setForm({ ...form, ownerId: event.target.value })}><option value="">Selecciona un propietario</option>{owners.map((owner) => <option key={owner.id} value={owner.id}>{owner.fullName} · {owner.phone}</option>)}</select></label>
         <label>Pet tag<input required value={form.petTag} onChange={(event) => setForm({ ...form, petTag: event.target.value })} placeholder="Ej. HP-0005" /></label>
         <label>Nombre<input required value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} placeholder="Ej. Coco" /></label>
         <label>Especie<input required value={form.species} onChange={(event) => setForm({ ...form, species: event.target.value })} placeholder="Perro o gato" /></label>

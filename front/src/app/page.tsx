@@ -2,8 +2,10 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { createVaccination, getVaccinations } from '../services/vaccination-service';
+import { getPets } from '../services/pet-service';
 import { getSupabaseClient, isSupabaseConfigured } from '../services/supabase-client';
 import { Vaccination, VaccinationStatus } from '../types/vaccination';
+import { Pet } from '../types/pet';
 
 const statusLabels: Record<VaccinationStatus, string> = {
   ADMINISTERED: 'Aplicada',
@@ -36,6 +38,7 @@ function VaccinationRow({ vaccination }: { vaccination: Vaccination }) {
 
 export default function VaccinationDashboard() {
   const [vaccinations, setVaccinations] = useState<Vaccination[]>([]);
+  const [pets, setPets] = useState<Pet[]>([]);
   const [filter, setFilter] = useState<'ALL' | VaccinationStatus>('ALL');
   const [loading, setLoading] = useState(true);
   const [authLoading, setAuthLoading] = useState(true);
@@ -61,8 +64,9 @@ export default function VaccinationDashboard() {
 
         setUserEmail(userData.user.email ?? 'Usuario autenticado');
         setAuthLoading(false);
-        const data = await getVaccinations();
-        setVaccinations(data);
+        const [vaccinationData, petData] = await Promise.all([getVaccinations(), getPets()]);
+        setVaccinations(vaccinationData);
+        setPets(petData);
       } catch (error) {
         setErrorMessage(error instanceof Error ? error.message : 'No se pudieron cargar los datos');
       } finally {
@@ -155,7 +159,7 @@ export default function VaccinationDashboard() {
           <div className="modal-header"><div><p className="eyebrow">Registro clínico</p><h2 id="vaccination-form-title">Agregar vacunación</h2></div><button className="close-button" type="button" aria-label="Cerrar formulario" onClick={closeForm}>×</button></div>
           <p className="modal-description">Registra la dosis aplicada y la fecha de seguimiento para la mascota.</p>
           <form onSubmit={saveVaccination}>
-            <label className="form-field">ID de la mascota<input required min="1" type="number" value={form.petId} onChange={(event) => setForm({ ...form, petId: event.target.value })} placeholder="Ej. 1" /></label>
+            <label className="form-field">Mascota<select required value={form.petId} onChange={(event) => setForm({ ...form, petId: event.target.value })}><option value="">Selecciona una mascota</option>{pets.map((pet) => <option key={pet.id} value={pet.id}>{pet.name} · {pet.species} · {pet.petTag}</option>)}</select></label>
             <label className="form-field">Nombre de la vacuna<input required value={form.vaccineName} onChange={(event) => setForm({ ...form, vaccineName: event.target.value })} placeholder="Ej. Rabia" /></label>
             <div className="form-grid"><label className="form-field">Fecha de aplicación<input required type="date" value={form.administeredAt} onChange={(event) => setForm({ ...form, administeredAt: event.target.value })} /></label><label className="form-field">Próxima dosis<input required type="date" min={form.administeredAt || undefined} value={form.nextDueDate} onChange={(event) => setForm({ ...form, nextDueDate: event.target.value })} /></label></div>
             {formError && <p className="form-error" role="alert">{formError}</p>}
