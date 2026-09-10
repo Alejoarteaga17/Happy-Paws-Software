@@ -1,6 +1,8 @@
 # Happy Paws Frontend
 
-Aplicación Next.js para el panel operativo de la clínica. La ruta principal muestra el dashboard de vacunaciones, con indicadores para dosis próximas y vencidas. La ruta `/appointments` permite consultar, crear, modificar y cancelar citas veterinarias.
+Aplicación Next.js para el panel operativo de la clínica. La ruta principal muestra el dashboard de vacunaciones, `/pets` permite consultar y registrar mascotas, y `/appointments` permite consultar, crear, modificar y cancelar citas veterinarias.
+
+La pantalla `/pets` consume `GET/POST /api/v1/pets`, envía el token de sesión de Supabase y usa `ownerId` para vincular cada mascota con un propietario existente.
 
 ## Desarrollo
 

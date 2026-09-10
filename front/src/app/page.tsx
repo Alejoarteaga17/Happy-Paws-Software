@@ -120,7 +120,7 @@ export default function VaccinationDashboard() {
         <div className="brand"><span className="brand-mark">HP</span><span>Happy Paws<small>Care Central</small></span></div>
         <nav aria-label="Navegación principal">
           <a href="#resumen">Resumen</a>
-          <a href="#pacientes">Pacientes</a>
+          <a href="/pets">Pacientes</a>
           <a href="#agenda">Agenda</a>
           <a href="/appointments">Gestionar citas</a>
           <a className="active" href="#vacunaciones">Vacunaciones</a>

@@ -1,6 +1,16 @@
 # Happy Paws Backend
 
-API Express para la operación clínica. Expone vacunaciones en `/api/v1/vaccinations` y gestión de citas en `/api/v1/appointments`, usando Supabase como fuente de datos.
+API Express para la operación clínica. Expone mascotas en `/api/v1/pets`, vacunaciones en `/api/v1/vaccinations` y gestión de citas en `/api/v1/appointments`, usando Supabase como fuente de datos.
+
+## Mascotas
+
+Todas las rutas requieren `Authorization: Bearer <supabase-access-token>`:
+
+- `GET /api/v1/pets`: lista mascotas con el nombre del propietario.
+- `POST /api/v1/pets`: crea una mascota con `ownerId`, `petTag`, `name`, `species` y los campos opcionales `breed`, `birthDate` y `weight`.
+
+`ownerId` debe existir en `public.owners`; `petTag` es único y las relaciones se validan en Supabase.
+La consulta requiere rol `ADMIN`, `VET` o `RECEPTIONIST`; la creación requiere `ADMIN` o `RECEPTIONIST`. Esto es necesario porque el backend usa la clave `service_role`, que no aplica RLS automáticamente.
 
 ## Citas veterinarias
 
