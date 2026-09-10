@@ -6,11 +6,7 @@ Desde `back/`:
 
 ```bash
 npm test
+npm test -- --runInBand tests/appointment.service.test.ts tests/vaccination.service.test.ts
 ```
 
-Los tests verifican mapeo de filas, creación de recursos, validaciones de errores, asignación automática de veterinario y cancelación de citas.
-# Pruebas del backend
-
-Las pruebas cubren la clasificación de fechas de vacunación: una fecha anterior al día actual queda como `OVERDUE` y la fecha actual o futura como `PENDING`.
-
-Ejecutar con `npm test` desde `back/`.
+Los tests verifican mapeo de filas, incluyendo relaciones `pets` devueltas como objeto o arreglo, creación de recursos, validaciones de errores, asignación automática de veterinario y cancelación de citas.

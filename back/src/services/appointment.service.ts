@@ -9,15 +9,17 @@ interface AppointmentRow {
   reason: string;
   notes: string | null;
   status: AppointmentStatus;
-  pets: { name: string }[] | null;
+  pets: { name: string } | { name: string }[] | null;
 }
 
 const appointmentSelect = 'id, pet_id, vet_id, scheduled_at, reason, notes, status, pets(name)';
 
+const getPetName = (pets: AppointmentRow['pets']): string | undefined => Array.isArray(pets) ? pets[0]?.name : pets?.name;
+
 const toAppointment = (row: AppointmentRow): Appointment => ({
   id: row.id,
   petId: row.pet_id,
-  petName: row.pets?.[0]?.name ?? 'Mascota sin nombre',
+  petName: getPetName(row.pets) ?? 'Mascota sin nombre',
   vetId: row.vet_id,
   scheduledAt: row.scheduled_at,
   reason: row.reason,

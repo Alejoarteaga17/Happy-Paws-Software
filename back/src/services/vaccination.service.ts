@@ -8,13 +8,15 @@ interface VaccinationRow {
   administered_at: string;
   next_due_date: string;
   status: VaccinationStatus;
-  pets: { name: string }[] | null;
+  pets: { name: string } | { name: string }[] | null;
 }
+
+const getPetName = (pets: VaccinationRow['pets']): string | undefined => Array.isArray(pets) ? pets[0]?.name : pets?.name;
 
 const toVaccination = (row: VaccinationRow): Vaccination => ({
   id: row.id,
   petId: row.pet_id,
-  petName: row.pets?.[0]?.name ?? 'Mascota sin nombre',
+  petName: getPetName(row.pets) ?? 'Mascota sin nombre',
   vaccineName: row.vaccine_name,
   administeredAt: row.administered_at,
   nextDueDate: row.next_due_date,

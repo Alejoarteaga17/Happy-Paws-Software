@@ -13,6 +13,14 @@ const appointmentRow = {
 describe('AppointmentService', () => {
   beforeEach(() => { jest.clearAllMocks(); });
 
+  it('maps a many-to-one pet relation returned as an object', async () => {
+    const appointmentList = { order: jest.fn(async () => ({ data: [{ ...appointmentRow, pets: { name: 'Milo' } }], error: null })) };
+    const from = jest.fn().mockReturnValue({ select: jest.fn().mockReturnValue(appointmentList) });
+    mockedGetSupabaseClient.mockReturnValue({ from } as never);
+
+    await expect(AppointmentService.list()).resolves.toMatchObject([{ petName: 'Milo' }]);
+  });
+
   it('assigns the first available vet when one is not provided', async () => {
     const vetLookup = { maybeSingle: jest.fn(async () => ({ data: { id: 'vet-1' }, error: null })) };
     const appointmentInsert = { single: jest.fn(async () => ({ data: appointmentRow, error: null })) };
