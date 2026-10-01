@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "tsx watch src/app.ts",
     "build": "tsc",
-    "start": "node dist/app.js",
+    "start": "node dist/src/app.js",
     "test": "jest --runInBand",
     "lint": "eslint \"src/**/*.{ts,tsx}\" \"tests/**/*.{ts,tsx}\"",
     "lint:fix": "eslint \"src/**/*.{ts,tsx}\" \"tests/**/*.{ts,tsx}\" --fix",
