@@ -10,6 +10,8 @@ Plataforma interna para digitalizar la operación de Happy Paws Veterinary Clini
 
 ## Desarrollo local
 
+El repositorio no tiene un `package.json` raíz: `back` y `front` son aplicaciones independientes y sus comandos se ejecutan dentro de cada carpeta.
+
 Configura los archivos de entorno separados: `back/.env` para la API y `front/.env.local` para Next.js. No pongas la `service_role` key en el frontend.
 
 `back/.env`:
@@ -77,6 +79,19 @@ docker compose down
 
 El desarrollo sin Docker continúa usando `npm run dev` dentro de `back` y `front`, con sus respectivos archivos de entorno.
 
+## Formato y arquitectura
+
+Ambas aplicaciones usan Prettier con una configuración local para que el mismo chequeo funcione fuera y dentro de Docker:
+
+```bash
+(cd back && npm run format)
+(cd front && npm run format)
+```
+
+Para validar sin modificar archivos, ejecuta `npm run format:check` dentro de cada aplicación. El build de cada Dockerfile también ejecuta ese chequeo antes de compilar.
+
+La arquitectura actual está implementada por slices: Next.js consume la API Express, Express separa rutas, controladores, servicios y tipos, y Supabase es la única fuente de datos. En este estado sí están disponibles mascotas, citas y vacunaciones, junto con autenticación de token en las rutas protegidas y RLS en la migración. Aún no existen los módulos REST/UI completos de propietarios, usuarios, portal del propietario ni auditoría de eventos; tampoco hay un `package.json` raíz ni una instancia local de PostgreSQL. Estas son tareas pendientes del alcance global, no dependencias del formateador.
+
 Las rutas de vacunaciones requieren `Authorization: Bearer <supabase-access-token>`.
 
 Para cargar datos simulados directamente en Supabase, después de aplicar las migraciones y crear al menos cuatro mascotas:
@@ -89,6 +104,6 @@ npm run seed:vaccinations
 ## Validación
 
 ```bash
-cd back && npm test && npm run build
-cd front && npm run build
+(cd back && npm test && npm run build)
+(cd front && npm test && npm run build)
 ```

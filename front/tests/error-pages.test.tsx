@@ -11,7 +11,7 @@ type LinkProps = {
 };
 
 vi.mock('next/link', () => ({
-  default: ({ href, className, children }: LinkProps) => React.createElement('a', { href, className }, children)
+  default: ({ href, className, children }: LinkProps) => React.createElement('a', { href, className }, children),
 }));
 
 describe('error pages', () => {
@@ -26,10 +26,12 @@ describe('error pages', () => {
 
   it('renders the runtime error recovery actions', () => {
     const reset = vi.fn();
-    const markup = renderToStaticMarkup(React.createElement(ErrorPage, {
-      error: new Error('test error'),
-      reset
-    }));
+    const markup = renderToStaticMarkup(
+      React.createElement(ErrorPage, {
+        error: new Error('test error'),
+        reset,
+      }),
+    );
 
     expect(markup).toContain('Algo salió mal');
     expect(markup).toContain('La clínica necesita un segundo intento');

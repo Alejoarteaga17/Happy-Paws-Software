@@ -6,6 +6,10 @@
 
 ## 1. OBJETIVO
 
+### Estado actual validado del repositorio
+
+El repositorio es un monorepo sin `package.json` raíz: `back` y `front` se instalan, prueban, formatean y compilan desde sus propias carpetas. El slice implementado actualmente cubre dashboard, mascotas, citas y vacunaciones. El frontend usa Next.js App Router con CSS global y componentes React; no usa Tailwind en la implementación actual. El backend usa Express 5, TypeScript y Supabase con `service_role` únicamente en el servidor. Propietarios, usuarios, portal OWNER y auditoría todavía son alcance pendiente y no deben documentarse como módulos ya disponibles.
+
 Desarrollar e implementar la solución completa de software para **Happy Paws Care Central**, una aplicación web integral para la clínica veterinaria *Happy Paws Veterinary Clinic*. 
 
 El sistema debe digitalizar los flujos de trabajo operativos de la clínica, eliminando el uso de papel, centralizando la gestión de propietarios y mascotas, automatizando el control de citas y calendarios de vacunación, e implementando un portal seguro para que los propietarios de mascotas consulten el historial clínico y vacunas de sus animales.
@@ -17,8 +21,8 @@ Debes construir tanto el **Backend API (Node.js + Express + Supabase)** como el 
 ## 2. CONTEXTO Y ESPECIFICACIONES TÉCNICAS
 
 ### 2.1. Stack Tecnológico y Versiones Concretas
-* **Frontend:** Next.js (v14+ App Router), React 18+, Tailwind CSS, TypeScript.
-* **Backend:** Node.js (v20+ LTS), Express.js (v4.x), TypeScript.
+* **Frontend objetivo:** Next.js (v14+ App Router), React 18+, TypeScript. La implementación actual usa CSS global; no agregar Tailwind sin una decisión explícita del equipo.
+* **Backend actual:** Node.js (v20+ LTS), Express.js 5, TypeScript.
 * **Base de Datos:** **Supabase (PostgreSQL gestionado)**, usado de forma directa como única fuente de datos tanto en desarrollo como en producción. **No se levanta PostgreSQL local ni se usa Prisma ORM** — esto evita divergencias entre entornos locales y el entorno online. Cliente oficial: `@supabase/supabase-js`. Integración SSR/cookies de sesión en Next.js App Router: `@supabase/ssr`.
   ```bash
   npm install @supabase/supabase-js @supabase/ssr
@@ -28,6 +32,7 @@ Debes construir tanto el **Backend API (Node.js + Express + Supabase)** como el 
   2. **Row Level Security (RLS)** en las tablas de Supabase, como capa adicional de aislamiento de datos — especialmente crítica para el Portal de Propietarios (NFR-SEC-05).
 * **Infraestructura de Desarrollo:** El proyecto debe estar **dockerizado** (`docker-compose.yml` en la raíz) para que todo el equipo trabaje con el mismo entorno de `back` y `front`. Supabase **no** se dockeriza (es un servicio gestionado externo); Docker solo orquesta las apps `back` y `front`. Debe existir siempre la alternativa de **correr el proyecto sin Docker** (con `npm run dev` directo), documentada por igual.
 * **Pruebas:** Jest / Supertest (Backend), Vitest / React Testing Library (Frontend).
+* **Formato:** Prettier se configura y ejecuta por separado en `/back` y `/front`. Cada aplicación debe mantener `.prettierrc.json`, `.prettierignore`, los scripts `format` y `format:check`, y su Dockerfile debe ejecutar `format:check` antes de compilar.
 
 ### 2.2. Comandos para Instalar, Correr y Probar
 
@@ -40,20 +45,19 @@ SUPABASE_SERVICE_ROLE_KEY=<service-role-key>  # usado SOLO en /back, jamás expu
 
 **Opción A — Sin Docker (desarrollo local directo):**
 ```bash
-# Raíz del proyecto
-npm install
-
 # Backend (directorio /back)
 cd back
 npm install
 npm run dev          # Servidor en http://localhost:4000
 npm run test         # Ejecutar pruebas unitarias e integración
+npm run format:check # Validar formato sin modificar archivos
 
 # Frontend (directorio /front)
 cd front
 npm install
 npm run dev          # Servidor en http://localhost:3000
 npm run test         # Ejecutar pruebas frontend
+npm run format:check # Validar formato sin modificar archivos
 ```
 
 **Opción B — Con Docker (entorno homogéneo para todo el equipo):**

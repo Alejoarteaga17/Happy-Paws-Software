@@ -17,12 +17,21 @@ const vaccinationTemplates = [
   { vaccineName: 'Rabia', administeredAt: '2025-09-05', nextDueDate: '2026-09-12', status: 'PENDING' as const },
   { vaccineName: 'Séxtuple', administeredAt: '2025-03-11', nextDueDate: '2026-08-29', status: 'OVERDUE' as const },
   { vaccineName: 'Triple felina', administeredAt: '2025-10-02', nextDueDate: '2026-09-18', status: 'PENDING' as const },
-  { vaccineName: 'Leucemia felina', administeredAt: '2025-02-17', nextDueDate: '2026-08-19', status: 'OVERDUE' as const }
+  {
+    vaccineName: 'Leucemia felina',
+    administeredAt: '2025-02-17',
+    nextDueDate: '2026-08-19',
+    status: 'OVERDUE' as const,
+  },
 ];
 
 async function seedVaccinations(): Promise<void> {
   const supabase = getSupabaseClient();
-  const { data: pets, error: petsError } = await supabase.from('pets').select('id, name').order('id').limit(vaccinationTemplates.length);
+  const { data: pets, error: petsError } = await supabase
+    .from('pets')
+    .select('id, name')
+    .order('id')
+    .limit(vaccinationTemplates.length);
 
   if (petsError) {
     throw new Error(`No se pudieron consultar las mascotas: ${petsError.message}`);
@@ -30,7 +39,9 @@ async function seedVaccinations(): Promise<void> {
 
   const availablePets = (pets ?? []) as PetRow[];
   if (availablePets.length < vaccinationTemplates.length) {
-    throw new Error(`Se requieren al menos ${vaccinationTemplates.length} mascotas en Supabase; solo hay ${availablePets.length}.`);
+    throw new Error(
+      `Se requieren al menos ${vaccinationTemplates.length} mascotas en Supabase; solo hay ${availablePets.length}.`,
+    );
   }
 
   const seeds: VaccinationSeed[] = availablePets.map((pet, index) => ({
@@ -38,23 +49,30 @@ async function seedVaccinations(): Promise<void> {
     vaccine_name: vaccinationTemplates[index].vaccineName,
     administered_at: vaccinationTemplates[index].administeredAt,
     next_due_date: vaccinationTemplates[index].nextDueDate,
-    status: vaccinationTemplates[index].status
+    status: vaccinationTemplates[index].status,
   }));
 
   const { data: existing, error: existingError } = await supabase
     .from('vaccinations')
     .select('pet_id, vaccine_name, next_due_date')
-    .in('pet_id', seeds.map(({ pet_id }) => pet_id));
+    .in(
+      'pet_id',
+      seeds.map(({ pet_id }) => pet_id),
+    );
 
   if (existingError) {
     throw new Error(`No se pudieron comprobar vacunaciones existentes: ${existingError.message}`);
   }
 
-  const newSeeds = seeds.filter((seed) => !(existing ?? []).some((row) => (
-    row.pet_id === seed.pet_id &&
-    row.vaccine_name === seed.vaccine_name &&
-    row.next_due_date === seed.next_due_date
-  )));
+  const newSeeds = seeds.filter(
+    (seed) =>
+      !(existing ?? []).some(
+        (row) =>
+          row.pet_id === seed.pet_id &&
+          row.vaccine_name === seed.vaccine_name &&
+          row.next_due_date === seed.next_due_date,
+      ),
+  );
 
   if (newSeeds.length === 0) {
     console.log('Las vacunaciones simuladas ya existen. No se insertaron duplicados.');

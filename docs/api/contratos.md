@@ -375,6 +375,13 @@ El frontend no debe enviar `SUPABASE_SERVICE_ROLE_KEY`. Para ejecutar ambos proy
 | `409` | Conflicto de unicidad, como `petTag` duplicado | Mostrar el conflicto y solicitar otro valor |
 | `500` | Error interno o de Supabase | Mostrar error genérico y conservar la entrada del formulario |
 
-## 8. Endpoints aún no implementados
+## 8. Endpoints administrativos y portal
 
-Los endpoints de propietarios, servicios, usuarios, auditoría y autenticación propia no forman parte de este contrato porque todavía no están registrados en `back/src/app.ts`. Cuando se implementen, deben agregarse aquí junto con sus tipos, permisos, ejemplos de request/response y funciones correspondientes en `front/src/services`.
+El backend registra estas superficies autenticadas adicionales:
+
+- `GET/POST/PUT /api/v1/owners`: consulta staff; escritura ADMIN/RECEPTIONIST.
+- `GET /api/v1/portal/me`: dashboard aislado al OWNER autenticado.
+- `GET /api/v1/users`, `GET /api/v1/users/:id`, `PATCH /api/v1/users/:id/role`: administración ADMIN.
+- `GET /api/v1/audit`: consulta de auditoría ADMIN, con `limit` opcional entre 1 y 200.
+
+El backend valida el rol y el vínculo `owners.auth_user_id` antes de usar la clave `service_role`. Las lecturas de vacunaciones también requieren autenticación.

@@ -21,18 +21,24 @@ const getHeaders = async (): Promise<HeadersInit> => {
 };
 
 const request = async <T>(init?: RequestInit): Promise<T> => {
-  const response = await fetch(`${getApiUrl()}/api/v1/pets`, { cache: 'no-store', ...init, headers: { ...(await getHeaders()), ...init?.headers } });
+  const response = await fetch(`${getApiUrl()}/api/v1/pets`, {
+    cache: 'no-store',
+    ...init,
+    headers: { ...(await getHeaders()), ...init?.headers },
+  });
   const payload = (await response.json()) as { success: boolean; data: T | null; error: ApiError | null };
   if (!response.ok || !payload.success || payload.data === null) {
-    const message = payload.error?.code === 'PET_TAG_ALREADY_EXISTS'
-      ? 'El pet_tag ya está registrado.'
-      : payload.error?.code === 'OWNER_NOT_FOUND'
-        ? 'El propietario indicado no existe.'
-        : payload.error?.message ?? 'No se pudo completar la operación';
+    const message =
+      payload.error?.code === 'PET_TAG_ALREADY_EXISTS'
+        ? 'El pet_tag ya está registrado.'
+        : payload.error?.code === 'OWNER_NOT_FOUND'
+          ? 'El propietario indicado no existe.'
+          : (payload.error?.message ?? 'No se pudo completar la operación');
     throw new Error(message);
   }
   return payload.data;
 };
 
 export const getPets = (): Promise<Pet[]> => request<Pet[]>();
-export const createPet = (input: CreatePetInput): Promise<Pet> => request<Pet>({ method: 'POST', body: JSON.stringify(input) });
+export const createPet = (input: CreatePetInput): Promise<Pet> =>
+  request<Pet>({ method: 'POST', body: JSON.stringify(input) });

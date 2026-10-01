@@ -23,6 +23,6 @@ export async function getOwners(): Promise<Owner[]> {
     id: Number(owner.id),
     fullName: owner.full_name,
     phone: owner.phone,
-    email: owner.email
+    email: owner.email,
   }));
 }

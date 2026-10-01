@@ -11,7 +11,8 @@ interface VaccinationRow {
   pets: { name: string } | { name: string }[] | null;
 }
 
-const getPetName = (pets: VaccinationRow['pets']): string | undefined => Array.isArray(pets) ? pets[0]?.name : pets?.name;
+const getPetName = (pets: VaccinationRow['pets']): string | undefined =>
+  Array.isArray(pets) ? pets[0]?.name : pets?.name;
 
 const toVaccination = (row: VaccinationRow): Vaccination => ({
   id: row.id,
@@ -20,7 +21,7 @@ const toVaccination = (row: VaccinationRow): Vaccination => ({
   vaccineName: row.vaccine_name,
   administeredAt: row.administered_at,
   nextDueDate: row.next_due_date,
-  status: row.status
+  status: row.status,
 });
 
 export class VaccinationService {
@@ -60,7 +61,7 @@ export class VaccinationService {
         vaccine_name: input.vaccineName,
         administered_at: input.administeredAt,
         next_due_date: input.nextDueDate,
-        status: input.status
+        status: input.status,
       })
       .select('id, pet_id, vaccine_name, administered_at, next_due_date, status, pets(name)')
       .single();
@@ -77,7 +78,11 @@ export class VaccinationService {
   }
 }
 
-export const getVaccinationStatus = (administeredAt: string, nextDueDate?: string, today = new Date()): VaccinationStatus => {
+export const getVaccinationStatus = (
+  administeredAt: string,
+  nextDueDate?: string,
+  today = new Date(),
+): VaccinationStatus => {
   const administeredDate = new Date(`${administeredAt}T00:00:00Z`);
   const dueDate = new Date(`${nextDueDate ?? administeredAt}T00:00:00Z`);
   const currentDate = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));

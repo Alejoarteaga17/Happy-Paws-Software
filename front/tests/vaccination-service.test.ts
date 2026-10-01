@@ -4,7 +4,7 @@ import { createVaccination, getVaccinations } from '../src/services/vaccination-
 const getSession = vi.fn();
 vi.mock('../src/services/supabase-client', () => ({
   isSupabaseConfigured: true,
-  getSupabaseClient: () => ({ auth: { getSession } })
+  getSupabaseClient: () => ({ auth: { getSession } }),
 }));
 
 describe('vaccination service', () => {
@@ -15,62 +15,105 @@ describe('vaccination service', () => {
   });
 
   it('loads vaccinations with the session token', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({ success: true, data: [{ id: 1, status: 'PENDING' }], error: null }), { status: 200 })));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        new Response(JSON.stringify({ success: true, data: [{ id: 1, status: 'PENDING' }], error: null }), {
+          status: 200,
+        }),
+      ),
+    );
     await expect(getVaccinations()).resolves.toEqual([{ id: 1, status: 'PENDING' }]);
-    expect(fetch).toHaveBeenCalledWith('http://localhost:4000/api/v1/vaccinations', expect.objectContaining({ headers: { Authorization: 'Bearer token' } }));
+    expect(fetch).toHaveBeenCalledWith(
+      'http://localhost:4000/api/v1/vaccinations',
+      expect.objectContaining({ headers: { Authorization: 'Bearer token' } }),
+    );
   });
 
   it('requires an authenticated session before creating a vaccination', async () => {
     getSession.mockResolvedValue({ data: { session: null }, error: null });
-    await expect(createVaccination({ petId: 1, vaccineName: 'Rabia', administeredAt: '2026-09-10', nextDueDate: '2027-09-10' }))
-      .rejects.toThrow('Debes iniciar sesión');
+    await expect(
+      createVaccination({ petId: 1, vaccineName: 'Rabia', administeredAt: '2026-09-10', nextDueDate: '2027-09-10' }),
+    ).rejects.toThrow('Debes iniciar sesión');
   });
 
   it('creates a vaccination and reports invalid input', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({ success: false, data: null, error: { code: 'INVALID_VACCINATION' } }), { status: 400 })));
-    await expect(createVaccination({ petId: 1, vaccineName: 'Rabia', administeredAt: '2026-09-10', nextDueDate: '2027-09-10' }))
-      .rejects.toThrow('Completa los datos de la vacunación');
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        new Response(JSON.stringify({ success: false, data: null, error: { code: 'INVALID_VACCINATION' } }), {
+          status: 400,
+        }),
+      ),
+    );
+    await expect(
+      createVaccination({ petId: 1, vaccineName: 'Rabia', administeredAt: '2026-09-10', nextDueDate: '2027-09-10' }),
+    ).rejects.toThrow('Completa los datos de la vacunación');
   });
 
-  it.each(['PENDING', 'OVERDUE'] as const)('sends the selected %s status when creating a vaccination', async (status) => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({
-      success: true,
-      data: { id: 1, status },
-      error: null
-    }), { status: 201 })));
+  it.each(['PENDING', 'OVERDUE'] as const)(
+    'sends the selected %s status when creating a vaccination',
+    async (status) => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue(
+          new Response(
+            JSON.stringify({
+              success: true,
+              data: { id: 1, status },
+              error: null,
+            }),
+            { status: 201 },
+          ),
+        ),
+      );
 
-    await createVaccination({
-      petId: 1,
-      vaccineName: 'Rabia',
-      administeredAt: '2026-09-01',
-      nextDueDate: '2026-09-10',
-      status
-    });
-
-    expect(fetch).toHaveBeenCalledWith('http://localhost:4000/api/v1/vaccinations', expect.objectContaining({
-      body: JSON.stringify({
+      await createVaccination({
         petId: 1,
         vaccineName: 'Rabia',
         administeredAt: '2026-09-01',
         nextDueDate: '2026-09-10',
-        status
-      })
-    }));
-  });
+        status,
+      });
+
+      expect(fetch).toHaveBeenCalledWith(
+        'http://localhost:4000/api/v1/vaccinations',
+        expect.objectContaining({
+          body: JSON.stringify({
+            petId: 1,
+            vaccineName: 'Rabia',
+            administeredAt: '2026-09-01',
+            nextDueDate: '2026-09-10',
+            status,
+          }),
+        }),
+      );
+    },
+  );
 
   it('returns the persisted status from the API after creating a vaccination', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({
-      success: true,
-      data: { id: 1, status: 'OVERDUE' },
-      error: null
-    }), { status: 201 })));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            success: true,
+            data: { id: 1, status: 'OVERDUE' },
+            error: null,
+          }),
+          { status: 201 },
+        ),
+      ),
+    );
 
-    await expect(createVaccination({
-      petId: 1,
-      vaccineName: 'Rabia',
-      administeredAt: '2026-09-01',
-      nextDueDate: '2026-09-05',
-      status: 'OVERDUE'
-    })).resolves.toMatchObject({ status: 'OVERDUE' });
+    await expect(
+      createVaccination({
+        petId: 1,
+        vaccineName: 'Rabia',
+        administeredAt: '2026-09-01',
+        nextDueDate: '2026-09-05',
+        status: 'OVERDUE',
+      }),
+    ).resolves.toMatchObject({ status: 'OVERDUE' });
   });
 });

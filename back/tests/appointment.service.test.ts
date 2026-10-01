@@ -6,15 +6,25 @@ jest.mock('../src/config/supabase', () => ({ getSupabaseClient: jest.fn() }));
 const mockedGetSupabaseClient = jest.mocked(getSupabaseClient);
 
 const appointmentRow = {
-  id: 4, pet_id: 2, vet_id: 'vet-1', scheduled_at: '2026-09-11T14:00:00Z',
-  reason: 'Control', notes: null, status: 'SCHEDULED', pets: [{ name: 'Milo' }]
+  id: 4,
+  pet_id: 2,
+  vet_id: 'vet-1',
+  scheduled_at: '2026-09-11T14:00:00Z',
+  reason: 'Control',
+  notes: null,
+  status: 'SCHEDULED',
+  pets: [{ name: 'Milo' }],
 };
 
 describe('AppointmentService', () => {
-  beforeEach(() => { jest.clearAllMocks(); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
   it('maps a many-to-one pet relation returned as an object', async () => {
-    const appointmentList = { order: jest.fn(async () => ({ data: [{ ...appointmentRow, pets: { name: 'Milo' } }], error: null })) };
+    const appointmentList = {
+      order: jest.fn(async () => ({ data: [{ ...appointmentRow, pets: { name: 'Milo' } }], error: null })),
+    };
     const from = jest.fn().mockReturnValue({ select: jest.fn().mockReturnValue(appointmentList) });
     mockedGetSupabaseClient.mockReturnValue({ from } as never);
 
@@ -26,20 +36,30 @@ describe('AppointmentService', () => {
     const appointmentInsert = { single: jest.fn(async () => ({ data: appointmentRow, error: null })) };
     const appointmentSelect = jest.fn().mockReturnValue(appointmentInsert);
     const insert = jest.fn().mockReturnValue({ select: appointmentSelect });
-    const from = jest.fn()
-      .mockReturnValueOnce({ select: jest.fn().mockReturnValue({ eq: jest.fn().mockReturnValue({ order: jest.fn().mockReturnValue({ limit: jest.fn().mockReturnValue(vetLookup) }) }) }) })
+    const from = jest
+      .fn()
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnValue({
+          eq: jest
+            .fn()
+            .mockReturnValue({ order: jest.fn().mockReturnValue({ limit: jest.fn().mockReturnValue(vetLookup) }) }),
+        }),
+      })
       .mockReturnValueOnce({ insert });
     mockedGetSupabaseClient.mockReturnValue({ from } as never);
 
-    await expect(AppointmentService.create({ petId: 2, scheduledAt: appointmentRow.scheduled_at, reason: 'Control' }))
-      .resolves.toMatchObject({ id: 4, petName: 'Milo', vetId: 'vet-1' });
+    await expect(
+      AppointmentService.create({ petId: 2, scheduledAt: appointmentRow.scheduled_at, reason: 'Control' }),
+    ).resolves.toMatchObject({ id: 4, petName: 'Milo', vetId: 'vet-1' });
     expect(insert).toHaveBeenCalledWith(expect.objectContaining({ pet_id: 2, vet_id: 'vet-1', status: 'SCHEDULED' }));
   });
 
   it('returns not found when an appointment cannot be loaded', async () => {
     const maybeSingle = jest.fn(async () => ({ data: null, error: null }));
     const eq = jest.fn().mockReturnValue({ maybeSingle });
-    mockedGetSupabaseClient.mockReturnValue({ from: jest.fn().mockReturnValue({ select: jest.fn().mockReturnValue({ eq }) }) } as never);
+    mockedGetSupabaseClient.mockReturnValue({
+      from: jest.fn().mockReturnValue({ select: jest.fn().mockReturnValue({ eq }) }),
+    } as never);
 
     await expect(AppointmentService.getById(999)).rejects.toThrow('APPOINTMENT_NOT_FOUND');
   });

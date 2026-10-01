@@ -40,7 +40,7 @@ export async function getVaccinations(): Promise<Vaccination[]> {
 
   const response = await fetch(`${normalizedApiUrl}/api/v1/vaccinations`, {
     cache: 'no-store',
-    headers
+    headers,
   });
   const payload = (await response.json()) as {
     success: boolean;
@@ -70,9 +70,9 @@ export async function createVaccination(input: CreateVaccinationInput): Promise<
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${sessionData.session.access_token}`
+      Authorization: `Bearer ${sessionData.session.access_token}`,
     },
-    body: JSON.stringify(input)
+    body: JSON.stringify(input),
   });
   const payload = (await response.json()) as {
     success: boolean;

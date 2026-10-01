@@ -26,15 +26,12 @@ const toPet = (row: PetRow): Pet => ({
   species: row.species,
   breed: row.breed,
   birthDate: row.birth_date,
-  weight: row.weight
+  weight: row.weight,
 });
 
 export class PetService {
   static async list(): Promise<Pet[]> {
-    const { data, error } = await getSupabaseClient()
-      .from('pets')
-      .select(petSelect)
-      .order('name', { ascending: true });
+    const { data, error } = await getSupabaseClient().from('pets').select(petSelect).order('name', { ascending: true });
 
     if (error) throw new Error(`PETS_LIST_FAILED: ${error.message}`);
     return (data as PetRow[]).map(toPet);
@@ -50,7 +47,7 @@ export class PetService {
         species: input.species.trim(),
         breed: input.breed?.trim() || null,
         birth_date: input.birthDate || null,
-        weight: input.weight ?? null
+        weight: input.weight ?? null,
       })
       .select(petSelect)
       .single();

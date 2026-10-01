@@ -25,17 +25,19 @@ describe('VaccinationService', () => {
   it('maps a many-to-one pet relation returned as an object', async () => {
     const vaccinationList = {
       order: jest.fn(async () => ({
-        data: [{
-          id: 1,
-          pet_id: 7,
-          vaccine_name: 'Rabia',
-          administered_at: '2026-09-09',
-          next_due_date: '2027-09-09',
-          status: 'ADMINISTERED',
-          pets: { name: 'Luna' }
-        }],
-        error: null
-      }))
+        data: [
+          {
+            id: 1,
+            pet_id: 7,
+            vaccine_name: 'Rabia',
+            administered_at: '2026-09-09',
+            next_due_date: '2027-09-09',
+            status: 'ADMINISTERED',
+            pets: { name: 'Luna' },
+          },
+        ],
+        error: null,
+      })),
     };
     const from = jest.fn().mockReturnValue({ select: jest.fn().mockReturnValue(vaccinationList) });
     mockedGetSupabaseClient.mockReturnValue({ from } as never);
