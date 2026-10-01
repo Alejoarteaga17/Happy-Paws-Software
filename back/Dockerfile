@@ -4,7 +4,7 @@ COPY package*.json ./
 RUN npm ci
 
 FROM dependencies AS build
-COPY tsconfig.json .eslintrc.json .eslintignore .prettierrc.json .prettierignore ./
+COPY tsconfig.json jest.config.js .eslintrc.json .eslintignore .prettierrc.json .prettierignore ./
 COPY tests ./tests
 COPY src ./src
 RUN npm run format:check

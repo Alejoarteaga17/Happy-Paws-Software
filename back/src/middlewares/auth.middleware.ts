@@ -58,7 +58,8 @@ export async function requireAuth(request: Request, response: Response, next: Ne
   next();
 }
 
-export const requireRoles = (...allowedRoles: AppRole[]) =>
+export const requireRoles =
+  (...allowedRoles: AppRole[]) =>
   (request: Request, response: Response, next: NextFunction): void => {
     if (!request.user) {
       unauthorized(response);
