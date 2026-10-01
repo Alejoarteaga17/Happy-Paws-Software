@@ -14,7 +14,8 @@ interface AppointmentRow {
 
 const appointmentSelect = 'id, pet_id, vet_id, scheduled_at, reason, notes, status, pets(name)';
 
-const getPetName = (pets: AppointmentRow['pets']): string | undefined => Array.isArray(pets) ? pets[0]?.name : pets?.name;
+const getPetName = (pets: AppointmentRow['pets']): string | undefined =>
+  Array.isArray(pets) ? pets[0]?.name : pets?.name;
 
 const toAppointment = (row: AppointmentRow): Appointment => ({
   id: row.id,
@@ -24,7 +25,7 @@ const toAppointment = (row: AppointmentRow): Appointment => ({
   scheduledAt: row.scheduled_at,
   reason: row.reason,
   notes: row.notes,
-  status: row.status
+  status: row.status,
 });
 
 export class AppointmentService {
@@ -52,7 +53,8 @@ export class AppointmentService {
 
   static async create(input: CreateAppointmentInput): Promise<Appointment> {
     const supabase = getSupabaseClient();
-    let vetId = input.vetId;
+    const { vetId: requestedVetId } = input;
+    let vetId = requestedVetId;
 
     if (!vetId) {
       const { data: vet, error: vetLookupError } = await supabase
@@ -65,12 +67,19 @@ export class AppointmentService {
 
       if (vetLookupError) throw new Error('VET_LOOKUP_FAILED');
       if (!vet) throw new Error('VET_NOT_FOUND');
-      vetId = vet.id as string;
+      const { id } = vet;
+      vetId = id as string;
     }
 
     const { data, error } = await supabase
       .from('appointments')
-      .insert({ pet_id: input.petId, vet_id: vetId, scheduled_at: input.scheduledAt, reason: input.reason, status: input.status ?? 'SCHEDULED' })
+      .insert({
+        pet_id: input.petId,
+        vet_id: vetId,
+        scheduled_at: input.scheduledAt,
+        reason: input.reason,
+        status: input.status ?? 'SCHEDULED',
+      })
       .select(appointmentSelect)
       .single();
 

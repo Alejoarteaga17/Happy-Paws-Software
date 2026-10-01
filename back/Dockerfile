@@ -4,8 +4,11 @@ COPY package*.json ./
 RUN npm ci
 
 FROM dependencies AS build
-COPY tsconfig.json ./
+COPY tsconfig.json .eslintrc.json .eslintignore .prettierrc.json .prettierignore ./
+COPY tests ./tests
 COPY src ./src
+RUN npm run format:check
+RUN npm run lint
 RUN npm run build
 
 FROM node:22-alpine AS runtime

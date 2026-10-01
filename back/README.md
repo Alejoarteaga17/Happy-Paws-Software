@@ -1,28 +1,25 @@
 # Happy Paws Backend
 
-API Express para la operación clínica. Expone mascotas en `/api/v1/pets`, vacunaciones en `/api/v1/vaccinations` y gestión de citas en `/api/v1/appointments`, usando Supabase como fuente de datos.
+API Express para la operación clínica. Usa Supabase como fuente de datos y separa rutas, controladores, servicios y acceso a datos.
 
-## Mascotas
+## Autenticación y autorización
 
-Todas las rutas requieren `Authorization: Bearer <supabase-access-token>`:
+Todas las rutas de datos requieren `Authorization: Bearer <access-token>`. El backend valida el token con Supabase Auth, carga el rol desde `profiles` y, para cuentas `OWNER`, carga el propietario vinculado por `owners.auth_user_id`. Como el backend usa `service_role`, las comprobaciones de rol y recurso se realizan explícitamente antes de cada consulta.
 
-- `GET /api/v1/pets`: lista mascotas con el nombre del propietario y `createdAt` para los indicadores temporales del resumen.
-- `POST /api/v1/pets`: crea una mascota con `ownerId`, `petTag`, `name`, `species` y los campos opcionales `breed`, `birthDate` y `weight`.
+Las lecturas de vacunaciones no son anónimas. `GET /api/v1/portal/me` es la única superficie de portal y devuelve exclusivamente los datos del propietario autenticado.
 
-`ownerId` debe existir en `public.owners`; `petTag` es único y las relaciones se validan en Supabase.
-La consulta requiere rol `ADMIN`, `VET` o `RECEPTIONIST`; la creación requiere `ADMIN` o `RECEPTIONIST`. Esto es necesario porque el backend usa la clave `service_role`, que no aplica RLS automáticamente.
+## Rutas
 
-## Citas veterinarias
+- Mascotas: `GET /api/v1/pets`, `POST /api/v1/pets` (consulta staff; creación ADMIN/RECEPTIONIST).
+- Citas: CRUD en `/api/v1/appointments` (staff).
+- Vacunaciones: `GET/POST /api/v1/vaccinations` (consulta staff; escritura ADMIN/VET).
+- Propietarios: `GET/POST/PUT /api/v1/owners` (staff; escritura ADMIN/RECEPTIONIST).
+- Portal OWNER: `GET /api/v1/portal/me`.
+- Usuarios: `GET /api/v1/users`, `GET /api/v1/users/:id`, `PATCH /api/v1/users/:id/role` (ADMIN).
+- Auditoría: `GET /api/v1/audit` (ADMIN).
+- Sesión: `GET /api/v1/auth/me`.
 
-Todas las rutas requieren `Authorization: Bearer <supabase-access-token>`:
-
-- `GET /api/v1/appointments`: consulta la agenda ordenada por fecha.
-- `GET /api/v1/appointments/:id`: consulta una cita.
-- `POST /api/v1/appointments`: crea una cita con `petId`, `scheduledAt` y `reason`.
-- `PUT /api/v1/appointments/:id`: modifica mascota, fecha/hora, motivo, veterinario o estado.
-- `PATCH /api/v1/appointments/:id/cancel`: cambia el estado a `CANCELLED`.
-
-Las respuestas usan `{ success, data, error }`. La tabla `appointments` y sus políticas RLS están definidas en la migración de Supabase existente.
+Las respuestas usan `{ success, data, error }`. Las mutaciones de mascotas, citas, vacunaciones, propietarios y perfiles registran actor, entidad y metadatos en `audit_logs`.
 
 ## Variables de entorno
 
@@ -30,11 +27,10 @@ Las respuestas usan `{ success, data, error }`. La tabla `appointments` y sus po
 SUPABASE_URL=https://cuaqjycqzyfjdpilklkl.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=<service-role-key-secreta>
 PORT=4000
-ALLOW_ANONYMOUS_READS=true
+ALLOW_ANONYMOUS_READS=false
 ```
 
-La clave `SUPABASE_SERVICE_ROLE_KEY` nunca debe enviarse al frontend ni commitearse.
-Mientras se implementa el login, `ALLOW_ANONYMOUS_READS=true` permite consultar el dashboard de vacunaciones sin sesión. Solo aplica a `GET /api/v1/vaccinations`; los `POST` siguen requiriendo un token de Supabase. Cambia este valor a `false` o elimínalo cuando el login esté listo.
+`ALLOW_ANONYMOUS_READS` se conserva por compatibilidad, pero no habilita lecturas anónimas. La clave `SUPABASE_SERVICE_ROLE_KEY` nunca debe enviarse al frontend ni commitearse.
 
 ## Comandos
 
@@ -42,17 +38,14 @@ Mientras se implementa el login, `ALLOW_ANONYMOUS_READS=true` permite consultar 
 npm install
 npm test
 npm run build
+npm run lint
 npm run seed:vaccinations
+npm run format
+npm run format:check
 ```
 
-`npm run seed:vaccinations` consulta las primeras cuatro mascotas existentes y guarda cuatro vacunaciones simuladas directamente en Supabase. Es idempotente para esos registros: repetirlo no crea duplicados.
+Desde la raíz, `docker compose up --build back` compila y ejecuta la API.
 
-## Docker
+## Calidad de código
 
-Desde la raíz del repositorio, copia `back/.env.example` a `back/.env` y completa la clave secreta. El servicio se construye y ejecuta junto con el frontend mediante:
-
-```bash
-docker compose up --build back
-```
-
-La imagen compila TypeScript en una etapa de build y ejecuta `dist/app.js` con dependencias de producción. Supabase no se levanta localmente.
+ESLint usa `eslint-config-airbnb-base` como guía de nomenclatura y estilo, las reglas recomendadas para TypeScript y `eslint-config-prettier` para evitar conflictos con Prettier. `npm run lint` valida `src` y `tests`; `npm run lint:fix` aplica las correcciones automáticas disponibles. El Dockerfile ejecuta ESLint antes de compilar.
