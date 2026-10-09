@@ -4,6 +4,7 @@ import { AppointmentService } from '../services/appointment.service';
 import { AuditService } from '../services/audit.service';
 
 const statuses: AppointmentStatus[] = ['SCHEDULED', 'COMPLETED', 'CANCELLED'];
+const maxNotesLength = 2000;
 
 const sendError = (response: Response, error: unknown, fallbackCode: string): void => {
   const message = error instanceof Error ? error.message : 'Error interno';
@@ -63,6 +64,8 @@ export const createAppointment = async (request: Request, response: Response): P
     !Number.isNaN(Date.parse(body.scheduledAt)) &&
     typeof body.reason === 'string' &&
     body.reason.trim().length > 0 &&
+    (body.notes === undefined ||
+      (typeof body.notes === 'string' && body.notes.trim().length <= maxNotesLength)) &&
     (body.vetId === undefined || typeof body.vetId === 'string') &&
     (body.status === undefined ||
       (typeof body.status === 'string' && statuses.includes(body.status as AppointmentStatus)));
@@ -95,6 +98,8 @@ export const updateAppointment = async (request: Request, response: Response): P
     (body.scheduledAt === undefined ||
       (typeof body.scheduledAt === 'string' && !Number.isNaN(Date.parse(body.scheduledAt)))) &&
     (body.reason === undefined || (typeof body.reason === 'string' && body.reason.trim().length > 0)) &&
+    (body.notes === undefined ||
+      (typeof body.notes === 'string' && body.notes.trim().length <= maxNotesLength)) &&
     (body.vetId === undefined || typeof body.vetId === 'string') &&
     (body.status === undefined ||
       (typeof body.status === 'string' && statuses.includes(body.status as AppointmentStatus)));

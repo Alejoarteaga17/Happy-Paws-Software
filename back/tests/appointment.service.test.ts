@@ -73,4 +73,15 @@ describe('AppointmentService', () => {
     await AppointmentService.cancel(4);
     expect(update).toHaveBeenCalledWith({ status: 'CANCELLED' });
   });
+
+  it('persists a standardized clinical note when updating an appointment', async () => {
+    const maybeSingle = jest.fn(async () => ({ data: appointmentRow, error: null }));
+    const eq = jest.fn().mockReturnValue({ select: jest.fn().mockReturnValue({ maybeSingle }) });
+    const update = jest.fn().mockReturnValue({ eq });
+    mockedGetSupabaseClient.mockReturnValue({ from: jest.fn().mockReturnValue({ update }) } as never);
+
+    await AppointmentService.update(4, { notes: '  Hallazgos: estable. Tratamiento: control.  ' });
+
+    expect(update).toHaveBeenCalledWith({ notes: 'Hallazgos: estable. Tratamiento: control.' });
+  });
 });

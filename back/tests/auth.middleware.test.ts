@@ -54,4 +54,34 @@ describe('authorization middleware', () => {
     expect(result.statusCode).toBe(403);
     expect(next).not.toHaveBeenCalled();
   });
+
+  it('allows an authenticated owner with a linked owner record', () => {
+    const next = jest.fn();
+    const { responseMock, result } = response();
+
+    requireOwner(
+      { user: { id: 'owner-1', email: 'owner@example.com', role: 'OWNER', ownerId: 7 } } as never,
+      responseMock as never,
+      next,
+    );
+
+    expect(result.statusCode).toBe(200);
+    expect(next).toHaveBeenCalledTimes(1);
+  });
+
+  it('allows every configured staff role for a staff-only route', () => {
+    for (const role of ['ADMIN', 'VET', 'RECEPTIONIST'] as const) {
+      const next = jest.fn();
+      const { responseMock, result } = response();
+
+      requireRoles('ADMIN', 'VET', 'RECEPTIONIST')(
+        { user: { id: `${role}-1`, email: `${role.toLowerCase()}@example.com`, role, ownerId: null } } as never,
+        responseMock as never,
+        next,
+      );
+
+      expect(result.statusCode).toBe(200);
+      expect(next).toHaveBeenCalledTimes(1);
+    }
+  });
 });

@@ -78,6 +78,7 @@ export class AppointmentService {
         vet_id: vetId,
         scheduled_at: input.scheduledAt,
         reason: input.reason,
+        notes: input.notes?.trim() || null,
         status: input.status ?? 'SCHEDULED',
       })
       .select(appointmentSelect)
@@ -102,6 +103,7 @@ export class AppointmentService {
     if (input.petId !== undefined) updateData.pet_id = input.petId;
     if (input.scheduledAt !== undefined) updateData.scheduled_at = input.scheduledAt;
     if (input.reason !== undefined) updateData.reason = input.reason;
+    if (input.notes !== undefined) updateData.notes = input.notes.trim() || null;
     if (input.vetId !== undefined) updateData.vet_id = input.vetId;
     if (input.status !== undefined) updateData.status = input.status;
 

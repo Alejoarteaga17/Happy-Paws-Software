@@ -20,7 +20,7 @@ const labels: Record<AppointmentStatus, string> = {
   COMPLETED: 'Completada',
   CANCELLED: 'Cancelada',
 };
-const emptyForm: AppointmentInput = { petId: 0, scheduledAt: '', reason: '', status: 'SCHEDULED' };
+const emptyForm: AppointmentInput = { petId: 0, scheduledAt: '', reason: '', notes: '', status: 'SCHEDULED' };
 const formatDate = (value: string) =>
   new Intl.DateTimeFormat('es-CO', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
 const temporalLabel = (appointment: Appointment): string =>
@@ -87,6 +87,7 @@ function AppointmentsManager() {
       petId: appointment.petId,
       scheduledAt: appointment.scheduledAt.slice(0, 16),
       reason: appointment.reason,
+      notes: appointment.notes ?? '',
       status: appointment.status,
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -166,6 +167,17 @@ function AppointmentsManager() {
                 placeholder="Describe el motivo de la visita"
               />
             </label>
+            <label>
+              Nota clínica estandarizada
+              <textarea
+                rows={5}
+                maxLength={2000}
+                value={form.notes ?? ''}
+                onChange={(event) => setForm({ ...form, notes: event.target.value })}
+                placeholder="Registra hallazgos, diagnóstico y tratamiento indicado"
+              />
+              <span className="field-help">Máximo 2000 caracteres.</span>
+            </label>
             <div className="form-actions">
               <button className="primary-button" disabled={saving}>
                 {saving ? 'Guardando...' : editingId === null ? 'Crear cita' : 'Guardar cambios'}
@@ -206,6 +218,7 @@ function AppointmentsManager() {
                     <strong>{appointment.petName}</strong>
                     <span>{formatDate(appointment.scheduledAt)}</span>
                     <span>{appointment.reason}</span>
+                    {appointment.notes && <span>{appointment.notes}</span>}
                   </div>
                   <div className="appointment-actions">
                     <StatusBadge tone={appointment.status.toLowerCase()} label={temporalLabel(appointment)} />

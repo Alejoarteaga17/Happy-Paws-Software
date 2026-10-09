@@ -15,6 +15,7 @@ export interface CreateAppointmentInput {
   petId: number;
   scheduledAt: string;
   reason: string;
+  notes?: string;
   vetId?: string;
   status?: AppointmentStatus;
 }
@@ -23,6 +24,7 @@ export interface UpdateAppointmentInput {
   petId?: number;
   scheduledAt?: string;
   reason?: string;
+  notes?: string;
   vetId?: string | null;
   status?: AppointmentStatus;
 }
