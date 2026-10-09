@@ -70,7 +70,7 @@ describe('authorization middleware', () => {
   });
 
   it('allows every configured staff role for a staff-only route', () => {
-    for (const role of ['ADMIN', 'VET', 'RECEPTIONIST'] as const) {
+    (['ADMIN', 'VET', 'RECEPTIONIST'] as const).forEach((role) => {
       const next = jest.fn();
       const { responseMock, result } = response();
 
@@ -82,6 +82,6 @@ describe('authorization middleware', () => {
 
       expect(result.statusCode).toBe(200);
       expect(next).toHaveBeenCalledTimes(1);
-    }
+    });
   });
 });

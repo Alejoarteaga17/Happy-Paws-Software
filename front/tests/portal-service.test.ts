@@ -4,7 +4,9 @@ import { getOwnerPortal, mapPortal } from '../src/services/portal-service';
 vi.mock('../src/services/supabase-client', () => ({
   isSupabaseConfigured: true,
   getSupabaseClient: () => ({
-    auth: { getSession: vi.fn().mockResolvedValue({ data: { session: { access_token: 'owner-token' } }, error: null }) },
+    auth: {
+      getSession: vi.fn().mockResolvedValue({ data: { session: { access_token: 'owner-token' } }, error: null }),
+    },
   }),
 }));
 
@@ -58,9 +60,11 @@ describe('portal service', () => {
 
   it('requests only the authenticated owner portal endpoint', async () => {
     vi.stubEnv('NEXT_PUBLIC_API_URL', 'http://localhost:4000');
-    const fetchMock = vi.fn().mockResolvedValue(
-      new Response(JSON.stringify({ success: true, data: portalRow, error: null }), { status: 200 }),
-    );
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(
+        new Response(JSON.stringify({ success: true, data: portalRow, error: null }), { status: 200 }),
+      );
     vi.stubGlobal('fetch', fetchMock);
 
     await expect(getOwnerPortal()).resolves.toMatchObject({ owner: { id: 7 } });
@@ -75,7 +79,9 @@ describe('portal service', () => {
     vi.stubGlobal(
       'fetch',
       vi.fn().mockResolvedValue(
-        new Response(JSON.stringify({ success: false, data: null, error: { message: 'No autorizado' } }), { status: 403 }),
+        new Response(JSON.stringify({ success: false, data: null, error: { message: 'No autorizado' } }), {
+          status: 403,
+        }),
       ),
     );
 
