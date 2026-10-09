@@ -4,9 +4,7 @@ import { useEffect, useState } from 'react';
 import AppHeader from '../../components/app-header';
 import RestrictedView from '../../components/restricted-view';
 import { useAuth } from '../../context/auth-context';
-import { getAppointments } from '../../services/appointment-service';
-import { getPets } from '../../services/pet-service';
-import { getVaccinations } from '../../services/vaccination-service';
+import { getOwnerPortal } from '../../services/portal-service';
 import { Appointment } from '../../types/appointment';
 import { Pet } from '../../types/pet';
 import { Vaccination } from '../../types/vaccination';
@@ -28,8 +26,8 @@ function OwnerPortal() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    Promise.all([getPets(), getAppointments(), getVaccinations()])
-      .then(([loadedPets, loadedAppointments, loadedVaccinations]) => {
+    getOwnerPortal()
+      .then(({ pets: loadedPets, appointments: loadedAppointments, vaccinations: loadedVaccinations }) => {
         setPets(loadedPets);
         setAppointments(loadedAppointments);
         setVaccinations(loadedVaccinations);

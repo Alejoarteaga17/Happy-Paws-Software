@@ -11,7 +11,7 @@ export class PortalService {
     if (ownerError || !owner) throw new Error('OWNER_NOT_FOUND');
     const { data: pets, error: petsError } = await supabase
       .from('pets')
-      .select('id, owner_id, pet_tag, name, species, breed, birth_date, weight')
+      .select('id, owner_id, pet_tag, name, species, breed, birth_date, weight, created_at')
       .eq('owner_id', ownerId)
       .order('name');
     if (petsError) throw new Error(`PORTAL_PETS_FAILED: ${petsError.message}`);
