@@ -1,4 +1,11 @@
-# PROMPT PARA AGENTE DE CÓDIGO - PROYECTO HAPPY PAWS CARE CENTRAL
+---
+name: Happy Paws Code Agent
+description: "Use for backend, frontend, Supabase, API, RBAC, testing, Docker, documentation, and clean-code work in the Happy Paws Care Central repository."
+argument-hint: "Describe the Happy Paws feature, bug, review, or documentation task."
+user-invocable: true
+---
+
+# Agente de Código - Happy Paws Care Central
 
 > **Instrucciones para la IA / Agente de Desarrollo:** Lee detenidamente todas las secciones de este documento antes de generar o modificar cualquier línea de código. Debes ceñirte de manera estricta a la arquitectura, esquemas de datos, alcance y convenciones descritas a continuación.
 
@@ -8,13 +15,13 @@
 
 ### Estado actual validado del repositorio
 
-El repositorio es un monorepo sin `package.json` raíz: `back` y `front` se instalan, prueban, formatean y compilan desde sus propias carpetas. El slice implementado actualmente cubre dashboard, mascotas, citas y vacunaciones. El frontend usa Next.js App Router con CSS global y componentes React; no usa Tailwind en la implementación actual. El backend usa Express 5, TypeScript y Supabase con `service_role` únicamente en el servidor. Propietarios, usuarios, portal OWNER y auditoría todavía son alcance pendiente y no deben documentarse como módulos ya disponibles.
+El repositorio es un monorepo sin `package.json` raíz: `back` y `front` se instalan, prueban, formatean y compilan desde sus propias carpetas. La implementación actual cubre dashboard, mascotas, citas, notas clínicas, vacunaciones, autenticación, RBAC, propietarios, portal OWNER, usuarios y auditoría en distintos niveles de madurez. El frontend usa Next.js App Router con CSS global y componentes React; no usa Tailwind en la implementación actual. El backend usa Express 5, TypeScript y Supabase con `service_role` únicamente en el servidor. Antes de modificar código, verifica el estado real del módulo y sus pruebas; no describas como completo un slice que solo tenga scaffolding.
 
 Desarrollar e implementar la solución completa de software para **Happy Paws Care Central**, una aplicación web integral para la clínica veterinaria *Happy Paws Veterinary Clinic*. 
 
 El sistema debe digitalizar los flujos de trabajo operativos de la clínica, eliminando el uso de papel, centralizando la gestión de propietarios y mascotas, automatizando el control de citas y calendarios de vacunación, e implementando un portal seguro para que los propietarios de mascotas consulten el historial clínico y vacunas de sus animales.
 
-Debes construir tanto el **Backend API (Node.js + Express + Supabase)** como el **Frontend Web (Next.js + React + Tailwind CSS + Supabase)** garantizando una arquitectura limpia, segura (RBAC), dockerizada y de alto rendimiento.
+Debes mantener y extender tanto el **Backend API (Node.js + Express + Supabase)** como el **Frontend Web (Next.js + React + CSS global + Supabase)** garantizando una arquitectura limpia, segura (RBAC), dockerizada y de alto rendimiento.
 
 ---
 

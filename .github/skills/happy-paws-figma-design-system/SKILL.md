@@ -1,6 +1,8 @@
 ---
 name: happy-paws-figma-design-system
-description: "Use when implementing, reviewing, or extending the Happy Paws frontend UI from the Figma design system, including tokens, typography, atoms, components, dashboard, login, badges, forms, and AppHeader."
+description: "Use when implementing, reviewing, or refactoring Happy Paws frontend UI from the Figma design system: Figma tokens, typography, atoms, components, dashboard, login, portal, badges, forms, tables, responsive layouts, and AppHeader."
+argument-hint: "Describe the Happy Paws screen, component, or visual change to implement from Figma."
+user-invocable: true
 ---
 
 # Happy Paws Figma Design System
@@ -27,6 +29,8 @@ Use this skill when the task mentions any of the following:
 - Typography, color tokens, borders, radii, spacing or responsive visual behavior.
 
 This skill applies only to `front/`. Do not modify `back/` for a visual task.
+
+Do not load this skill for backend, Supabase schema, API contract, RBAC, or infrastructure-only changes. For cross-layer work, use the existing frontend behavior and API contracts as constraints, and apply this skill only to the frontend visual surface.
 
 ## Design system map
 
@@ -110,6 +114,7 @@ If a new visual pattern repeats across two screens, add or extend a shared compo
 8. Keep responsive behavior functional at desktop and mobile widths.
 9. Do not add Tailwind solely because the historical project prompt mentions it; the current frontend uses global CSS and React components.
 10. Do not use temporary Figma asset URLs in production code.
+11. Run the frontend test, type-check, build, lint, and format checks after implementation.
 
 ## Component conventions
 
