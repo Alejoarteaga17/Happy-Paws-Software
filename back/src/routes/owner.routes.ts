@@ -3,9 +3,9 @@ import { createOwner, deleteOwner, getOwner, listOwners, updateOwner } from '../
 import { requireAuth, requireRoles } from '../middlewares/auth.middleware';
 
 export const ownerRouter = Router();
-ownerRouter.use(requireAuth, requireRoles('ADMIN', 'RECEPTIONIST', 'VET'));
-ownerRouter.get('/', listOwners);
-ownerRouter.get('/:id', getOwner);
+ownerRouter.use(requireAuth);
+ownerRouter.get('/', requireRoles('ADMIN', 'RECEPTIONIST'), listOwners);
+ownerRouter.get('/:id', requireRoles('ADMIN', 'RECEPTIONIST'), getOwner);
 ownerRouter.post('/', requireRoles('ADMIN', 'RECEPTIONIST'), createOwner);
 ownerRouter.put('/:id', requireRoles('ADMIN', 'RECEPTIONIST'), updateOwner);
 ownerRouter.delete('/:id', requireRoles('ADMIN'), deleteOwner);
