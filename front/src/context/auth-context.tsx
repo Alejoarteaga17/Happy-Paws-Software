@@ -21,7 +21,9 @@ interface AuthContextValue {
 }
 
 export type Permission =
+  | 'manage_owners'
   | 'manage_pets'
+  | 'edit_pets_basic'
   | 'manage_appointments'
   | 'view_appointments'
   | 'manage_vaccinations'
@@ -31,9 +33,10 @@ export type Permission =
 
 const permissions: Record<UserRole, Permission[]> = {
   OWNER: ['view_owner_portal', 'view_appointments'],
-  RECEPTIONIST: ['manage_pets', 'manage_appointments', 'view_appointments'],
-  VET: ['manage_appointments', 'manage_vaccinations', 'view_appointments'],
+  RECEPTIONIST: ['manage_owners', 'manage_pets', 'manage_appointments', 'view_appointments'],
+  VET: ['edit_pets_basic', 'manage_vaccinations'],
   ADMIN: [
+    'manage_owners',
     'manage_pets',
     'manage_appointments',
     'view_appointments',

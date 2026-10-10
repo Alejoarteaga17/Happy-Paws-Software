@@ -25,6 +25,7 @@ const appointmentLabels: Record<Appointment['status'], string> = {
   SCHEDULED: 'Agendada',
   COMPLETED: 'Completada',
   CANCELLED: 'Cancelada',
+  MISSED: 'No atendida',
 };
 
 function LoadingState() {

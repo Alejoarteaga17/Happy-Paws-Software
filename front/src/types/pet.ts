@@ -20,3 +20,9 @@ export interface CreatePetInput {
   birthDate?: string;
   weight?: number;
 }
+
+export type UpdatePetInput = Partial<CreatePetInput> & {
+  breed?: string | null;
+  birthDate?: string | null;
+  weight?: number | null;
+};

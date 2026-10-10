@@ -1,12 +1,13 @@
 # Happy Paws Care Central
 
-Plataforma interna para digitalizar la operación de Happy Paws Veterinary Clinic. El primer slice implementado cubre el registro y seguimiento de vacunaciones (RF-06).
+Plataforma interna para digitalizar la operación de Happy Paws Veterinary Clinic. Los slices operativos actuales cubren propietarios, mascotas, citas, vacunaciones, autenticación/RBAC y el portal seguro del propietario.
 
-## Vacunaciones
+## Módulos operativos
 
 - `supabase/migrations/20260909000000_create_happy_paws_schema.sql`: esquema inicial completo, relaciones, índices, datos base y políticas RLS.
-- `back/`: API Express con mascotas en `/api/v1/pets`, vacunaciones y CRUD de citas en `/api/v1/appointments`.
-- `front/`: dashboard Next.js con vacunaciones, registro de mascotas en `/pets` y gestión de citas en `/appointments`.
+- `back/`: API Express con CRUD de propietarios (`/api/v1/owners`), mascotas (`/api/v1/pets`), citas (`/api/v1/appointments`) y vacunaciones.
+- `front/`: dashboard Next.js con propietarios en `/owners`, mascotas en `/pets`, citas en `/appointments` y vacunaciones.
+- Propietarios y mascotas usan eliminación lógica para conservar historial clínico. Las citas `SCHEDULED` se marcan automáticamente como `MISSED` cuando su fecha ya pasó; `CANCELLED` queda reservado para cancelaciones explícitas.
 
 ## Desarrollo local
 
@@ -90,7 +91,7 @@ Ambas aplicaciones usan Prettier con una configuración local para que el mismo 
 
 Para validar sin modificar archivos, ejecuta `npm run format:check` dentro de cada aplicación. El build de cada Dockerfile también ejecuta ese chequeo antes de compilar.
 
-La arquitectura actual está implementada por slices: Next.js consume la API Express, Express separa rutas, controladores, servicios y tipos, y Supabase es la única fuente de datos. En este estado sí están disponibles mascotas, citas y vacunaciones, junto con autenticación de token en las rutas protegidas y RLS en la migración. Aún no existen los módulos REST/UI completos de propietarios, usuarios, portal del propietario ni auditoría de eventos; tampoco hay un `package.json` raíz ni una instancia local de PostgreSQL. Estas son tareas pendientes del alcance global, no dependencias del formateador.
+La arquitectura actual está implementada por slices: Next.js consume la API Express, Express separa rutas, controladores, servicios y tipos, y Supabase es la única fuente de datos. Las escrituras pasan por la API protegida con Supabase Auth y RBAC; las tablas mantienen RLS como segunda barrera. Recepción gestiona propietarios, mascotas y citas; administración puede desactivar propietarios y mascotas; veterinaria puede consultar y editar datos básicos de mascotas. Tampoco hay un `package.json` raíz ni una instancia local de PostgreSQL.
 
 Las rutas de vacunaciones requieren `Authorization: Bearer <supabase-access-token>`.
 

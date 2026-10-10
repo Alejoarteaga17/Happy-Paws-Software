@@ -19,6 +19,7 @@ const labels: Record<AppointmentStatus, string> = {
   SCHEDULED: 'Agendada',
   COMPLETED: 'Completada',
   CANCELLED: 'Cancelada',
+  MISSED: 'No atendida',
 };
 const emptyForm: AppointmentInput = { petId: 0, scheduledAt: '', reason: '', notes: '', status: 'SCHEDULED' };
 const formatDate = (value: string) =>
@@ -155,6 +156,7 @@ function AppointmentsManager() {
                 <option value="SCHEDULED">Agendada / pendiente</option>
                 <option value="COMPLETED">Completada</option>
                 <option value="CANCELLED">Cancelada</option>
+                <option value="MISSED">No atendida</option>
               </select>
             </label>
             <label>
