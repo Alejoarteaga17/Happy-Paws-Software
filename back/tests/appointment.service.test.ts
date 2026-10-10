@@ -22,10 +22,14 @@ describe('AppointmentService', () => {
   });
 
   it('maps a many-to-one pet relation returned as an object', async () => {
+    const missedUpdate = { eq: jest.fn().mockReturnValue({ lt: jest.fn(async () => ({ error: null })) }) };
     const appointmentList = {
       order: jest.fn(async () => ({ data: [{ ...appointmentRow, pets: { name: 'Milo' } }], error: null })),
     };
-    const from = jest.fn().mockReturnValue({ select: jest.fn().mockReturnValue(appointmentList) });
+    const from = jest
+      .fn()
+      .mockReturnValueOnce({ update: jest.fn().mockReturnValue(missedUpdate) })
+      .mockReturnValueOnce({ select: jest.fn().mockReturnValue(appointmentList) });
     mockedGetSupabaseClient.mockReturnValue({ from } as never);
 
     await expect(AppointmentService.list()).resolves.toMatchObject([{ petName: 'Milo' }]);
@@ -57,11 +61,30 @@ describe('AppointmentService', () => {
   it('returns not found when an appointment cannot be loaded', async () => {
     const maybeSingle = jest.fn(async () => ({ data: null, error: null }));
     const eq = jest.fn().mockReturnValue({ maybeSingle });
+    const missedUpdate = { eq: jest.fn().mockReturnValue({ lt: jest.fn(async () => ({ error: null })) }) };
     mockedGetSupabaseClient.mockReturnValue({
-      from: jest.fn().mockReturnValue({ select: jest.fn().mockReturnValue({ eq }) }),
+      from: jest
+        .fn()
+        .mockReturnValueOnce({ update: jest.fn().mockReturnValue(missedUpdate) })
+        .mockReturnValueOnce({ select: jest.fn().mockReturnValue({ eq }) }),
     } as never);
 
     await expect(AppointmentService.getById(999)).rejects.toThrow('APPOINTMENT_NOT_FOUND');
+  });
+
+  it('marks past scheduled appointments as missed before listing them', async () => {
+    const update = jest.fn().mockReturnValue({
+      eq: jest.fn().mockReturnValue({ lt: jest.fn(async () => ({ error: null })) }),
+    });
+    const order = jest.fn(async () => ({ data: [], error: null }));
+    const from = jest
+      .fn()
+      .mockReturnValueOnce({ update })
+      .mockReturnValueOnce({ select: jest.fn().mockReturnValue({ order }) });
+    mockedGetSupabaseClient.mockReturnValue({ from } as never);
+
+    await AppointmentService.list();
+    expect(update).toHaveBeenCalledWith({ status: 'MISSED' });
   });
 
   it('cancels an appointment through the update operation', async () => {

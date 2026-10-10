@@ -103,3 +103,22 @@ export const updateOwner = async (request: Request, response: Response): Promise
     fail(response, error, 'OWNER_UPDATE_FAILED');
   }
 };
+
+export const deleteOwner = async (request: Request, response: Response): Promise<void> => {
+  const id = Number(request.params.id);
+  if (!Number.isInteger(id) || id < 1) {
+    response.status(400).json({
+      success: false,
+      data: null,
+      error: { code: 'INVALID_OWNER_ID', message: 'El id del propietario es inválido.' },
+    });
+    return;
+  }
+  try {
+    const data = await OwnerService.setDeleted(id, true);
+    await AuditService.record({ actorUserId: request.user!.id, action: 'DELETE', entityName: 'owners', entityId: id });
+    response.json({ success: true, data, error: null });
+  } catch (error) {
+    fail(response, error, 'OWNER_DELETE_FAILED');
+  }
+};

@@ -13,6 +13,7 @@ export class OwnerService {
     const { data, error } = await getSupabaseClient()
       .from('owners')
       .select('id, auth_user_id, full_name, phone, email, address, created_at')
+      .is('deleted_at', null)
       .order('full_name');
     if (error) throw new Error(`OWNERS_LIST_FAILED: ${error.message}`);
     return data ?? [];
@@ -59,6 +60,18 @@ export class OwnerService {
       .select('id, auth_user_id, full_name, phone, email, address, created_at')
       .maybeSingle();
     if (error) throw new Error(`OWNER_UPDATE_FAILED: ${error.message}`);
+    if (!data) throw new Error('OWNER_NOT_FOUND');
+    return data;
+  }
+
+  static async setDeleted(id: number, deleted: boolean) {
+    const { data, error } = await getSupabaseClient()
+      .from('owners')
+      .update({ deleted_at: deleted ? new Date().toISOString() : null })
+      .eq('id', id)
+      .select('id, auth_user_id, full_name, phone, email, address, created_at')
+      .maybeSingle();
+    if (error) throw new Error(`OWNER_DELETE_FAILED: ${error.message}`);
     if (!data) throw new Error('OWNER_NOT_FOUND');
     return data;
   }

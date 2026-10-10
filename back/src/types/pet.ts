@@ -20,3 +20,13 @@ export interface CreatePetInput {
   birthDate?: string;
   weight?: number;
 }
+
+export interface UpdatePetInput {
+  ownerId?: number;
+  petTag?: string;
+  name?: string;
+  species?: string;
+  breed?: string | null;
+  birthDate?: string | null;
+  weight?: number | null;
+}

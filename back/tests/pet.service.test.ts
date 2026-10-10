@@ -31,7 +31,7 @@ describe('PetService', () => {
       ],
       error: null,
     }));
-    const select = jest.fn().mockReturnValue({ order });
+    const select = jest.fn().mockReturnValue({ is: jest.fn().mockReturnValue({ order }) });
     mockedGetSupabaseClient.mockReturnValue({ from: jest.fn().mockReturnValue({ select }) } as never);
 
     await expect(PetService.list()).resolves.toEqual([
@@ -89,5 +89,55 @@ describe('PetService', () => {
     await expect(PetService.create({ ownerId: 7, petTag: 'HP-001', name: 'Luna', species: 'Gato' })).rejects.toThrow(
       'PET_TAG_ALREADY_EXISTS',
     );
+  });
+
+  it('updates a pet with normalized fields', async () => {
+    const maybeSingle = jest.fn(async () => ({
+      data: {
+        id: 2,
+        created_at: '2026-09-10T10:00:00Z',
+        owner_id: 7,
+        pet_tag: 'HP-002',
+        name: 'Milo',
+        species: 'Perro',
+        breed: null,
+        birth_date: null,
+        weight: 5,
+        owners: [{ full_name: 'Ana Perez' }],
+      },
+      error: null,
+    }));
+    const select = jest.fn().mockReturnValue({ maybeSingle });
+    const update = jest
+      .fn()
+      .mockReturnValue({ eq: jest.fn().mockReturnValue({ is: jest.fn().mockReturnValue({ select }) }) });
+    mockedGetSupabaseClient.mockReturnValue({ from: jest.fn().mockReturnValue({ update }) } as never);
+
+    await PetService.update(2, { name: ' Milo ', species: ' Perro ' });
+    expect(update).toHaveBeenCalledWith({ name: 'Milo', species: 'Perro' });
+  });
+
+  it('soft deletes a pet without removing its row', async () => {
+    const maybeSingle = jest.fn(async () => ({
+      data: {
+        id: 2,
+        created_at: '2026-09-10T10:00:00Z',
+        owner_id: 7,
+        pet_tag: 'HP-002',
+        name: 'Milo',
+        species: 'Perro',
+        breed: null,
+        birth_date: null,
+        weight: null,
+        owners: [{ full_name: 'Ana Perez' }],
+      },
+      error: null,
+    }));
+    const select = jest.fn().mockReturnValue({ maybeSingle });
+    const update = jest.fn().mockReturnValue({ eq: jest.fn().mockReturnValue({ select }) });
+    mockedGetSupabaseClient.mockReturnValue({ from: jest.fn().mockReturnValue({ update }) } as never);
+
+    await PetService.setDeleted(2, true);
+    expect(update).toHaveBeenCalledWith({ deleted_at: expect.any(String) });
   });
 });

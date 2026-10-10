@@ -29,7 +29,17 @@ const toAppointment = (row: AppointmentRow): Appointment => ({
 });
 
 export class AppointmentService {
+  private static async markPastScheduledAsMissed(): Promise<void> {
+    const { error } = await getSupabaseClient()
+      .from('appointments')
+      .update({ status: 'MISSED' })
+      .eq('status', 'SCHEDULED')
+      .lt('scheduled_at', new Date().toISOString());
+    if (error) throw new Error(`APPOINTMENTS_STATUS_UPDATE_FAILED: ${error.message}`);
+  }
+
   static async list(): Promise<Appointment[]> {
+    await AppointmentService.markPastScheduledAsMissed();
     const { data, error } = await getSupabaseClient()
       .from('appointments')
       .select(appointmentSelect)
@@ -40,6 +50,7 @@ export class AppointmentService {
   }
 
   static async getById(id: number): Promise<Appointment> {
+    await AppointmentService.markPastScheduledAsMissed();
     const { data, error } = await getSupabaseClient()
       .from('appointments')
       .select(appointmentSelect)

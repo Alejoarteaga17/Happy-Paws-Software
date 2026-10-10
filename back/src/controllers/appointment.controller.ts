@@ -3,7 +3,7 @@ import { AppointmentStatus, CreateAppointmentInput, UpdateAppointmentInput } fro
 import { AppointmentService } from '../services/appointment.service';
 import { AuditService } from '../services/audit.service';
 
-const statuses: AppointmentStatus[] = ['SCHEDULED', 'COMPLETED', 'CANCELLED'];
+const statuses: AppointmentStatus[] = ['SCHEDULED', 'COMPLETED', 'CANCELLED', 'MISSED'];
 const maxNotesLength = 2000;
 
 const sendError = (response: Response, error: unknown, fallbackCode: string): void => {
