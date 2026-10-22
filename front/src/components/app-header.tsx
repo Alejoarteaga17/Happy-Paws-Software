@@ -41,19 +41,23 @@ export default function AppHeader() {
         </span>
       </a>
       <nav className="header-nav" aria-label="Navegación principal">
-        {navigationItems
-          .filter((item) => !profile || item.roles.includes(profile.role as UserRole))
-          .map((item) => {
-            const [itemPath, itemHash] = item.href.split('#');
-            const isActive = itemHash ? pathname === itemPath && hash === `#${itemHash}` : pathname === itemPath;
+        <ul className="header-nav-list">
+          {navigationItems
+            .filter((item) => !profile || item.roles.includes(profile.role as UserRole))
+            .map((item) => {
+              const [itemPath, itemHash] = item.href.split('#');
+              const isActive = itemHash ? pathname === itemPath && hash === `#${itemHash}` : pathname === itemPath;
 
-            return (
-              <a className={`header-nav-link${isActive ? ' active' : ''}`} href={item.href} key={item.label}>
-                <Icon name={item.icon} className="header-nav-icon" />
-                <span className="header-nav-label">{item.label}</span>
-              </a>
-            );
-          })}
+              return (
+                <li key={item.label}>
+                  <a className={`header-nav-link${isActive ? ' active' : ''}`} href={item.href}>
+                    <Icon name={item.icon} className="header-nav-icon" />
+                    <span className="header-nav-label">{item.label}</span>
+                  </a>
+                </li>
+              );
+            })}
+        </ul>
       </nav>
       <div className="header-profile">
         <a href={profile?.role === 'OWNER' ? '/portal' : '/users'} aria-label="Abrir perfil de usuario" title="Perfil">

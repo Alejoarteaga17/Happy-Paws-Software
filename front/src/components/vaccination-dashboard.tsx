@@ -136,16 +136,6 @@ export default function VaccinationDashboard() {
             <span className="eyebrow">Módulo preventivo</span>
             <h1>Vacunaciones</h1>
           </div>
-          <div className="user-chip">
-            <span className="user-avatar">HP</span>
-            <span>
-              <strong>{userEmail}</strong>
-              <small>Sesión de Supabase</small>
-            </span>
-            <button className="text-button logout-button" type="button" onClick={() => void signOut()}>
-              Salir
-            </button>
-          </div>
         </header>
         <section className="intro">
           <div>

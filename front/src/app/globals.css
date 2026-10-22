@@ -170,11 +170,17 @@ h3 {
   text-transform: uppercase;
 }
 .header-nav {
+  flex: 1;
+  margin: 0;
+}
+.header-nav-list {
   display: flex;
   flex: 1;
   justify-content: center;
   gap: 8px;
   margin: 0;
+  padding: 0;
+  list-style: none;
 }
 .header-nav-link {
   display: flex;
@@ -1030,7 +1036,7 @@ h3 {
   .header-profile {
     display: none;
   }
-  .header-nav {
+  .header-nav-list {
     justify-content: space-between;
     gap: 3px;
   }
