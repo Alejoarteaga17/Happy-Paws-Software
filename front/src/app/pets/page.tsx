@@ -1,0 +1,247 @@
+'use client';
+
+import { FormEvent, useEffect, useState } from 'react';
+import { getOwners } from '../../services/owner-service';
+import { createPet, deletePet, getPets, updatePet } from '../../services/pet-service';
+import { Owner } from '../../types/owner';
+import { Pet } from '../../types/pet';
+import AppHeader from '../../components/app-header';
+import RestrictedView from '../../components/restricted-view';
+import { RoleView, useAuth } from '../../context/auth-context';
+
+const emptyForm = { ownerId: '', petTag: '', name: '', species: '', breed: '', birthDate: '', weight: '' };
+
+export default function PetsPage() {
+  const { can, loading } = useAuth();
+  if (loading) return <main className="restricted-view">Cargando perfil...</main>;
+  if (!can('manage_pets') && !can('edit_pets_basic'))
+    return (
+      <RestrictedView permission="manage_pets">
+        <PetsManager />
+      </RestrictedView>
+    );
+  return <PetsManager />;
+}
+
+function PetsManager() {
+  const { can } = useAuth();
+  const canManage = can('manage_pets');
+  const [pets, setPets] = useState<Pet[]>([]);
+  const [owners, setOwners] = useState<Owner[]>([]);
+  const [form, setForm] = useState(emptyForm);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+
+  const loadPets = async () => {
+    try {
+      const [loadedPets, loadedOwners] = await Promise.all([getPets(), getOwners()]);
+      setPets(loadedPets);
+      setOwners(loadedOwners);
+      setMessage(null);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'No se pudieron cargar las mascotas');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void loadPets();
+  }, []);
+
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSaving(true);
+    setMessage(null);
+    try {
+      const input = {
+        ownerId: Number(form.ownerId),
+        petTag: form.petTag,
+        name: form.name,
+        species: form.species,
+        breed: form.breed || undefined,
+        birthDate: form.birthDate || undefined,
+        weight: form.weight ? Number(form.weight) : undefined,
+      };
+      if (editingId === null) await createPet(input);
+      else await updatePet(editingId, input);
+      setForm(emptyForm);
+      setEditingId(null);
+      setMessage(
+        editingId === null ? 'La mascota fue registrada correctamente.' : 'La mascota fue actualizada correctamente.',
+      );
+      await loadPets();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'No se pudo registrar la mascota');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <main className="appointment-shell">
+      <AppHeader />
+      <header className="appointment-header">
+        <div>
+          <p className="eyebrow">RF-01 · Pacientes</p>
+          <h1>Registro de mascotas</h1>
+          <p>Vincula cada paciente con su propietario para mantener su historia clínica organizada.</p>
+        </div>
+        <a className="back-link" href="/">
+          Volver al panel
+        </a>
+      </header>
+      <section className="appointment-layout">
+        {(canManage || editingId !== null) && (
+          <form className="appointment-form" onSubmit={submit}>
+            <p className="eyebrow">{editingId === null ? 'Nueva mascota' : `Editando mascota #${editingId}`}</p>
+            <h2>{editingId === null ? 'Registrar paciente' : 'Actualizar paciente'}</h2>
+            <label>
+              Propietario
+              <select
+                required
+                value={form.ownerId}
+                disabled={!canManage}
+                onChange={(event) => setForm({ ...form, ownerId: event.target.value })}
+              >
+                <option value="">Selecciona un propietario</option>
+                {owners.map((owner) => (
+                  <option key={owner.id} value={owner.id}>
+                    {owner.fullName} · {owner.phone}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Pet tag
+              <input
+                required
+                value={form.petTag}
+                disabled={!canManage}
+                onChange={(event) => setForm({ ...form, petTag: event.target.value })}
+                placeholder="Ej. HP-0005"
+              />
+            </label>
+            <label>
+              Nombre
+              <input
+                required
+                value={form.name}
+                onChange={(event) => setForm({ ...form, name: event.target.value })}
+                placeholder="Ej. Coco"
+              />
+            </label>
+            <label>
+              Especie
+              <input
+                required
+                value={form.species}
+                onChange={(event) => setForm({ ...form, species: event.target.value })}
+                placeholder="Perro o gato"
+              />
+            </label>
+            <label>
+              Raza
+              <input
+                value={form.breed}
+                onChange={(event) => setForm({ ...form, breed: event.target.value })}
+                placeholder="Opcional"
+              />
+            </label>
+            <label>
+              Fecha de nacimiento
+              <input
+                type="date"
+                value={form.birthDate}
+                onChange={(event) => setForm({ ...form, birthDate: event.target.value })}
+              />
+            </label>
+            <label>
+              Peso en kg
+              <input
+                min="0.01"
+                step="0.01"
+                type="number"
+                value={form.weight}
+                onChange={(event) => setForm({ ...form, weight: event.target.value })}
+                placeholder="Opcional"
+              />
+            </label>
+            <button className="primary-button" disabled={saving}>
+              {saving ? 'Guardando...' : editingId === null ? 'Registrar mascota' : 'Guardar cambios'}
+            </button>
+          </form>
+        )}
+        <section className="appointment-list">
+          <div className="list-title">
+            <div>
+              <p className="eyebrow">Pacientes</p>
+              <h2>Mascotas registradas</h2>
+            </div>
+            <span>{pets.length}</span>
+          </div>
+          {message && <p className="notice">{message}</p>}
+          {loading ? (
+            <p className="empty">Cargando mascotas...</p>
+          ) : pets.length === 0 ? (
+            <p className="empty">No hay mascotas registradas.</p>
+          ) : (
+            <ul>
+              {pets.map((pet) => (
+                <li className="appointment-item" key={pet.id}>
+                  <div>
+                    <strong>{pet.name}</strong>
+                    <span>
+                      {pet.species}
+                      {pet.breed ? ` · ${pet.breed}` : ''}
+                    </span>
+                    <span>
+                      Pet tag: {pet.petTag} · Propietario: {pet.ownerName}
+                    </span>
+                  </div>
+                  <div className="appointment-actions">
+                    <button
+                      className="text-button"
+                      onClick={() => {
+                        setEditingId(pet.id);
+                        setForm({
+                          ownerId: String(pet.ownerId),
+                          petTag: pet.petTag,
+                          name: pet.name,
+                          species: pet.species,
+                          breed: pet.breed ?? '',
+                          birthDate: pet.birthDate ?? '',
+                          weight: pet.weight ? String(pet.weight) : '',
+                        });
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                    >
+                      Editar
+                    </button>
+                    <RoleView permission="manage_users">
+                      <button
+                        className="text-button danger-button"
+                        onClick={() =>
+                          void deletePet(pet.id)
+                            .then(loadPets)
+                            .catch((reason) =>
+                              setMessage(reason instanceof Error ? reason.message : 'No se pudo eliminar la mascota'),
+                            )
+                        }
+                      >
+                        Eliminar
+                      </button>
+                    </RoleView>
+                    <span>{pet.weight ? `${pet.weight} kg` : 'Peso no registrado'}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </section>
+    </main>
+  );
+}

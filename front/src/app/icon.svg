@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Happy Paws">
+  <rect width="64" height="64" rx="18" fill="#7c90b0"/>
+  <g fill="#ffffff">
+    <ellipse cx="32" cy="40" rx="14" ry="11"/>
+    <ellipse cx="17" cy="25" rx="6" ry="8" transform="rotate(-28 17 25)"/>
+    <ellipse cx="28" cy="17" rx="6" ry="8" transform="rotate(-8 28 17)"/>
+    <ellipse cx="40" cy="17" rx="6" ry="8" transform="rotate(8 40 17)"/>
+    <ellipse cx="51" cy="25" rx="6" ry="8" transform="rotate(28 51 25)"/>
+  </g>
+</svg>

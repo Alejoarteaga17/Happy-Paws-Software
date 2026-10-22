@@ -1,4 +1,11 @@
-# PROMPT PARA AGENTE DE CÓDIGO - PROYECTO HAPPY PAWS CARE CENTRAL
+---
+name: Happy Paws Code Agent
+description: "Use for backend, frontend, Supabase, API, RBAC, testing, Docker, documentation, and clean-code work in the Happy Paws Care Central repository."
+argument-hint: "Describe the Happy Paws feature, bug, review, or documentation task."
+user-invocable: true
+---
+
+# Agente de Código - Happy Paws Care Central
 
 > **Instrucciones para la IA / Agente de Desarrollo:** Lee detenidamente todas las secciones de este documento antes de generar o modificar cualquier línea de código. Debes ceñirte de manera estricta a la arquitectura, esquemas de datos, alcance y convenciones descritas a continuación.
 
@@ -6,19 +13,23 @@
 
 ## 1. OBJETIVO
 
+### Estado actual validado del repositorio
+
+El repositorio es un monorepo sin `package.json` raíz: `back` y `front` se instalan, prueban, formatean y compilan desde sus propias carpetas. La implementación actual cubre dashboard, mascotas, citas, notas clínicas, vacunaciones, autenticación, RBAC, propietarios, portal OWNER, usuarios y auditoría en distintos niveles de madurez. El frontend usa Next.js App Router con CSS global y componentes React; no usa Tailwind en la implementación actual. El backend usa Express 5, TypeScript y Supabase con `service_role` únicamente en el servidor. Antes de modificar código, verifica el estado real del módulo y sus pruebas; no describas como completo un slice que solo tenga scaffolding.
+
 Desarrollar e implementar la solución completa de software para **Happy Paws Care Central**, una aplicación web integral para la clínica veterinaria *Happy Paws Veterinary Clinic*. 
 
 El sistema debe digitalizar los flujos de trabajo operativos de la clínica, eliminando el uso de papel, centralizando la gestión de propietarios y mascotas, automatizando el control de citas y calendarios de vacunación, e implementando un portal seguro para que los propietarios de mascotas consulten el historial clínico y vacunas de sus animales.
 
-Debes construir tanto el **Backend API (Node.js + Express + Supabase)** como el **Frontend Web (Next.js + React + Tailwind CSS + Supabase)** garantizando una arquitectura limpia, segura (RBAC), dockerizada y de alto rendimiento.
+Debes mantener y extender tanto el **Backend API (Node.js + Express + Supabase)** como el **Frontend Web (Next.js + React + CSS global + Supabase)** garantizando una arquitectura limpia, segura (RBAC), dockerizada y de alto rendimiento.
 
 ---
 
 ## 2. CONTEXTO Y ESPECIFICACIONES TÉCNICAS
 
 ### 2.1. Stack Tecnológico y Versiones Concretas
-* **Frontend:** Next.js (v14+ App Router), React 18+, Tailwind CSS, TypeScript.
-* **Backend:** Node.js (v20+ LTS), Express.js (v4.x), TypeScript.
+* **Frontend objetivo:** Next.js (v14+ App Router), React 18+, TypeScript. La implementación actual usa CSS global; no agregar Tailwind sin una decisión explícita del equipo.
+* **Backend actual:** Node.js (v20+ LTS), Express.js 5, TypeScript.
 * **Base de Datos:** **Supabase (PostgreSQL gestionado)**, usado de forma directa como única fuente de datos tanto en desarrollo como en producción. **No se levanta PostgreSQL local ni se usa Prisma ORM** — esto evita divergencias entre entornos locales y el entorno online. Cliente oficial: `@supabase/supabase-js`. Integración SSR/cookies de sesión en Next.js App Router: `@supabase/ssr`.
   ```bash
   npm install @supabase/supabase-js @supabase/ssr
@@ -28,6 +39,7 @@ Debes construir tanto el **Backend API (Node.js + Express + Supabase)** como el 
   2. **Row Level Security (RLS)** en las tablas de Supabase, como capa adicional de aislamiento de datos — especialmente crítica para el Portal de Propietarios (NFR-SEC-05).
 * **Infraestructura de Desarrollo:** El proyecto debe estar **dockerizado** (`docker-compose.yml` en la raíz) para que todo el equipo trabaje con el mismo entorno de `back` y `front`. Supabase **no** se dockeriza (es un servicio gestionado externo); Docker solo orquesta las apps `back` y `front`. Debe existir siempre la alternativa de **correr el proyecto sin Docker** (con `npm run dev` directo), documentada por igual.
 * **Pruebas:** Jest / Supertest (Backend), Vitest / React Testing Library (Frontend).
+* **Calidad de código:** Prettier se configura y ejecuta por separado en `/back` y `/front`. ESLint se ejecuta en ambos paquetes antes de compilar. `/back` usa `eslint-config-airbnb-base` con soporte TypeScript y `eslint-config-prettier`; `/front` usa las reglas `next/core-web-vitals`. Cada aplicación debe mantener `.prettierrc.json`, `.prettierignore`, su configuración ESLint, los scripts `lint`, `lint:fix`, `format` y `format:check`, y su Dockerfile debe ejecutar formato y lint antes de compilar.
 
 ### 2.2. Comandos para Instalar, Correr y Probar
 
@@ -40,20 +52,21 @@ SUPABASE_SERVICE_ROLE_KEY=<service-role-key>  # usado SOLO en /back, jamás expu
 
 **Opción A — Sin Docker (desarrollo local directo):**
 ```bash
-# Raíz del proyecto
-npm install
-
 # Backend (directorio /back)
 cd back
 npm install
 npm run dev          # Servidor en http://localhost:4000
 npm run test         # Ejecutar pruebas unitarias e integración
+npm run lint         # Validar reglas Airbnb + TypeScript
+npm run format:check # Validar formato sin modificar archivos
 
 # Frontend (directorio /front)
 cd front
 npm install
 npm run dev          # Servidor en http://localhost:3000
 npm run test         # Ejecutar pruebas frontend
+npm run lint         # Validar reglas Next.js
+npm run format:check # Validar formato sin modificar archivos
 ```
 
 **Opción B — Con Docker (entorno homogéneo para todo el equipo):**
@@ -225,6 +238,14 @@ A continuación se detallan las tablas exactas a definir como migraciones SQL de
 - **Commits Conventional Commits:** `feat: ...`, `fix: ...`, `docs: ...`, `refactor: ...`, `test: ...`.
 - **Migraciones SQL de Supabase:** nombre descriptivo en `snake_case` al crearlas con `supabase migration new` (ej: `create_profiles_table`, `add_rls_owners_pets`); el timestamp lo antepone automáticamente el CLI.
 
+### 2.7. Calidad de Código y Formato
+- **Backend:** ejecutar los cambios con `npm run lint`, `npm run format:check`, `npm test` y `npm run build` desde `/back`. La nomenclatura y estilo siguen `eslint-config-airbnb-base`; los imports TypeScript no llevan extensión `.ts` y los nombres de columnas Supabase pueden conservar `snake_case` cuando representan el esquema de base de datos.
+- **Frontend:** ejecutar `npm run lint`, `npm run format:check`, `npm test` y `npm run build` desde `/front`. La configuración sigue `next/core-web-vitals` y las convenciones propias de Next.js App Router.
+- **Prettier:** usar la configuración local de cada paquete; no reformatear manualmente con reglas distintas ni introducir configuraciones globales que contradigan `.prettierrc.json`.
+- **Correcciones:** antes de entregar código, corregir los errores de ESLint y Prettier. Las advertencias nuevas deben resolverse o justificarse; no desactivar reglas globalmente para ocultar errores.
+- **Excepciones:** si una regla de Airbnb entra en conflicto con TypeScript, Jest, Supabase o una convención establecida del proyecto, aplicar una excepción mínima, localizada y documentada en la configuración ESLint.
+- **Docker:** conservar los pasos `format:check` y `lint` en ambos Dockerfiles antes de `build`, para que el contenedor use los mismos controles que el desarrollo local.
+
 ---
 
 ## 3. ALCANCE
@@ -251,6 +272,7 @@ A continuación se detallan las tablas exactas a definir como migraciones SQL de
 ### 3.3. Principio de Minimalismo por Iteración
 Cada iteración/generación de código del agente debe:
 * Producir **código limpio** y consistente con las convenciones ya definidas en este documento (Sección 2.6).
+* Ejecutar los controles de calidad del paquete afectado (`lint`, `format:check`, pruebas y build) antes de considerar terminada una modificación.
 * **No duplicar funcionalidades** ya existentes en el proyecto: antes de crear una función, componente, hook o endpoint, el agente debe verificar si ya existe algo equivalente y reutilizarlo o extenderlo en vez de recrearlo.
 * **No generar archivos que no sean explícitamente necesarios** para lo que se le pidió en ese momento (nada de archivos de ejemplo, boilerplate especulativo, o features "por si acaso" fuera del pedido actual).
 * Si detecta código muerto, duplicado o un archivo que ya no se usa como consecuencia del cambio solicitado, debe señalarlo en el resumen final (Sección 5) en vez de dejarlo silenciosamente.
