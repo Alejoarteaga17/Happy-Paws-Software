@@ -38,7 +38,7 @@ Debes mantener y extender tanto el **Backend API (Node.js + Express + Supabase)*
   1. Middleware en Express que valida el rol (leído del JWT de Supabase o de la tabla `profiles`).
   2. **Row Level Security (RLS)** en las tablas de Supabase, como capa adicional de aislamiento de datos — especialmente crítica para el Portal de Propietarios (NFR-SEC-05).
 * **Infraestructura de Desarrollo:** El proyecto debe estar **dockerizado** (`docker-compose.yml` en la raíz) para que todo el equipo trabaje con el mismo entorno de `back` y `front`. Supabase **no** se dockeriza (es un servicio gestionado externo); Docker solo orquesta las apps `back` y `front`. Debe existir siempre la alternativa de **correr el proyecto sin Docker** (con `npm run dev` directo), documentada por igual.
-* **Pruebas:** Jest / Supertest (Backend), Vitest / React Testing Library (Frontend).
+* **Pruebas:** Jest / Supertest (Backend), Vitest / React Testing Library (Frontend). Cada cambio de comportamiento debe incluir tests enfocados para sus casos exitosos, errores y permisos relevantes; no se considera terminado un cambio nuevo sin validar su cobertura.
 * **Calidad de código:** Prettier se configura y ejecuta por separado en `/back` y `/front`. ESLint se ejecuta en ambos paquetes antes de compilar. `/back` usa `eslint-config-airbnb-base` con soporte TypeScript y `eslint-config-prettier`; `/front` usa las reglas `next/core-web-vitals`. Cada aplicación debe mantener `.prettierrc.json`, `.prettierignore`, su configuración ESLint, los scripts `lint`, `lint:fix`, `format` y `format:check`, y su Dockerfile debe ejecutar formato y lint antes de compilar.
 
 ### 2.2. Comandos para Instalar, Correr y Probar
@@ -57,6 +57,7 @@ cd back
 npm install
 npm run dev          # Servidor en http://localhost:4000
 npm run test         # Ejecutar pruebas unitarias e integración
+npm run test:coverage # Ejecutar pruebas y medir cobertura del código crítico (objetivo >= 90%, ideal cercano a 95%)
 npm run lint         # Validar reglas Airbnb + TypeScript
 npm run format:check # Validar formato sin modificar archivos
 
@@ -65,6 +66,7 @@ cd front
 npm install
 npm run dev          # Servidor en http://localhost:3000
 npm run test         # Ejecutar pruebas frontend
+npm run test:coverage # Ejecutar pruebas y medir cobertura del código crítico (objetivo >= 90%, ideal cercano a 95%)
 npm run lint         # Validar reglas Next.js
 npm run format:check # Validar formato sin modificar archivos
 ```
@@ -297,7 +299,7 @@ El agente considerará la tarea finalizada únicamente si se cumplen al 100% las
 - [ ] **[RF-12 & RF-13] Dashboard & Auditoría:** El panel inicial muestra resúmenes relevantes según el rol y registra logs de eventos clave (login, actualización de citas).
 - [ ] **[Infraestructura] Docker:** El proyecto corre correctamente tanto con `docker compose up` como sin Docker (`npm run dev` en `/back` y `/front`).
 - [ ] **[Documentación] READMEs:** Existe un `README.md` útil y actualizado en `/back`, `/front`, `/back/tests` y `/front/tests`, además del `README.md` raíz.
-- [ ] **[Calidad & Pruebas]:** Todos los tests en `/back` y `/front` se ejecutan sin errores con `npm run test` con un mínimo de 80% de cobertura en servicios principales.
+- [ ] **[Calidad & Pruebas]:** Todos los tests en `/back` y `/front` se ejecutan sin errores con `npm run test`; cada cambio de código agrega o actualiza tests enfocados y mantiene al menos 90% de cobertura en el código crítico, buscando un objetivo cercano al 95%. La cobertura debe medirse con `npm run test:coverage`, sin excluir lógica de negocio para inflar artificialmente el porcentaje.
 
 ---
 

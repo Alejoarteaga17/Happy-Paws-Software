@@ -12,6 +12,8 @@ const navigationItems = [
   { href: '/appointments', label: 'Agenda', icon: 'assignment', roles: ['ADMIN', 'RECEPTIONIST', 'VET', 'OWNER'] },
   { href: '/vaccinations', label: 'Vacunaciones', icon: 'vaccines', roles: ['ADMIN', 'VET', 'RECEPTIONIST', 'OWNER'] },
   { href: '/owners', label: 'Propietarios', icon: 'group', roles: ['ADMIN', 'RECEPTIONIST'] },
+  { href: '/search', label: 'Buscar', icon: 'search', roles: ['ADMIN', 'RECEPTIONIST', 'VET'] },
+  { href: '/clinical-notes', label: 'Notas clínicas', icon: 'clinical_notes', roles: ['ADMIN', 'VET'] },
   { href: '/users', label: 'Usuarios', icon: 'manage_accounts', roles: ['ADMIN'] },
   { href: '/audit', label: 'Auditoría', icon: 'history', roles: ['ADMIN'] },
 ];

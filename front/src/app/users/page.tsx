@@ -5,15 +5,8 @@ import AppHeader from '../../components/app-header';
 import RestrictedView from '../../components/restricted-view';
 import UserAccountForm, { OwnerOption, UserAccountFormValues } from '../../components/user-account-form';
 import { getOwners } from '../../services/owner-service';
-import { getSupabaseClient } from '../../services/supabase-client';
+import { createUser, getUsers, updateUserRole, updateUserStatus, UserRow } from '../../services/user-service';
 import { UserRole } from '../../context/auth-context';
-
-interface UserRow {
-  id: string;
-  email: string;
-  full_name: string;
-  role: UserRole;
-}
 
 export default function UsersPage() {
   return (
@@ -31,19 +24,49 @@ function UsersTable() {
   useEffect(() => {
     const loadData = async () => {
       const [{ data, error: queryError }, loadedOwners] = await Promise.all([
-        getSupabaseClient().from('profiles').select('id,email,full_name,role').order('full_name'),
+        getUsers()
+          .then((users) => ({ data: users, error: null }))
+          .catch((loadError: Error) => ({ data: [], error: loadError })),
         getOwners(),
       ]);
       if (queryError) setError(queryError.message);
-      else setUsers((data ?? []) as UserRow[]);
+      else setUsers(data);
       setOwners(loadedOwners);
     };
 
     void loadData().catch((loadError: Error) => setError(loadError.message));
   }, []);
 
-  const handleCreateOwnerAccount = (_values: UserAccountFormValues) => {
-    setFeedback('La cuenta está lista para registrarse. La conexión con Supabase se habilitará en el siguiente paso.');
+  const handleCreateOwnerAccount = async (values: UserAccountFormValues) => {
+    try {
+      const owner = owners.find((candidate) => candidate.id === values.ownerId);
+      await createUser({
+        ...values,
+        fullName: owner?.fullName ?? values.email,
+      });
+      setFeedback('La cuenta fue creada correctamente.');
+      setUsers(await getUsers());
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'No se pudo crear la cuenta');
+    }
+  };
+
+  const changeRole = async (id: string, role: UserRole) => {
+    try {
+      await updateUserRole(id, role);
+      setUsers(await getUsers());
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'No se pudo actualizar el rol');
+    }
+  };
+
+  const changeStatus = async (user: UserRow) => {
+    try {
+      await updateUserStatus(user.id, !user.active);
+      setUsers(await getUsers());
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'No se pudo actualizar el estado');
+    }
   };
 
   return (
@@ -72,6 +95,8 @@ function UsersTable() {
                 <th>Nombre</th>
                 <th>Correo</th>
                 <th>Rol</th>
+                <th>Estado</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -80,7 +105,25 @@ function UsersTable() {
                   <td>{user.full_name}</td>
                   <td>{user.email}</td>
                   <td>
-                    <span className="status status-scheduled">{user.role}</span>
+                    <select
+                      value={user.role}
+                      onChange={(event) => void changeRole(user.id, event.target.value as UserRole)}
+                    >
+                      <option value="OWNER">OWNER</option>
+                      <option value="RECEPTIONIST">RECEPTIONIST</option>
+                      <option value="VET">VET</option>
+                      <option value="ADMIN">ADMIN</option>
+                    </select>
+                  </td>
+                  <td>
+                    <span className={`status ${user.active ? 'status-completed' : 'status-cancelled'}`}>
+                      {user.active ? 'Activo' : 'Inactivo'}
+                    </span>
+                  </td>
+                  <td>
+                    <button className="text-button" onClick={() => void changeStatus(user)}>
+                      {user.active ? 'Desactivar' : 'Activar'}
+                    </button>
                   </td>
                 </tr>
               ))}

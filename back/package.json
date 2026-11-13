@@ -6,6 +6,7 @@
     "build": "tsc",
     "start": "node dist/src/app.js",
     "test": "jest --runInBand",
+    "test:coverage": "jest --runInBand --coverage",
     "lint": "eslint \"src/**/*.{ts,tsx}\" \"tests/**/*.{ts,tsx}\"",
     "lint:fix": "eslint \"src/**/*.{ts,tsx}\" \"tests/**/*.{ts,tsx}\" --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx}\" \"tests/**/*.{ts,tsx,js,jsx}\" \"*.config.{js,ts}\"",

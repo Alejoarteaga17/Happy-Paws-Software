@@ -8,6 +8,8 @@ import { portalRouter } from './routes/portal.routes';
 import { userRouter } from './routes/user.routes';
 import { auditRouter } from './routes/audit.routes';
 import { authRouter } from './routes/auth.routes';
+import { clinicalNoteRouter } from './routes/clinical-note.routes';
+import { searchRouter } from './routes/search.routes';
 
 export const app = express();
 app.use(cors());
@@ -21,6 +23,8 @@ app.use('/api/v1/portal', portalRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/audit', auditRouter);
 app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/clinical-notes', clinicalNoteRouter);
+app.use('/api/v1/search', searchRouter);
 
 if (require.main === module) {
   const port = Number(process.env.PORT ?? 4000);

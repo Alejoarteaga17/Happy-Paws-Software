@@ -5,6 +5,7 @@
     "dev": "next dev",
     "build": "next build",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx}\" \"tests/**/*.{ts,tsx,js,jsx}\" \"*.config.{js,ts}\"",
