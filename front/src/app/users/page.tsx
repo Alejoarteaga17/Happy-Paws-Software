@@ -4,9 +4,10 @@ import { useEffect, useState } from 'react';
 import AppHeader from '../../components/app-header';
 import RestrictedView from '../../components/restricted-view';
 import UserAccountForm, { OwnerOption, UserAccountFormValues } from '../../components/user-account-form';
+import UserTable from '../../components/user-table';
 import { getOwners } from '../../services/owner-service';
 import { createUser, getUsers, updateUserRole, updateUserStatus, UserRow } from '../../services/user-service';
-import { UserRole } from '../../context/auth-context';
+import { UserRole, useAuth } from '../../context/auth-context';
 
 export default function UsersPage() {
   return (
@@ -17,6 +18,7 @@ export default function UsersPage() {
 }
 
 function UsersTable() {
+  const { profile } = useAuth();
   const [users, setUsers] = useState<UserRow[]>([]);
   const [owners, setOwners] = useState<OwnerOption[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -39,10 +41,8 @@ function UsersTable() {
 
   const handleCreateOwnerAccount = async (values: UserAccountFormValues) => {
     try {
-      const owner = owners.find((candidate) => candidate.id === values.ownerId);
       await createUser({
         ...values,
-        fullName: owner?.fullName ?? values.email,
       });
       setFeedback('La cuenta fue creada correctamente.');
       setUsers(await getUsers());
@@ -82,53 +82,24 @@ function UsersTable() {
         </header>
         {feedback && <p className="notice summary-error">{feedback}</p>}
         <UserAccountForm
-          role="OWNER"
+          allowedRoles={
+            profile?.role === 'ADMIN' ? ['OWNER', 'VET', 'RECEPTIONIST', 'ADMIN'] : ['OWNER', 'VET', 'RECEPTIONIST']
+          }
           owners={owners}
           existingEmails={users.map((user) => user.email)}
           onSubmit={handleCreateOwnerAccount}
         />
         <section className="summary-panel table-panel">
           {error && <p className="form-error">{error}</p>}
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Correo</th>
-                <th>Rol</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user) => (
-                <tr key={user.id}>
-                  <td>{user.full_name}</td>
-                  <td>{user.email}</td>
-                  <td>
-                    <select
-                      value={user.role}
-                      onChange={(event) => void changeRole(user.id, event.target.value as UserRole)}
-                    >
-                      <option value="OWNER">OWNER</option>
-                      <option value="RECEPTIONIST">RECEPTIONIST</option>
-                      <option value="VET">VET</option>
-                      <option value="ADMIN">ADMIN</option>
-                    </select>
-                  </td>
-                  <td>
-                    <span className={`status ${user.active ? 'status-completed' : 'status-cancelled'}`}>
-                      {user.active ? 'Activo' : 'Inactivo'}
-                    </span>
-                  </td>
-                  <td>
-                    <button className="text-button" onClick={() => void changeStatus(user)}>
-                      {user.active ? 'Desactivar' : 'Activar'}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <UserTable
+            users={users}
+            allowedRoles={
+              profile?.role === 'ADMIN' ? ['OWNER', 'VET', 'RECEPTIONIST', 'ADMIN'] : ['OWNER', 'VET', 'RECEPTIONIST']
+            }
+            canChangeStatus={profile?.role === 'ADMIN'}
+            onRoleChange={(id, role) => void changeRole(id, role)}
+            onStatusChange={(user) => void changeStatus(user)}
+          />
         </section>
       </section>
     </main>

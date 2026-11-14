@@ -7,6 +7,7 @@ const sendError = (response: Response, error: unknown, fallbackCode: string): vo
   const code = error instanceof Error ? error.message : fallbackCode;
   const errors: Record<string, { status: number; message: string }> = {
     OWNER_NOT_FOUND: { status: 400, message: 'El propietario indicado no existe.' },
+    OWNER_INACTIVE: { status: 400, message: 'No se puede asignar la mascota a un propietario inactivo.' },
     PET_TAG_ALREADY_EXISTS: { status: 409, message: 'El pet_tag ya está registrado.' },
     PET_NOT_FOUND: { status: 404, message: 'La mascota no existe.' },
   };

@@ -84,6 +84,8 @@ h3 {
   width: 36px;
   height: 36px;
   border-radius: 50%;
+  overflow: hidden;
+  object-fit: cover;
   background: var(--primary);
   color: #fff;
   font-family: var(--title);
@@ -941,6 +943,18 @@ h3 {
   color: var(--muted);
   font-size: 12px;
   line-height: 1.6;
+}
+.login-avatar-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 20px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.login-avatar-preview .user-avatar {
+  width: 52px;
+  height: 52px;
 }
 .login-button {
   width: 100%;

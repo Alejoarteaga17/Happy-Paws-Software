@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { BrandMark, Icon } from './ui';
+import { BrandMark, Icon, UserAvatar } from './ui';
 import { useAuth, UserRole } from '../context/auth-context';
 
 const navigationItems = [
@@ -63,7 +63,7 @@ export default function AppHeader() {
       </nav>
       <div className="header-profile">
         <a href={profile?.role === 'OWNER' ? '/portal' : '/users'} aria-label="Abrir perfil de usuario" title="Perfil">
-          <span className="user-avatar">{profile?.fullName.slice(0, 2).toUpperCase() ?? 'HP'}</span>
+          <UserAvatar seed={profile?.email || profile?.id || 'happy-paws'} label={profile?.fullName ?? 'Happy Paws'} />
         </a>
         {profile && (
           <button

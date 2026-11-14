@@ -24,6 +24,7 @@ export class OwnerService {
       .from('owners')
       .select('id, auth_user_id, full_name, phone, email, address, created_at')
       .eq('id', id)
+      .is('deleted_at', null)
       .maybeSingle();
     if (error) throw new Error(`OWNER_LOOKUP_FAILED: ${error.message}`);
     if (!data) throw new Error('OWNER_NOT_FOUND');
@@ -57,6 +58,7 @@ export class OwnerService {
       .from('owners')
       .update(values)
       .eq('id', id)
+      .is('deleted_at', null)
       .select('id, auth_user_id, full_name, phone, email, address, created_at')
       .maybeSingle();
     if (error) throw new Error(`OWNER_UPDATE_FAILED: ${error.message}`);
@@ -64,14 +66,14 @@ export class OwnerService {
     return data;
   }
 
-  static async setDeleted(id: number, deleted: boolean) {
+  static async setActive(id: number, active: boolean) {
     const { data, error } = await getSupabaseClient()
       .from('owners')
-      .update({ deleted_at: deleted ? new Date().toISOString() : null })
+      .update({ deleted_at: active ? null : new Date().toISOString() })
       .eq('id', id)
       .select('id, auth_user_id, full_name, phone, email, address, created_at')
       .maybeSingle();
-    if (error) throw new Error(`OWNER_DELETE_FAILED: ${error.message}`);
+    if (error) throw new Error(`OWNER_STATUS_UPDATE_FAILED: ${error.message}`);
     if (!data) throw new Error('OWNER_NOT_FOUND');
     return data;
   }

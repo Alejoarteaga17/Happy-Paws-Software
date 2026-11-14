@@ -30,6 +30,17 @@ const toPet = (row: PetRow): Pet => ({
 });
 
 export class PetService {
+  private static async assertActiveOwner(ownerId: number): Promise<void> {
+    const { data, error } = await getSupabaseClient()
+      .from('owners')
+      .select('id')
+      .eq('id', ownerId)
+      .is('deleted_at', null)
+      .maybeSingle();
+    if (error) throw new Error(`OWNER_LOOKUP_FAILED: ${error.message}`);
+    if (!data) throw new Error('OWNER_INACTIVE');
+  }
+
   static async list(): Promise<Pet[]> {
     const { data, error } = await getSupabaseClient()
       .from('pets')
@@ -42,6 +53,7 @@ export class PetService {
   }
 
   static async create(input: CreatePetInput): Promise<Pet> {
+    await PetService.assertActiveOwner(input.ownerId);
     const { data, error } = await getSupabaseClient()
       .from('pets')
       .insert({
@@ -67,7 +79,10 @@ export class PetService {
 
   static async update(id: number, input: UpdatePetInput): Promise<Pet> {
     const values: Record<string, number | string | null> = {};
-    if (input.ownerId !== undefined) values.owner_id = input.ownerId;
+    if (input.ownerId !== undefined) {
+      await PetService.assertActiveOwner(input.ownerId);
+      values.owner_id = input.ownerId;
+    }
     if (input.petTag !== undefined) values.pet_tag = input.petTag.trim();
     if (input.name !== undefined) values.name = input.name.trim();
     if (input.species !== undefined) values.species = input.species.trim();

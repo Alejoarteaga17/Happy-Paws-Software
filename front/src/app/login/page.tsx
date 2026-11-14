@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 import { getSupabaseClient, isSupabaseConfigured } from '../../services/supabase-client';
-import { BrandMark } from '../../components/ui';
+import { BrandMark, UserAvatar } from '../../components/ui';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -65,6 +65,10 @@ export default function LoginPage() {
         <p className="eyebrow">Acceso clínico</p>
         <h1 id="login-title">Inicia sesión</h1>
         <p className="login-description">Ingresa con tu cuenta autorizada para gestionar el registro de vacunas.</p>
+        <div className="login-avatar-preview" aria-live="polite">
+          <UserAvatar seed={email.trim() || 'happy-paws'} label={email.trim() || 'tu perfil'} />
+          <span>{email.trim() ? 'Tu avatar de perfil' : 'Escribe tu correo para ver tu avatar'}</span>
+        </div>
         <form onSubmit={submit}>
           <label className="form-field">
             Correo electrónico

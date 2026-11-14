@@ -112,7 +112,7 @@ Lista las mascotas ordenadas alfabéticamente por nombre e incluye el nombre del
 
 ### `POST /api/v1/pets`
 
-Crea una mascota asociada a un propietario existente.
+Crea una mascota asociada a un propietario existente y activo. La mascota conserva el `ownerId` y la relación no se elimina físicamente.
 
 **Entrada**
 
@@ -379,9 +379,9 @@ El frontend no debe enviar `SUPABASE_SERVICE_ROLE_KEY`. Para ejecutar ambos proy
 
 El backend registra estas superficies autenticadas adicionales:
 
-- `GET/POST/PUT /api/v1/owners`: consulta staff; escritura ADMIN/RECEPTIONIST.
+- `GET/POST/PUT /api/v1/owners`: consulta staff; escritura ADMIN/RECEPTIONIST. `PATCH /api/v1/owners/:id/status` permite a ADMIN activar o desactivar propietarios; no existe eliminación física por API.
 - `GET /api/v1/portal/me`: dashboard aislado al OWNER autenticado.
-- `GET /api/v1/users`, `GET /api/v1/users/:id`, `POST /api/v1/users`, `PATCH /api/v1/users/:id/role`, `PATCH /api/v1/users/:id/status`: administración ADMIN. La creación recibe `email`, `password`, `fullName`, `role` y, para propietarios, `ownerId`; el estado permite activar o desactivar el acceso.
+- `GET /api/v1/users`, `GET /api/v1/users/:id`, `POST /api/v1/users`, `PATCH /api/v1/users/:id/role`: administración ADMIN y RECEPTIONIST. `PATCH /api/v1/users/:id/status` queda reservado a ADMIN. La creación recibe `email`, `password`, `fullName`, `role` y, para propietarios, `ownerId`; el estado permite activar o desactivar el acceso.
 - `GET /api/v1/audit`: consulta de auditoría ADMIN, con `limit` opcional entre 1 y 200.
 - `GET /api/v1/search?q=...`: búsqueda global autenticada para ADMIN, VET y RECEPTIONIST. `q` debe tener entre 2 y 100 caracteres y devuelve resultados de propietarios y mascotas.
 - `GET /api/v1/clinical-notes`: consulta de notas clínicas autenticada para ADMIN, VET y RECEPTIONIST.

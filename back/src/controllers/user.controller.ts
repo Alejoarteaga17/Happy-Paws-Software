@@ -22,6 +22,14 @@ export const createUser = async (request: Request, response: Response): Promise<
     });
     return;
   }
+  if (request.user?.role === 'RECEPTIONIST' && role === 'ADMIN') {
+    response.status(403).json({
+      success: false,
+      data: null,
+      error: { code: 'FORBIDDEN_ROLE_ASSIGNMENT', message: 'Recepción no puede crear cuentas ADMIN.' },
+    });
+    return;
+  }
   try {
     const data = await UserService.create({ email, password, fullName, role: role as AppRole, ownerId });
     await AuditService.record({
@@ -78,6 +86,14 @@ export const updateUserRole = async (request: Request, response: Response): Prom
     response
       .status(400)
       .json({ success: false, data: null, error: { code: 'INVALID_ROLE', message: 'El rol indicado no es válido.' } });
+    return;
+  }
+  if (request.user?.role === 'RECEPTIONIST' && role === 'ADMIN') {
+    response.status(403).json({
+      success: false,
+      data: null,
+      error: { code: 'FORBIDDEN_ROLE_ASSIGNMENT', message: 'Recepción no puede asignar el rol ADMIN.' },
+    });
     return;
   }
   try {
