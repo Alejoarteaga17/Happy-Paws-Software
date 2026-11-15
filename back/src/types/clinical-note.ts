@@ -9,11 +9,18 @@ export interface ClinicalNote {
   treatment: string;
   observations: string | null;
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateClinicalNoteInput {
   appointmentId: number;
   diagnosis: string;
   treatment: string;
+  observations?: string | null;
+}
+
+export interface UpdateClinicalNoteInput {
+  diagnosis?: string;
+  treatment?: string;
   observations?: string | null;
 }

@@ -40,6 +40,18 @@ interface PortalRow {
     next_due_date: string;
     status: Vaccination['status'];
   }>;
+  clinicalNotes?: Array<{
+    id: number;
+    appointment_id: number;
+    pet_id: number;
+    pet_name: string;
+    veterinarian_id: string;
+    diagnosis: string;
+    treatment: string;
+    observations: string | null;
+    created_at: string;
+    updated_at: string;
+  }>;
 }
 
 interface ApiError {
@@ -100,6 +112,19 @@ const mapPortal = (row: PortalRow): OwnerPortalData => {
       administeredAt: vaccination.administered_at,
       nextDueDate: vaccination.next_due_date,
       status: vaccination.status,
+    })),
+    clinicalNotes: (row.clinicalNotes ?? []).map((note) => ({
+      id: note.id,
+      appointmentId: note.appointment_id,
+      petId: note.pet_id,
+      petName: note.pet_name,
+      veterinarianId: note.veterinarian_id,
+      veterinarianName: 'Equipo veterinario',
+      diagnosis: note.diagnosis,
+      treatment: note.treatment,
+      observations: note.observations,
+      createdAt: note.created_at,
+      updatedAt: note.updated_at,
     })),
   };
 };

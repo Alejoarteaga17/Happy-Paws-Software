@@ -56,7 +56,7 @@ El alcance del trabajo para **Happy Paws Care Central** se centra en entregar un
 Para garantizar límites claros del proyecto y mantener un MVP enfocado, las siguientes características y capacidades quedan explícitamente excluidas de esta fase del proyecto:
 
 * **Comercio Electrónico y Facturación:** Funcionalidad de tienda en línea, venta de productos, gestión de inventario o integraciones con pasarelas de pago.
-* **Telemedicina y Servicios para Clientes:** Portales para pacientes o propietarios, consultas remotas, visitas virtuales o herramientas de mensajería orientadas a los clientes.
+* **Telemedicina y Servicios para Clientes:** Consultas remotas, visitas virtuales o herramientas de mensajería orientadas a los clientes. El portal autenticado de propietarios sí forma parte del MVP y se limita a consulta de información clínica autorizada.
 * **Sistemas Complejos de Notificaciones:** SMS automatizados, activadores automáticos de correo electrónico o integraciones con servicios externos de mensajería (más allá de marcadores de posición básicos y documentados en la interfaz).
 * **Herramientas de Cumplimiento Normativo Completo:** Marcos avanzados de cumplimiento, herramientas de auditoría HIPAA/GDPR o sistemas regulatorios complejos.
 

@@ -9,6 +9,7 @@ export interface ClinicalNote {
   treatment: string;
   observations: string | null;
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface ClinicalNoteInput {

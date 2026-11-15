@@ -8,6 +8,7 @@ import { getOwnerPortal } from '../../services/portal-service';
 import { Appointment } from '../../types/appointment';
 import { Pet } from '../../types/pet';
 import { Vaccination } from '../../types/vaccination';
+import { ClinicalNote } from '../../types/clinical-note';
 import { StatusBadge } from '../../components/ui';
 
 export default function OwnerPortalPage() {
@@ -23,15 +24,24 @@ function OwnerPortal() {
   const [pets, setPets] = useState<Pet[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [vaccinations, setVaccinations] = useState<Vaccination[]>([]);
+  const [clinicalNotes, setClinicalNotes] = useState<ClinicalNote[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     getOwnerPortal()
-      .then(({ pets: loadedPets, appointments: loadedAppointments, vaccinations: loadedVaccinations }) => {
-        setPets(loadedPets);
-        setAppointments(loadedAppointments);
-        setVaccinations(loadedVaccinations);
-      })
+      .then(
+        ({
+          pets: loadedPets,
+          appointments: loadedAppointments,
+          vaccinations: loadedVaccinations,
+          clinicalNotes: loadedClinicalNotes,
+        }) => {
+          setPets(loadedPets);
+          setAppointments(loadedAppointments);
+          setVaccinations(loadedVaccinations);
+          setClinicalNotes(loadedClinicalNotes);
+        },
+      )
       .catch((reason) => setError(reason instanceof Error ? reason.message : 'No se pudo cargar el portal'));
   }, []);
 
@@ -71,6 +81,27 @@ function OwnerPortal() {
               </ul>
             ) : (
               <p className="empty">No hay mascotas vinculadas.</p>
+            )}
+          </section>
+          <section className="summary-panel">
+            <p className="eyebrow">Historial clínico</p>
+            <h2>Notas recientes</h2>
+            {clinicalNotes.length ? (
+              <ul>
+                {clinicalNotes.slice(0, 5).map((note) => (
+                  <li className="appointment-item" key={note.id}>
+                    <div>
+                      <strong>{note.petName}</strong>
+                      <span>
+                        {note.diagnosis} · {note.treatment}
+                      </span>
+                      {note.observations && <span>{note.observations}</span>}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="empty">No hay notas clínicas registradas.</p>
             )}
           </section>
           <section className="summary-panel">

@@ -13,11 +13,13 @@ Las lecturas de vacunaciones no son anónimas. `GET /api/v1/portal/me` es la ún
 - Mascotas: `GET /api/v1/pets`, `POST /api/v1/pets` (consulta staff; creación ADMIN/RECEPTIONIST).
 - Citas: CRUD en `/api/v1/appointments` (staff).
 - Vacunaciones: `GET/POST /api/v1/vaccinations` (consulta staff; escritura ADMIN/VET).
-- Propietarios: `GET/POST/PUT /api/v1/owners` (staff; escritura ADMIN/RECEPTIONIST).
+- Propietarios: `GET/POST/PUT /api/v1/owners`, `PATCH /api/v1/owners/:id/status` (staff; escritura ADMIN/RECEPTIONIST; desactivación ADMIN).
 - Portal OWNER: `GET /api/v1/portal/me`.
-- Usuarios: `GET /api/v1/users`, `GET /api/v1/users/:id`, `PATCH /api/v1/users/:id/role` (ADMIN).
+- Notas clínicas: `GET/POST /api/v1/clinical-notes`, `PUT /api/v1/clinical-notes/:id` (ADMIN/VET; el VET solo modifica citas asignadas).
+- Búsqueda global: `GET /api/v1/search?q=...` (usuarios autorizados).
+- Usuarios: `GET /api/v1/users`, `GET /api/v1/users/:id`, `POST /api/v1/users`, `PATCH /api/v1/users/:id`, `PATCH /api/v1/users/:id/role` (ADMIN/RECEPTIONIST; desactivación ADMIN).
 - Auditoría: `GET /api/v1/audit` (ADMIN).
-- Sesión: `GET /api/v1/auth/me`.
+- Sesión: `GET /api/v1/auth/me`, `POST /api/v1/auth/audit-login`.
 
 Las respuestas usan `{ success, data, error }`. Las mutaciones de mascotas, citas, vacunaciones, propietarios y perfiles registran actor, entidad y metadatos en `audit_logs`.
 

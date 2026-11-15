@@ -1,11 +1,11 @@
 ---
 name: happy-paws-figma-design-system
-description: "Use when implementing, reviewing, or refactoring Happy Paws frontend UI from the Figma design system: Figma tokens, typography, atoms, components, dashboard, login, portal, badges, forms, tables, responsive layouts, and AppHeader."
+description: "Use when implementing, reviewing, or refactoring Happy Paws frontend UI from the Figma design system, including premium visual polish, purposeful motion, typography, atoms, components, dashboard, login, portal, badges, forms, tables, responsive layouts, and AppHeader."
 argument-hint: "Describe the Happy Paws screen, component, or visual change to implement from Figma."
 user-invocable: true
 ---
 
-# Happy Paws Figma Design System
+# Happy Paws Figma Design System and Premium UI Craftsmanship
 
 ## Purpose
 
@@ -31,6 +31,39 @@ Use this skill when the task mentions any of the following:
 This skill applies only to `front/`. Do not modify `back/` for a visual task.
 
 Do not load this skill for backend, Supabase schema, API contract, RBAC, or infrastructure-only changes. For cross-layer work, use the existing frontend behavior and API contracts as constraints, and apply this skill only to the frontend visual surface.
+
+## Premium UI direction
+
+Use the Figma system as the visual source of truth, then add premium interaction and motion only where it improves comprehension, hierarchy or feedback. The result should feel intentional and warm for a veterinary care product, not like a generic template or an unrelated award-site concept.
+
+### Establish the visual direction
+
+Before changing layout or styling, identify the page's emotional goal and commit to a coherent direction. Prefer a calm, editorial and organic treatment that complements Happy Paws typography and semantic colors:
+
+- Use strong typographic hierarchy with `clamp()` for display text while preserving the verified Quattrocento, Newsreader and Iosevka Charon Mono roles.
+- Build depth with spacing, tonal surfaces, restrained borders, soft gradients or subtle translucent layers only when they remain legible against the Figma tokens.
+- Use texture or decorative shapes sparingly; they must not compete with pet records, clinical information, forms or primary actions.
+- Do not introduce brutalist, cyberpunk or cinematic styling as a default. Use those directions only when the user explicitly requests them and they remain consistent with the product.
+
+### Motion and interaction
+
+Treat motion as a system rather than decoration:
+
+- Prefer short, purposeful entrance, state-change and feedback transitions using `transform` and `opacity`.
+- Add staggered word or item reveals only when the content structure supports them and the markup remains accessible.
+- Use hover, focus and pressed states to make controls feel tactile. Magnetic cursors, custom cursors, pinned scroll sections, horizontal scroll journeys and parallax are opt-in enhancements, not baseline requirements.
+- A sticky header may react to scroll direction only when it does not hide navigation or interfere with forms, dialogs or mobile use.
+- Use existing CSS and React capabilities first. Add Framer Motion, GSAP, Lenis, SplitType, React Three Fiber or other dependencies only when the request requires them and the repository's dependency policy supports them.
+- Avoid preloaders for ordinary route transitions. If an asset-heavy experience genuinely needs initialization, show useful progress and preserve a fast, usable fallback.
+
+### Accessibility and performance guardrails
+
+- Respect `prefers-reduced-motion: reduce` by disabling or simplifying non-essential animation.
+- Gate pointer-specific effects behind `@media (hover: hover) and (pointer: fine)` and provide equivalent keyboard and touch interactions.
+- Keep focus indicators visible and ensure motion never obscures status, error, consent or clinical information.
+- Animate composited properties such as `transform` and `opacity`; avoid animating layout properties such as `width`, `height`, `top`, `margin` or `font-size`.
+- Use `will-change` only for elements that are actively animated and remove it when the animation completes.
+- Keep images, gradients, filters and blur effects bounded so the page remains responsive on mobile and lower-powered devices.
 
 ## Design system map
 

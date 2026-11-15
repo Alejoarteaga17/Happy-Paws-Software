@@ -2,7 +2,7 @@
 
 Aplicación Next.js para el panel operativo de la clínica. La ruta principal (`/`) muestra el resumen de la clínica con estadísticas, agenda de hoy y cuidados pendientes. `/vaccinations` contiene el módulo completo de vacunaciones, `/pets` permite consultar y registrar mascotas, y `/appointments` permite consultar, crear, modificar y cancelar citas veterinarias.
 
-La pantalla `/pets` consume `GET/POST /api/v1/pets`, envía el token de sesión de Supabase y usa `ownerId` para vincular cada mascota con un propietario existente. El frontend también incluye `/portal` para OWNER, `/owners` para el directorio operativo, `/users` y `/audit` para ADMIN.
+La pantalla `/pets` consume `GET/POST /api/v1/pets`, envía el token de sesión de Supabase y usa `ownerId` para vincular cada mascota con un propietario existente. El frontend también incluye `/portal` para OWNER (citas, vacunaciones y notas clínicas autorizadas), `/owners` para el directorio operativo, `/clinical-notes` para el equipo clínico, `/users` y `/audit` para ADMIN.
 
 ## Desarrollo
 

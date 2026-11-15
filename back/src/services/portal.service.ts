@@ -34,11 +34,30 @@ export class PortalService {
     ]);
     if (appointmentsResult.error) throw new Error(`PORTAL_APPOINTMENTS_FAILED: ${appointmentsResult.error.message}`);
     if (vaccinationsResult.error) throw new Error(`PORTAL_VACCINATIONS_FAILED: ${vaccinationsResult.error.message}`);
+    const petNames = new Map((pets ?? []).map((pet) => [pet.id, pet.name]));
+    const appointmentPets = new Map(
+      (appointmentsResult.data ?? []).map((appointment) => [appointment.id, appointment.pet_id]),
+    );
+    const appointmentIds = (appointmentsResult.data ?? []).map((appointment) => appointment.id);
+    const clinicalNotesResult = appointmentIds.length
+      ? await supabase
+          .from('clinical_notes')
+          .select('id, appointment_id, diagnosis, treatment, observations, created_at, updated_at, veterinarian_id')
+          .in('appointment_id', appointmentIds)
+          .order('created_at', { ascending: false })
+      : { data: [], error: null };
+    if (clinicalNotesResult.error)
+      throw new Error(`PORTAL_CLINICAL_NOTES_FAILED: ${clinicalNotesResult.error.message}`);
     return {
       owner,
       pets: pets ?? [],
       appointments: appointmentsResult.data ?? [],
       vaccinations: vaccinationsResult.data ?? [],
+      clinicalNotes: (clinicalNotesResult.data ?? []).map((note) => ({
+        ...note,
+        pet_id: appointmentPets.get(note.appointment_id) ?? 0,
+        pet_name: petNames.get(appointmentPets.get(note.appointment_id) ?? 0) ?? 'Mascota sin nombre',
+      })),
     };
   }
 }

@@ -36,13 +36,30 @@ export default function LoginPage() {
     }
 
     setLoading(true);
-    const { error } = await getSupabaseClient().auth.signInWithPassword({ email, password });
+    const { data, error } = await getSupabaseClient().auth.signInWithPassword({ email, password });
     if (error) {
       setErrorMessage('Correo o contraseña incorrectos.');
       setLoading(false);
       return;
     }
 
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL?.trim().replace(/\/$/, '');
+    if (!apiUrl || !data.session) {
+      setErrorMessage('No se pudo registrar el inicio de sesión.');
+      await getSupabaseClient().auth.signOut();
+      setLoading(false);
+      return;
+    }
+    const auditResponse = await fetch(`${apiUrl}/api/v1/auth/audit-login`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${data.session.access_token}` },
+    });
+    if (!auditResponse.ok) {
+      setErrorMessage('No se pudo registrar el inicio de sesión.');
+      await getSupabaseClient().auth.signOut();
+      setLoading(false);
+      return;
+    }
     window.location.href = '/';
   };
 
