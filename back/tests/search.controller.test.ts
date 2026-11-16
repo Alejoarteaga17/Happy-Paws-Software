@@ -57,4 +57,14 @@ describe('searchRecords controller', () => {
     expect(result.statusCode).toBe(500);
     expect(result.body).toMatchObject({ error: { code: 'SEARCH_FAILED' } });
   });
+
+  it('rejects a search query that exceeds the maximum length', async () => {
+    const { responseMock, result } = response();
+    mockedSearch.mockClear();
+
+    await searchRecords({ query: { q: 'a'.repeat(101) } } as never, responseMock as never);
+
+    expect(result.statusCode).toBe(400);
+    expect(mockedSearch).not.toHaveBeenCalled();
+  });
 });

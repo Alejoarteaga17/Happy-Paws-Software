@@ -22,8 +22,9 @@ function SearchView() {
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
+    setResults([]);
     try {
-      setResults(await searchRecords(query));
+      setResults(await searchRecords(query.trim()));
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : 'No se pudo buscar');
     }

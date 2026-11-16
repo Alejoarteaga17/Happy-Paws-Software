@@ -15,9 +15,13 @@
     "@blobatar/react": "^2.7.0",
     "@supabase/supabase-js": "^2.57.4",
     "blobatar": "^2.7.0",
-    "next": "^14.2.30",
+    "next": "^15.5.29",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
+  },
+  "overrides": {
+    "postcss": "8.5.28",
+    "source-map-js": "1.2.2"
   },
   "devDependencies": {
     "@testing-library/react": "^16.3.0",

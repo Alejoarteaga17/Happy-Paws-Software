@@ -58,4 +58,46 @@ describe('SearchService', () => {
 
     await expect(SearchService.search('Ana')).rejects.toThrow('SEARCH_FAILED: database unavailable');
   });
+
+  it('escapes PostgREST filter syntax in user-controlled search text', async () => {
+    const limit = jest.fn(async () => ({ data: [], error: null }));
+    const chain = {
+      select: jest.fn().mockReturnThis(),
+      is: jest.fn().mockReturnThis(),
+      or: jest.fn().mockReturnThis(),
+      order: jest.fn().mockReturnThis(),
+      limit,
+    };
+    mockedGetSupabaseClient.mockReturnValue({ from: jest.fn().mockReturnValue(chain) } as never);
+
+    await SearchService.search('a),id.neq.0');
+
+    expect(chain.or).toHaveBeenNthCalledWith(
+      1,
+      'full_name.ilike.%a\\)\\,id\\.neq\\.0%,phone.ilike.%a\\)\\,id\\.neq\\.0%,email.ilike.%a\\)\\,id\\.neq\\.0%',
+    );
+  });
+
+  it('keeps the parallel owner and pet queries below the two-second requirement', async () => {
+    const limit = jest.fn(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(() => resolve({ data: [], error: null }), 1100);
+        }),
+    );
+    const chain = {
+      select: jest.fn().mockReturnThis(),
+      is: jest.fn().mockReturnThis(),
+      or: jest.fn().mockReturnThis(),
+      order: jest.fn().mockReturnThis(),
+      limit,
+    };
+    mockedGetSupabaseClient.mockReturnValue({ from: jest.fn().mockReturnValue(chain) } as never);
+
+    const startedAt = performance.now();
+    await SearchService.search('Ana');
+    const elapsed = performance.now() - startedAt;
+
+    expect(elapsed).toBeLessThan(2000);
+  }, 3000);
 });

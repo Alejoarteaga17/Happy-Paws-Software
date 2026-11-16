@@ -1,10 +1,12 @@
 import { getSupabaseClient } from '../config/supabase';
 import { SearchResult } from '../types/search';
 
+const escapePostgrestLikeValue = (value: string): string => value.replace(/([\\%_(),."'])/g, '\\$1');
+
 export class SearchService {
   static async search(query: string): Promise<SearchResult[]> {
     const normalized = query.trim();
-    const pattern = `%${normalized}%`;
+    const pattern = `%${escapePostgrestLikeValue(normalized)}%`;
     const client = getSupabaseClient();
     const [{ data: owners, error: ownersError }, { data: pets, error: petsError }] = await Promise.all([
       client

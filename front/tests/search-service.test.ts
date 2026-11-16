@@ -41,4 +41,12 @@ describe('search service', () => {
 
     await expect(searchRecords('Ana')).rejects.toThrow('No autorizado');
   });
+
+  it('rejects invalid search lengths before making a request', async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(searchRecords('a')).rejects.toThrow('entre 2 y 100');
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
 });

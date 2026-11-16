@@ -285,21 +285,21 @@ Cada iteración/generación de código del agente debe:
 
 El agente considerará la tarea finalizada únicamente si se cumplen al 100% las siguientes verificaciones:
 
-- [ ] **[RF-01 & RF-02] CRUD Propietarios y Mascotas:** Se pueden registrar, consultar y actualizar propietarios y vincular mascotas con su respectivo `pet_tag`.
-- [ ] **[RF-03] Búsqueda Rápida:** La API y la UI permiten buscar mascotas/propietarios por nombre, teléfono o `pet_tag` respondiendo en < 2 segundos.
-- [ ] **[RF-04 & RF-05] Citas y Notas Médicas:** Un recepcionista puede agendar cita; un veterinario asignado puede ingresar y actualizar las notas clínicas estandarizadas de la consulta.
-- [ ] **[RF-06] Control de Vacunas:** El sistema calcula las vacunas próximas y vencidas (`OVERDUE`) y las resalta visualmente en el panel de control.
-- [ ] **[RF-07 & RF-08] Seguridad y RBAC:** 
+- [~] **[RF-01 & RF-02] CRUD Propietarios y Mascotas:** Implementado, pero falta resolver `sex` y `updated_at` en el esquema y certificar la base remota.
+- [~] **[RF-03] Búsqueda Rápida:** API y UI implementadas; falta demostrar el SLA de menos de 2 segundos.
+- [x] **[RF-04 & RF-05] Citas y Notas Médicas:** Un recepcionista puede agendar cita; un veterinario asignado puede ingresar y actualizar notas clínicas estandarizadas.
+- [x] **[RF-06] Control de Vacunas:** El sistema calcula estados próximos y vencidos (`OVERDUE`) y los resalta visualmente.
+- [~] **[RF-07 & RF-08] Seguridad y RBAC:**
   - Solo usuarios autenticados con sesión válida de Supabase Auth acceden a la API.
   - El rol `RECEPTIONIST` no puede ingresar notas clínicas.
   - El rol `VET` puede registrar consultas y vacunas.
   - El rol `ADMIN` gestiona usuarios del sistema.
   - Las políticas RLS en Supabase bloquean el acceso aunque se intente saltar el backend.
-- [ ] **[RF-09, RF-10, RF-11 & NFR-SEC-05] Portal Propietarios:** Un propietario autenticado **solo** puede ver sus propias mascotas, sus citas y el estado de sus vacunas. No tiene acceso a datos de otros clientes.
-- [ ] **[RF-12 & RF-13] Dashboard & Auditoría:** El panel inicial muestra resúmenes relevantes según el rol y registra logs de eventos clave (login, actualización de citas).
-- [ ] **[Infraestructura] Docker:** El proyecto corre correctamente tanto con `docker compose up` como sin Docker (`npm run dev` en `/back` y `/front`).
-- [ ] **[Documentación] READMEs:** Existe un `README.md` útil y actualizado en `/back`, `/front`, `/back/tests` y `/front/tests`, además del `README.md` raíz.
-- [ ] **[Calidad & Pruebas]:** Todos los tests en `/back` y `/front` se ejecutan sin errores con `npm run test`; cada cambio de código agrega o actualiza tests enfocados y mantiene al menos 90% de cobertura en el código crítico, buscando un objetivo cercano al 95%. La cobertura debe medirse con `npm run test:coverage`, sin excluir lógica de negocio para inflar artificialmente el porcentaje.
+- [~] **[RF-09, RF-10, RF-11 & NFR-SEC-05] Portal Propietarios:** Implementado; falta prueba remota de aislamiento entre propietarios y RLS.
+- [~] **[RF-12 & RF-13] Dashboard & Auditoría:** Dashboard, auditoría CRUD y login implementados; falta validación formal por rol y completar eventos críticos.
+- [x] **[Infraestructura] Docker:** Dockerfiles y `docker-compose.yml` existen, además de la ejecución directa documentada.
+- [x] **[Documentación] READMEs:** Existen READMEs raíz, backend, frontend y suites de pruebas; se añade la matriz de requisitos.
+- [~] **[Calidad & Pruebas]:** Suites locales pasan; falta medir cobertura crítica, E2E y objetivo de aprobación ≥95 % en staging.
 
 ---
 

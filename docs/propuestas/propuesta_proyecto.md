@@ -40,7 +40,7 @@
 - **Digitalizar los Registros Principales:** Centralizar los perfiles de propietarios y mascotas para permitir búsquedas inmediatas y eliminar la dependencia de carpetas físicas.
 - **Mejorar la Continuidad de la Atención:** Implementar el seguimiento de las fechas de vacunación y resúmenes claros de las citas para evitar controles posteriores pendientes.
 - **Garantizar la Calidad Funcional y las Pruebas:** Establecer casos de prueba estructurados y escenarios operativos para evaluar exhaustivamente la confiabilidad del sistema y los flujos de usuario para clientes, recepcionistas, veterinarios y administradores de la clínica.
-- **Entregar una Herramienta Interna Ligera:** Desarrollar una interfaz fácil de usar y sin complejidad innecesaria, diseñada exclusivamente para el personal interno y sin introducir una carga operativa adicional.
+- **Entregar una Herramienta Ligera y Segura:** Desarrollar una interfaz fácil de usar para el personal interno y un portal de consulta OWNER, sin introducir una carga operativa adicional.
 
 ## 3.3 Alcance del Trabajo
 El alcance del trabajo para **Happy Paws Care Central** se centra en entregar un Producto Mínimo Viable (MVP) funcional y adaptado a las operaciones internas de la clínica:
@@ -112,10 +112,12 @@ El desarrollo de **Happy Paws Care Central** sigue un ciclo Agile iterativo estr
 ### Hitos Principales del Proyecto
 | ID del Hito | Fecha Objetivo | Nombre del Hito | Descripción y Entregable Principal |
 | :---: | :---: | :--- | :--- |
-| **M1** | **20 de agosto de 2026** | **Configuración y Arquitectura** | Repositorio inicializado, ERD finalizado y plantilla `.env` configurada. |
-| **M2** | **03 de septiembre de 2026** | **Módulo de Mascotas y Propietarios** | Registro de propietarios y búsqueda dinámica completamente funcional (< 2 s). |
-| **M3** | **17 de septiembre de 2026** | **Registro de Consultas Clínicas** | Interfaz estandarizada para notas de citas completada y vinculada a los perfiles de las mascotas. |
-| **M4** | **01 de octubre de 2026** | **Seguimiento de Vacunaciones** | Panel de vacunación con indicadores de estado completamente funcional. |
-| **M5** | **08 de octubre de 2026** | **Portal de Propietarios y RBAC** | Portal autenticado para propietarios y permisos diferenciados para todos los roles del sistema. |
-| **M6** | **23 de octubre de 2026** | **Staging y Finalización de QA** | Aplicación desplegada en una URL de staging con una tasa de aprobación de casos de prueba E2E superior al 95%. |
-| **M7** | **05 de noviembre de 2026** | **Entrega Final del Proyecto** | Documentación operativa entregada, UAT aprobada y proyecto finalizado. |
+| **M1** | **20 de agosto de 2026** | **Configuración y Arquitectura** | **Completo local.** Repositorio, arquitectura, ERD y configuración documentada. |
+| **M2** | **03 de septiembre de 2026** | **Módulo de Mascotas y Propietarios** | **Parcial.** CRUD y búsqueda implementados; faltan `sex`, `updated_at` y medición < 2 s. |
+| **M3** | **17 de septiembre de 2026** | **Registro de Consultas Clínicas** | **Completo local.** Notas estandarizadas vinculadas a cita, mascota y veterinario. |
+| **M4** | **01 de octubre de 2026** | **Seguimiento de Vacunaciones** | **Completo local.** Panel e indicadores de estado implementados y probados. |
+| **M5** | **08 de octubre de 2026** | **Portal de Propietarios y RBAC** | **Parcial.** Flujos implementados; falta certificación RLS y aislamiento en Supabase. |
+| **M6** | **23 de octubre de 2026** | **Staging y Finalización de QA** | **Pendiente externo.** Falta staging, E2E y aprobación ≥95 %. |
+| **M7** | **05 de noviembre de 2026** | **Entrega Final del Proyecto** | **Pendiente externo.** Falta UAT, aprobación del cliente y acta de aceptación. |
+
+La matriz detallada y la evidencia por requisito se mantienen en [`estado-requisitos.md`](./estado-requisitos.md).

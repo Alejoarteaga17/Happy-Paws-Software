@@ -82,18 +82,18 @@ export const getUser = async (request: Request, response: Response): Promise<voi
 export const updateUserRole = async (request: Request, response: Response): Promise<void> => {
   const id = typeof request.params.id === 'string' ? request.params.id : request.params.id[0];
   const role = request.body?.role;
+  if (request.user?.role !== 'ADMIN') {
+    response.status(403).json({
+      success: false,
+      data: null,
+      error: { code: 'FORBIDDEN_ROLE_ASSIGNMENT', message: 'Solo ADMIN puede modificar roles.' },
+    });
+    return;
+  }
   if (typeof role !== 'string' || !roles.includes(role as AppRole)) {
     response
       .status(400)
       .json({ success: false, data: null, error: { code: 'INVALID_ROLE', message: 'El rol indicado no es válido.' } });
-    return;
-  }
-  if (request.user?.role === 'RECEPTIONIST' && role === 'ADMIN') {
-    response.status(403).json({
-      success: false,
-      data: null,
-      error: { code: 'FORBIDDEN_ROLE_ASSIGNMENT', message: 'Recepción no puede asignar el rol ADMIN.' },
-    });
     return;
   }
   try {
