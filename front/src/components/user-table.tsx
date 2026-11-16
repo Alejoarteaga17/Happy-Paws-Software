@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { UserRole } from '../context/auth-context';
 import { UserRow } from '../services/user-service';
 
