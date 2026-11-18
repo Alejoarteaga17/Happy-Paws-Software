@@ -4,6 +4,7 @@ import { CreatePetInput, Pet, UpdatePetInput } from '../types/pet';
 interface PetRow {
   id: number;
   created_at: string;
+  updated_at: string;
   owner_id: number;
   pet_tag: string;
   name: string;
@@ -11,14 +12,17 @@ interface PetRow {
   breed: string | null;
   birth_date: string | null;
   weight: number | null;
+  sex: Pet['sex'];
   owners: { full_name: string }[] | null;
 }
 
-const petSelect = 'id, owner_id, pet_tag, name, species, breed, birth_date, weight, created_at, owners(full_name)';
+const petSelect =
+  'id, owner_id, pet_tag, name, species, breed, birth_date, weight, sex, created_at, updated_at, owners(full_name)';
 
 const toPet = (row: PetRow): Pet => ({
   id: row.id,
   createdAt: row.created_at,
+  updatedAt: row.updated_at,
   ownerId: row.owner_id,
   ownerName: row.owners?.[0]?.full_name ?? 'Propietario sin nombre',
   petTag: row.pet_tag,
@@ -27,6 +31,7 @@ const toPet = (row: PetRow): Pet => ({
   breed: row.breed,
   birthDate: row.birth_date,
   weight: row.weight,
+  sex: row.sex,
 });
 
 export class PetService {
@@ -64,6 +69,7 @@ export class PetService {
         breed: input.breed?.trim() || null,
         birth_date: input.birthDate || null,
         weight: input.weight ?? null,
+        sex: input.sex ?? null,
       })
       .select(petSelect)
       .single();
@@ -89,6 +95,7 @@ export class PetService {
     if (input.breed !== undefined) values.breed = input.breed?.trim() || null;
     if (input.birthDate !== undefined) values.birth_date = input.birthDate || null;
     if (input.weight !== undefined) values.weight = input.weight;
+    if (input.sex !== undefined) values.sex = input.sex;
 
     const { data, error } = await getSupabaseClient()
       .from('pets')

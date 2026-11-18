@@ -9,12 +9,12 @@ const navigationItems = [
   { href: '/', label: 'Resumen', icon: 'contextual_token', roles: ['ADMIN', 'VET', 'RECEPTIONIST'] },
   { href: '/portal', label: 'Mi portal', icon: 'pets', roles: ['OWNER'] },
   { href: '/pets', label: 'Pacientes', icon: 'pets', roles: ['ADMIN', 'RECEPTIONIST', 'VET'] },
-  { href: '/appointments', label: 'Agenda', icon: 'assignment', roles: ['ADMIN', 'RECEPTIONIST', 'VET', 'OWNER'] },
-  { href: '/vaccinations', label: 'Vacunaciones', icon: 'vaccines', roles: ['ADMIN', 'VET', 'RECEPTIONIST', 'OWNER'] },
+  { href: '/appointments', label: 'Agenda', icon: 'assignment', roles: ['ADMIN', 'RECEPTIONIST', 'VET'] },
+  { href: '/vaccinations', label: 'Vacunaciones', icon: 'vaccines', roles: ['ADMIN', 'VET', 'RECEPTIONIST'] },
   { href: '/owners', label: 'Propietarios', icon: 'group', roles: ['ADMIN', 'RECEPTIONIST'] },
   { href: '/search', label: 'Buscar', icon: 'search', roles: ['ADMIN', 'RECEPTIONIST', 'VET'] },
   { href: '/clinical-notes', label: 'Notas clínicas', icon: 'clinical_notes', roles: ['ADMIN', 'VET'] },
-  { href: '/users', label: 'Usuarios', icon: 'manage_accounts', roles: ['ADMIN'] },
+  { href: '/users', label: 'Usuarios', icon: 'manage_accounts', roles: ['ADMIN', 'RECEPTIONIST'] },
   { href: '/audit', label: 'Auditoría', icon: 'history', roles: ['ADMIN'] },
 ];
 

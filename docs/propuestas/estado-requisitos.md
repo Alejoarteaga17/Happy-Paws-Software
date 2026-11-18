@@ -12,18 +12,18 @@ Los issues de GitHub relacionados continúan abiertos; esta matriz registra el e
 
 | RF | Issue(s) | Estado | Evidencia o pendiente |
 |---|---:|---|---|
-| RF-01 Propietarios | #11–#13 | Parcial | CRUD, validaciones y desactivación lógica implementados. Falta `updated_at` persistente en `owners` y evidencia de aceptación. |
-| RF-02 Mascotas | #14–#16 | Parcial | CRUD, desactivación y relación con propietarios activos implementados. Falta el atributo `sex` solicitado por #14 y validación RLS remota. |
+| RF-01 Propietarios | #11–#13 | Parcial | CRUD, validaciones, desactivación lógica y migración de `updated_at` implementados. Falta aplicar la migración y obtener evidencia de aceptación en staging. |
+| RF-02 Mascotas | #14–#16 | Parcial | CRUD, desactivación, relación con propietarios activos y `sex` nullable (`MALE`/`FEMALE`/`UNKNOWN`) implementados. Falta aplicar la migración y validar RLS remotamente. |
 | RF-03 Búsqueda | #17 | Parcial | Búsqueda por propietario, teléfono, email, mascota y `pet_tag` con UI y pruebas. Falta medir y demostrar el SLA de menos de 2 segundos. |
 | RF-04 Citas | #18–#19 | Completo local | Entidad, CRUD, estados, asignación de mascota y pruebas automatizadas. |
 | RF-05 Notas clínicas | #20 | Completo local | Entidad, creación, actualización, asociación a cita/veterinario, UI y pruebas. |
 | RF-06 Vacunaciones | #21–#22 | Completo local | Entidad, estados `PENDING`/`OVERDUE`/`ADMINISTERED`, dashboard, UI y pruebas. |
-| RF-07 RBAC | #23–#24 | Parcial | Roles y restricciones de API/UI implementados. Falta prueba RLS remota con los cuatro roles. |
+| RF-07 RBAC | #23–#24 | Parcial | Roles, matriz de rutas/acciones y restricciones de API/UI implementados; existe evidencia local automatizada. Falta ejecutar la matriz RLS remota con los cuatro roles. |
 | RF-08 Autenticación | #25 | Completo local | Supabase Auth, sesión, logout, middleware JWT y auditoría de login implementados. Falta prueba de despliegue. |
 | RF-09 Portal OWNER | #26–#27 | Parcial | Portal autenticado con mascotas, citas, vacunas y notas clínicas autorizadas. Falta evidencia remota de aislamiento entre propietarios. |
 | RF-10 Historial clínico OWNER | #28 | Parcial | Portal consulta notas clínicas asociadas a las citas del propietario. Falta validar RLS y orden/criterios de autorización en Supabase remoto. |
 | RF-11 Vacunaciones OWNER | #29 | Parcial | Portal muestra aplicadas, próximas y vencidas. Falta validación remota de aislamiento y rendimiento de consulta. |
-| RF-12 Dashboard | #30 | Parcial | Dashboard operativo y portal OWNER existen; la visibilidad por rol está centralizada en permisos. Falta una validación formal por cada rol y un dashboard diferenciado completo para VET/ADMIN/RECEPTIONIST. |
+| RF-12 Dashboard | #30 | Parcial | Dashboard operativo y portal OWNER existen; la visibilidad por rol está documentada en `docs/qa/role-matrix.md` y se corrigieron rutas inconsistentes. Falta ejecutar la validación formal por rol en staging. |
 | RF-13 Auditoría | #31 | Parcial | Auditoría de CRUD, permisos y login implementada. Falta completar y probar exhaustivamente todos los eventos críticos definidos por negocio. |
 | RF-14 Usuarios internos | #32–#33 | Completo local | Crear, consultar y editar para ADMIN/RECEPTIONIST; asignación de roles; solo ADMIN desactiva; formulario y tabla reutilizables. |
 | RF-15 Cuentas OWNER | #34–#35 | Parcial | Creación/asociación de cuentas y portal aislado implementados. Falta prueba RLS/aislamiento entre dos propietarios y aceptación formal. |
@@ -52,13 +52,14 @@ Los issues de GitHub relacionados continúan abiertos; esta matriz registra el e
 2. Registrar una medición de búsqueda menor a 2 segundos y consulta del portal menor a 3 segundos en staging.
 3. Ejecutar una matriz de aislamiento con dos propietarios y los roles ADMIN, VET, RECEPTIONIST y OWNER.
 4. Completar UAT y registrar aprobación formal.
-5. Resolver la decisión funcional de `sex` y `updated_at` en propietarios/mascotas antes de cerrar RF-01/RF-02.
+5. Aplicar la migración de `sex` y `updated_at` en staging antes de cerrar RF-01/RF-02.
 
 ## Validación local ejecutada
 
 En el repositorio pasan actualmente:
 
-- Backend: 55 pruebas, build TypeScript, Prettier y ESLint sin errores; cobertura global medida de 72.62 % de statements.
-- Frontend: 27 pruebas, build Next.js, Prettier y ESLint sin errores; cobertura global medida de 13.07 % de statements.
+- Backend: 64 pruebas y build TypeScript; ESLint sin errores (solo warnings preexistentes).
+- Frontend: 28 pruebas y build Next.js; ESLint sin errores (solo warnings preexistentes).
+- Playwright: 2 casos RBAC descubiertos; su ejecución requiere navegador instalado, URL de staging y credenciales sintéticas.
 
 La cobertura no cumple todavía el objetivo documental de 90 % para código crítico. Los warnings existentes de fuentes y `console` no bloquean la validación, pero deben limpiarse antes de la entrega final si el criterio de calidad exige cero warnings.

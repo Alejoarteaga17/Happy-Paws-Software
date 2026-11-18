@@ -21,10 +21,15 @@
 - Auditoría de login y operaciones críticas.
 - Payload JSON sobredimensionado y claves `__proto__`, `constructor` o `prototype` rechazadas.
 - Intento de RECEPTIONIST de cambiar roles rechazado con `403`.
+- Matriz completa de rutas y acciones por rol: [`role-matrix.md`](./role-matrix.md).
 
 ## Evidencia requerida
 
 Registrar fecha, commit, entorno, caso, resultado, duración y captura/log asociado. El criterio de M6 es una aprobación mínima del 95 % de los casos E2E. Medir también búsqueda por debajo de 2 segundos y consulta del portal por debajo de 3 segundos.
+
+La validación RLS debe ejecutarse con sesiones de usuario normales, nunca con `service_role`, y debe
+incluir dos cuentas OWNER vinculadas a propietarios distintos. La cuenta de servicio solo puede
+usarse para preparar datos sintéticos antes de iniciar las pruebas.
 
 Para RF-03, ejecutar al menos 10 búsquedas sintéticas por nombre, teléfono y `pet_tag` en staging,
 descartar la primera medición de calentamiento y registrar promedio, p95 y máximo. El criterio de

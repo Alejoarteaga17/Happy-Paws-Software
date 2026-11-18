@@ -1,7 +1,9 @@
 import { Request, Response } from 'express';
 import { PetService } from '../services/pet.service';
-import { CreatePetInput, UpdatePetInput } from '../types/pet';
+import { CreatePetInput, PetSex, UpdatePetInput } from '../types/pet';
 import { AuditService } from '../services/audit.service';
+
+const isPetSex = (value: unknown): value is PetSex => value === 'MALE' || value === 'FEMALE' || value === 'UNKNOWN';
 
 const sendError = (response: Response, error: unknown, fallbackCode: string): void => {
   const code = error instanceof Error ? error.message : fallbackCode;
@@ -59,7 +61,8 @@ export const createPet = async (request: Request, response: Response): Promise<v
     (body.breed === undefined || typeof body.breed === 'string') &&
     (body.birthDate === undefined ||
       (typeof body.birthDate === 'string' && !Number.isNaN(Date.parse(body.birthDate)))) &&
-    (body.weight === undefined || (typeof body.weight === 'number' && body.weight > 0));
+    (body.weight === undefined || (typeof body.weight === 'number' && body.weight > 0)) &&
+    (body.sex === undefined || isPetSex(body.sex));
 
   if (!validCreate) {
     response.status(400).json({
@@ -99,7 +102,8 @@ export const updatePet = async (request: Request, response: Response): Promise<v
     (body.birthDate === undefined ||
       body.birthDate === null ||
       (typeof body.birthDate === 'string' && !Number.isNaN(Date.parse(body.birthDate)))) &&
-    (body.weight === undefined || body.weight === null || (typeof body.weight === 'number' && body.weight > 0));
+    (body.weight === undefined || body.weight === null || (typeof body.weight === 'number' && body.weight > 0)) &&
+    (body.sex === undefined || body.sex === null || isPetSex(body.sex));
   if (!valid) {
     response.status(400).json({
       success: false,
