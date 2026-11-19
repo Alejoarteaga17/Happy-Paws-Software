@@ -23,6 +23,7 @@ const emptyForm = {
 };
 const visiblePageSize = 5;
 const petPlaceholder = '/pet-placeholder.svg';
+const petPhotoStorageKey = (petId: number): string => `happy-paws-pet-photo-${petId}`;
 
 export default function PetsPage() {
   const { can, loading } = useAuth();
@@ -59,7 +60,12 @@ function PetsManager() {
   const loadPets = useCallback(async () => {
     try {
       const loadedPets = await getPets();
-      setPets(loadedPets);
+      setPets(
+        loadedPets.map((pet) => ({
+          ...pet,
+          photoUrl: pet.photoUrl ?? window.localStorage.getItem(petPhotoStorageKey(pet.id)),
+        })),
+      );
       if (canManage) setOwners(await getOwners());
       setMessage(null);
     } catch (error) {
@@ -102,16 +108,18 @@ function PetsManager() {
         photoDataUrl,
       };
       if (editingId === null) {
-        await createPet({
+        const createdPet = await createPet({
           ownerId: Number(form.ownerId),
           petTag: form.petTag,
           ...basicFields,
         });
+        if (createdPet.photoUrl) window.localStorage.setItem(petPhotoStorageKey(createdPet.id), createdPet.photoUrl);
       } else {
-        await updatePet(editingId, {
+        const updatedPet = await updatePet(editingId, {
           ...basicFields,
           ...(canManage ? { ownerId: Number(form.ownerId), petTag: form.petTag } : {}),
         });
+        if (updatedPet.photoUrl) window.localStorage.setItem(petPhotoStorageKey(updatedPet.id), updatedPet.photoUrl);
       }
       setForm(emptyForm);
       setEditingId(null);
@@ -122,7 +130,15 @@ function PetsManager() {
       );
       await loadPets();
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'No se pudo registrar la mascota');
+      const rawMessage = error instanceof Error ? error.message : '';
+      const technicalMessage = /did not match|expected pattern|syntaxerror|unexpected token/i.test(rawMessage);
+      setMessage(
+        technicalMessage
+          ? editingId === null
+            ? 'No se pudo registrar la mascota. Verifica los datos y selecciona una imagen JPG, PNG o WEBP.'
+            : 'No se pudo actualizar la mascota. Verifica los datos y selecciona una imagen JPG, PNG o WEBP.'
+          : rawMessage || 'No se pudo guardar la mascota.',
+      );
     } finally {
       setSaving(false);
     }

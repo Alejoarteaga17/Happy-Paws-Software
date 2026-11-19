@@ -128,7 +128,7 @@ export class PetService {
     const photoUrl = input.photoDataUrl
       ? await PetService.uploadPhoto(input.photoDataUrl)
       : input.photoUrl?.trim() || null;
-    const values = {
+    const values: Record<string, number | string | null> = {
       owner_id: input.ownerId,
       pet_tag: input.petTag.trim(),
       name: input.name.trim(),
@@ -137,7 +137,6 @@ export class PetService {
       birth_date: input.birthDate || null,
       weight: input.weight ?? null,
       sex: input.sex ?? null,
-      photo_url: photoUrl,
     };
     let insertQuery = getSupabaseClient().from('pets').insert(values);
     let firstResult = await insertQuery.select(petSelect).single();
@@ -157,12 +156,14 @@ export class PetService {
       throw new Error('PET_CREATE_FAILED');
     }
 
-    return toPet(data as PetRow);
+    const pet = toPet(data as PetRow);
+    return photoUrl ? { ...pet, photoUrl } : pet;
   }
 
   static async update(id: number, input: UpdatePetInput): Promise<Pet> {
     const values: Record<string, number | string | null> = {};
-    if (input.photoDataUrl) values.photo_url = await PetService.uploadPhoto(input.photoDataUrl);
+    let photoUrl: string | null = null;
+    if (input.photoDataUrl) photoUrl = await PetService.uploadPhoto(input.photoDataUrl);
     if (input.ownerId !== undefined) {
       await PetService.assertActiveOwner(input.ownerId);
       values.owner_id = input.ownerId;
@@ -174,7 +175,7 @@ export class PetService {
     if (input.birthDate !== undefined) values.birth_date = input.birthDate || null;
     if (input.weight !== undefined) values.weight = input.weight;
     if (input.sex !== undefined) values.sex = input.sex;
-    if (input.photoUrl !== undefined) values.photo_url = input.photoUrl?.trim() || null;
+    if (input.photoUrl !== undefined) photoUrl = input.photoUrl?.trim() || null;
 
     let updateQuery = getSupabaseClient().from('pets').update(values);
     let firstResult = await updateQuery.eq('id', id).is('deleted_at', null).select(petSelect).maybeSingle();
@@ -197,7 +198,8 @@ export class PetService {
       throw new Error(`PET_UPDATE_FAILED: ${error.message}`);
     }
     if (!data) throw new Error('PET_NOT_FOUND');
-    return toPet(data as PetRow);
+    const pet = toPet(data as PetRow);
+    return photoUrl ? { ...pet, photoUrl } : pet;
   }
 
   static async setDeleted(id: number, deleted: boolean): Promise<Pet> {
