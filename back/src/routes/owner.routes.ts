@@ -16,4 +16,4 @@ ownerRouter.get('/:id', requireRoles('ADMIN', 'RECEPTIONIST'), getOwner);
 ownerRouter.post('/', requireRoles('ADMIN', 'RECEPTIONIST'), createOwner);
 ownerRouter.put('/:id', requireRoles('ADMIN', 'RECEPTIONIST'), updateOwner);
 ownerRouter.patch('/:id/status', requireRoles('ADMIN'), updateOwnerStatus);
-ownerRouter.delete('/:id', requireRoles('ADMIN'), deleteOwner);
+ownerRouter.delete('/:id', requireRoles('ADMIN', 'RECEPTIONIST'), deleteOwner);

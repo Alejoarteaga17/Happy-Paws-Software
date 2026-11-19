@@ -7,6 +7,7 @@ La API es la autoridad para autorización; la visibilidad del frontend solo mejo
 | Resumen clínico | Sí | Sí | Sí | No |
 | Portal propio | No | No | No | Sí |
 | Propietarios: listar/crear/editar | Sí | Sí | No | No |
+| Propietarios: eliminar | Sí | Sí | No | No |
 | Propietarios: activar/desactivar | Sí | No | No | No |
 | Mascotas: listar | Sí | Sí | Sí | No |
 | Mascotas: crear/eliminar | Sí | Sí | No | No |
