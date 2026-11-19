@@ -1,6 +1,12 @@
 import { getSupabaseClient, isSupabaseConfigured } from './supabase-client';
 import { Appointment, AppointmentInput } from '../types/appointment';
 
+export interface AvailableVet {
+  id: string;
+  fullName: string;
+  email: string;
+}
+
 const getHeaders = async (): Promise<HeadersInit> => {
   const headers: HeadersInit = { 'Content-Type': 'application/json' };
   if (isSupabaseConfigured) {
@@ -37,6 +43,7 @@ const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
 };
 
 export const getAppointments = (): Promise<Appointment[]> => request<Appointment[]>('');
+export const getAvailableVets = (): Promise<AvailableVet[]> => request<AvailableVet[]>('/vets');
 export const createAppointment = (input: AppointmentInput): Promise<Appointment> =>
   request<Appointment>('', { method: 'POST', body: JSON.stringify(input) });
 export const updateAppointment = (id: number, input: Partial<AppointmentInput>): Promise<Appointment> =>

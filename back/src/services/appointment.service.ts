@@ -12,6 +12,12 @@ interface AppointmentRow {
   pets: { name: string } | { name: string }[] | null;
 }
 
+export interface AvailableVet {
+  id: string;
+  fullName: string;
+  email: string;
+}
+
 const appointmentSelect = 'id, pet_id, vet_id, scheduled_at, reason, notes, status, pets(name)';
 
 const getPetName = (pets: AppointmentRow['pets']): string | undefined =>
@@ -29,6 +35,21 @@ const toAppointment = (row: AppointmentRow): Appointment => ({
 });
 
 export class AppointmentService {
+  static async listVets(): Promise<AvailableVet[]> {
+    const { data, error } = await getSupabaseClient()
+      .from('profiles')
+      .select('id, email, full_name')
+      .eq('role', 'VET')
+      .order('full_name', { ascending: true });
+
+    if (error) throw new Error(`VETS_LIST_FAILED: ${error.message}`);
+    return (data ?? []).map((vet) => ({
+      id: vet.id as string,
+      fullName: vet.full_name as string,
+      email: vet.email as string,
+    }));
+  }
+
   private static async markPastScheduledAsMissed(): Promise<void> {
     const { error } = await getSupabaseClient()
       .from('appointments')
@@ -80,6 +101,15 @@ export class AppointmentService {
       if (!vet) throw new Error('VET_NOT_FOUND');
       const { id } = vet;
       vetId = id as string;
+    } else {
+      const { data: vet, error: vetLookupError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', requestedVetId)
+        .eq('role', 'VET')
+        .maybeSingle();
+      if (vetLookupError) throw new Error('VET_LOOKUP_FAILED');
+      if (!vet) throw new Error('VET_NOT_FOUND');
     }
 
     const { data, error } = await supabase
@@ -87,7 +117,7 @@ export class AppointmentService {
       .insert({
         pet_id: input.petId,
         vet_id: vetId,
-        scheduled_at: input.scheduledAt,
+        scheduled_at: new Date(input.scheduledAt).toISOString(),
         reason: input.reason,
         notes: input.notes?.trim() || null,
         status: input.status ?? 'SCHEDULED',
@@ -112,7 +142,7 @@ export class AppointmentService {
   static async update(id: number, input: UpdateAppointmentInput): Promise<Appointment> {
     const updateData: Record<string, number | string | null> = {};
     if (input.petId !== undefined) updateData.pet_id = input.petId;
-    if (input.scheduledAt !== undefined) updateData.scheduled_at = input.scheduledAt;
+    if (input.scheduledAt !== undefined) updateData.scheduled_at = new Date(input.scheduledAt).toISOString();
     if (input.reason !== undefined) updateData.reason = input.reason;
     if (input.notes !== undefined) updateData.notes = input.notes.trim() || null;
     if (input.vetId !== undefined) updateData.vet_id = input.vetId;

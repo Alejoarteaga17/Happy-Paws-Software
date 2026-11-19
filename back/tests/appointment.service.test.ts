@@ -58,6 +58,37 @@ describe('AppointmentService', () => {
     expect(insert).toHaveBeenCalledWith(expect.objectContaining({ pet_id: 2, vet_id: 'vet-1', status: 'SCHEDULED' }));
   });
 
+  it('normalizes the appointment date and uses the selected veterinarian', async () => {
+    const vetLookup = { maybeSingle: jest.fn(async () => ({ data: { id: 'vet-2' }, error: null })) };
+    const appointmentInsert = { single: jest.fn(async () => ({ data: appointmentRow, error: null })) };
+    const insert = jest.fn().mockReturnValue({ select: jest.fn().mockReturnValue(appointmentInsert) });
+    const from = jest
+      .fn()
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnValue({
+          eq: jest.fn().mockReturnValue({
+            eq: jest.fn().mockReturnValue(vetLookup),
+          }),
+        }),
+      })
+      .mockReturnValueOnce({ insert });
+    mockedGetSupabaseClient.mockReturnValue({ from } as never);
+
+    await AppointmentService.create({
+      petId: 2,
+      scheduledAt: '2026-09-11T14:00',
+      reason: 'Control',
+      vetId: 'vet-2',
+    });
+
+    expect(insert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        vet_id: 'vet-2',
+        scheduled_at: new Date('2026-09-11T14:00').toISOString(),
+      }),
+    );
+  });
+
   it('returns not found when an appointment cannot be loaded', async () => {
     const maybeSingle = jest.fn(async () => ({ data: null, error: null }));
     const eq = jest.fn().mockReturnValue({ maybeSingle });

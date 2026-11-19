@@ -5,7 +5,9 @@ import {
   cancelAppointment,
   createAppointment,
   getAppointments,
+  getAvailableVets,
   updateAppointment,
+  AvailableVet,
 } from '../../services/appointment-service';
 import { getPets } from '../../services/pet-service';
 import { Appointment, AppointmentInput, AppointmentStatus } from '../../types/appointment';
@@ -42,6 +44,7 @@ export default function AppointmentsPage() {
 function AppointmentsManager() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [pets, setPets] = useState<Pet[]>([]);
+  const [vets, setVets] = useState<AvailableVet[]>([]);
   const [form, setForm] = useState<AppointmentInput>(emptyForm);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
@@ -50,10 +53,22 @@ function AppointmentsManager() {
 
   const loadAppointments = async () => {
     try {
-      const [loadedAppointments, loadedPets] = await Promise.all([getAppointments(), getPets()]);
+      const [loadedAppointments, loadedPets, loadedVets] = await Promise.all([
+        getAppointments(),
+        getPets(),
+        getAvailableVets(),
+      ]);
       setAppointments(loadedAppointments);
       setPets(loadedPets);
-      setMessage(null);
+      setVets(loadedVets);
+      setForm((current) =>
+        current.vetId || loadedVets.length === 0 ? current : { ...current, vetId: loadedVets[0].id },
+      );
+      setMessage(
+        loadedVets.length === 0
+          ? 'No hay veterinarios disponibles. Configura al menos una cuenta con rol VET antes de agendar.'
+          : null,
+      );
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'No se pudieron cargar las citas');
     } finally {
@@ -90,6 +105,7 @@ function AppointmentsManager() {
       reason: appointment.reason,
       notes: appointment.notes ?? '',
       status: appointment.status,
+      vetId: appointment.vetId ?? undefined,
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -147,6 +163,21 @@ function AppointmentsManager() {
               />
             </label>
             <label>
+              Veterinario
+              <select
+                required
+                value={form.vetId ?? ''}
+                onChange={(event) => setForm({ ...form, vetId: event.target.value })}
+              >
+                {vets.length === 0 && <option value="">No hay veterinarios disponibles</option>}
+                {vets.map((vet) => (
+                  <option key={vet.id} value={vet.id}>
+                    {vet.fullName || vet.email}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
               Estado
               <select
                 required
@@ -181,7 +212,7 @@ function AppointmentsManager() {
               <span className="field-help">Máximo 2000 caracteres.</span>
             </label>
             <div className="form-actions">
-              <button className="primary-button" disabled={saving}>
+              <button className="primary-button" disabled={saving || vets.length === 0}>
                 {saving ? 'Guardando...' : editingId === null ? 'Crear cita' : 'Guardar cambios'}
               </button>
               {editingId !== null && (

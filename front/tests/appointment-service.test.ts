@@ -3,6 +3,7 @@ import {
   cancelAppointment,
   createAppointment,
   getAppointments,
+  getAvailableVets,
   updateAppointment,
 } from '../src/services/appointment-service';
 
@@ -44,6 +45,27 @@ describe('appointment service', () => {
       'http://localhost:4000/api/v1/appointments/3',
       'http://localhost:4000/api/v1/appointments/3/cancel',
     ]);
+  });
+
+  it('loads available veterinarians for the appointment form', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            success: true,
+            data: [{ id: 'vet-1', fullName: 'Dra. Pérez', email: 'vet@example.com' }],
+            error: null,
+          }),
+          { status: 200 },
+        ),
+      ),
+    );
+
+    await expect(getAvailableVets()).resolves.toEqual([
+      { id: 'vet-1', fullName: 'Dra. Pérez', email: 'vet@example.com' },
+    ]);
+    expect(fetch).toHaveBeenCalledWith('http://localhost:4000/api/v1/appointments/vets', expect.anything());
   });
 
   it('translates a missing veterinarian error', async () => {

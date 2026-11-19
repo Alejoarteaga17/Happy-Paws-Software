@@ -17,4 +17,5 @@ export interface AppointmentInput {
   reason: string;
   notes?: string;
   status?: AppointmentStatus;
+  vetId?: string;
 }

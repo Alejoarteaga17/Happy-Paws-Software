@@ -38,6 +38,14 @@ export const listAppointments = async (_request: Request, response: Response): P
   }
 };
 
+export const listAvailableVets = async (_request: Request, response: Response): Promise<void> => {
+  try {
+    response.json({ success: true, data: await AppointmentService.listVets(), error: null });
+  } catch (error) {
+    sendError(response, error, 'VETS_LIST_FAILED');
+  }
+};
+
 export const getAppointment = async (request: Request, response: Response): Promise<void> => {
   const id = Number(request.params.id);
   if (!Number.isInteger(id)) {
