@@ -110,7 +110,7 @@ export default function AppHeader() {
             onClick={() => setProfileMenuOpen((open) => !open)}
           >
             <UserAvatar seed={profile.email || profile.id} label={profile.fullName} />
-            <Icon name="keyboard_arrow_down" className="profile-chevron" />
+            <span className="profile-chevron" aria-hidden="true">▼</span>
           </button>
           {profileMenuOpen && (
             <section className="profile-menu" id="profile-menu" aria-label="Perfil de usuario">

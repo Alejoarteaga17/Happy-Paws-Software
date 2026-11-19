@@ -244,12 +244,14 @@ h3 {
 .profile-trigger {
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 4px;
-  border: 1px solid transparent;
+  gap: 8px;
+  min-width: 68px;
+  justify-content: center;
+  padding: 5px 8px;
+  border: 1px solid var(--line);
   border-radius: 20px;
-  background: transparent;
-  color: var(--muted);
+  background: var(--paper);
+  color: var(--ink);
   cursor: pointer;
   transition:
     border-color 0.2s ease,
@@ -266,7 +268,16 @@ h3 {
   outline-offset: 3px;
 }
 .profile-chevron {
-  font-size: 17px;
+  display: inline-flex;
+  width: 14px;
+  height: 14px;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 14px;
+  color: var(--ink);
+  font-family: Arial, sans-serif;
+  font-size: 11px;
+  line-height: 1;
   transition: transform 0.2s ease;
 }
 .profile-trigger[aria-expanded='true'] .profile-chevron {
