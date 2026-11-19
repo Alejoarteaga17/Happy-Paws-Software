@@ -16,13 +16,16 @@ export default function OwnersPage() {
 }
 
 function OwnersTable() {
+  const visiblePageSize = 5;
   const [owners, setOwners] = useState<Owner[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState<OwnerInput>({ fullName: '', phone: '', email: '', address: '' });
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [visibleLimit, setVisibleLimit] = useState(visiblePageSize);
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<'fullName' | 'phone' | 'email', string>>>({});
+  const visibleOwners = owners.slice(0, visibleLimit);
 
   const validateField = (field: 'fullName' | 'phone' | 'email', value: string): string | undefined => {
     if (field === 'fullName' && value.trim().length < 3) {
@@ -181,7 +184,7 @@ function OwnersTable() {
               </tr>
             </thead>
             <tbody>
-              {owners.map((owner) => (
+              {visibleOwners.map((owner) => (
                 <tr key={owner.id}>
                   <td>{owner.fullName}</td>
                   <td>{owner.phone}</td>
@@ -220,6 +223,25 @@ function OwnersTable() {
               ))}
             </tbody>
           </table>
+          {visibleLimit < owners.length && (
+            <button
+              type="button"
+              className="secondary-button owner-show-more"
+              onClick={() => setVisibleLimit((current) => current + visiblePageSize)}
+            >
+              Mostrar más
+            </button>
+          )}
+          {visibleLimit > visiblePageSize && (
+            <div className="owner-pagination">
+              <span>
+                Mostrando {visibleOwners.length} de {owners.length} propietarios
+              </span>
+              <button type="button" className="text-button" onClick={() => setVisibleLimit(visiblePageSize)}>
+                Mostrar menos
+              </button>
+            </div>
+          )}
           {!owners.length && !error && <p className="empty">No hay propietarios disponibles.</p>}
         </section>
       </section>
