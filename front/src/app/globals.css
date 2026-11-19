@@ -949,6 +949,20 @@ h3 {
 .appointment-form textarea {
   resize: vertical;
 }
+.pet-owner-selector {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+}
+.pet-owner-selector select {
+  min-width: 0;
+}
+.pet-create-owner {
+  min-height: 38px;
+  white-space: nowrap;
+  text-align: center;
+}
 .form-actions {
   display: flex;
   flex-wrap: wrap;
@@ -1419,6 +1433,12 @@ h3 {
   }
 }
 @media (max-width: 620px) {
+  .pet-owner-selector {
+    grid-template-columns: 1fr;
+  }
+  .pet-create-owner {
+    width: 100%;
+  }
   .app-header {
     gap: 12px;
     min-height: 68px;

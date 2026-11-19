@@ -8,6 +8,7 @@ import { Pet } from '../../types/pet';
 import AppHeader from '../../components/app-header';
 import RestrictedView from '../../components/restricted-view';
 import { RoleView, useAuth } from '../../context/auth-context';
+import Link from 'next/link';
 
 const emptyForm = { ownerId: '', petTag: '', name: '', species: '', breed: '', birthDate: '', weight: '', sex: '' };
 
@@ -108,19 +109,26 @@ function PetsManager() {
             <h2>{editingId === null ? 'Registrar paciente' : 'Actualizar paciente'}</h2>
             <label>
               Propietario
-              <select
-                required
-                value={form.ownerId}
-                disabled={!canManage}
-                onChange={(event) => setForm({ ...form, ownerId: event.target.value })}
-              >
-                <option value="">Selecciona un propietario</option>
-                {owners.map((owner) => (
-                  <option key={owner.id} value={owner.id}>
-                    {owner.fullName} · {owner.phone}
-                  </option>
-                ))}
-              </select>
+              <div className="pet-owner-selector">
+                <select
+                  required
+                  value={form.ownerId}
+                  disabled={!canManage}
+                  onChange={(event) => setForm({ ...form, ownerId: event.target.value })}
+                >
+                  <option value="">Selecciona un propietario</option>
+                  {owners.map((owner) => (
+                    <option key={owner.id} value={owner.id}>
+                      {owner.fullName} · {owner.phone}
+                    </option>
+                  ))}
+                </select>
+                {canManage && (
+                  <Link className="secondary-button pet-create-owner" href="/owners">
+                    Crear propietario
+                  </Link>
+                )}
+              </div>
             </label>
             <label>
               Pet tag
