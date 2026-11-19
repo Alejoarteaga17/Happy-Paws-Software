@@ -52,6 +52,7 @@ describe('PetService', () => {
   });
 
   it('creates a pet with trimmed values', async () => {
+    const ownerMaybeSingle = jest.fn(async () => ({ data: { id: 7 }, error: null }));
     const single = jest.fn(async () => ({
       data: {
         id: 2,
@@ -69,7 +70,16 @@ describe('PetService', () => {
     }));
     const select = jest.fn().mockReturnValue({ single });
     const insert = jest.fn().mockReturnValue({ select });
-    mockedGetSupabaseClient.mockReturnValue({ from: jest.fn().mockReturnValue({ insert }) } as never);
+    const from = jest.fn().mockImplementation((table: unknown) =>
+      table === 'owners'
+        ? {
+            select: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({ is: jest.fn().mockReturnValue({ maybeSingle: ownerMaybeSingle }) }),
+            }),
+          }
+        : { insert },
+    );
+    mockedGetSupabaseClient.mockReturnValue({ from } as never);
 
     await expect(
       PetService.create({ ownerId: 7, petTag: ' HP-002 ', name: ' Milo ', species: ' Perro ' }),
@@ -80,14 +90,36 @@ describe('PetService', () => {
   });
 
   it('translates duplicate pet tags into a domain error', async () => {
+    const ownerMaybeSingle = jest.fn(async () => ({ data: { id: 7 }, error: null }));
     const single = jest.fn(async () => ({ data: null, error: { code: '23505' } }));
     const select = jest.fn().mockReturnValue({ single });
-    mockedGetSupabaseClient.mockReturnValue({
-      from: jest.fn().mockReturnValue({ insert: jest.fn().mockReturnValue({ select }) }),
-    } as never);
+    const from = jest.fn().mockImplementation((table: unknown) =>
+      table === 'owners'
+        ? {
+            select: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({ is: jest.fn().mockReturnValue({ maybeSingle: ownerMaybeSingle }) }),
+            }),
+          }
+        : { insert: jest.fn().mockReturnValue({ select }) },
+    );
+    mockedGetSupabaseClient.mockReturnValue({ from } as never);
 
     await expect(PetService.create({ ownerId: 7, petTag: 'HP-001', name: 'Luna', species: 'Gato' })).rejects.toThrow(
       'PET_TAG_ALREADY_EXISTS',
+    );
+  });
+
+  it('rejects assigning a pet to an inactive owner', async () => {
+    const ownerMaybeSingle = jest.fn(async () => ({ data: null, error: null }));
+    const from = jest.fn().mockReturnValue({
+      select: jest.fn().mockReturnValue({
+        eq: jest.fn().mockReturnValue({ is: jest.fn().mockReturnValue({ maybeSingle: ownerMaybeSingle }) }),
+      }),
+    });
+    mockedGetSupabaseClient.mockReturnValue({ from } as never);
+
+    await expect(PetService.create({ ownerId: 7, petTag: 'HP-003', name: 'Nina', species: 'Gato' })).rejects.toThrow(
+      'OWNER_INACTIVE',
     );
   });
 

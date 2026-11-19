@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 import { getSupabaseClient, isSupabaseConfigured } from '../../services/supabase-client';
-import { BrandMark } from '../../components/ui';
+import { BrandMark, UserAvatar } from '../../components/ui';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -36,13 +36,30 @@ export default function LoginPage() {
     }
 
     setLoading(true);
-    const { error } = await getSupabaseClient().auth.signInWithPassword({ email, password });
+    const { data, error } = await getSupabaseClient().auth.signInWithPassword({ email, password });
     if (error) {
       setErrorMessage('Correo o contraseña incorrectos.');
       setLoading(false);
       return;
     }
 
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL?.trim().replace(/\/$/, '');
+    if (!apiUrl || !data.session) {
+      setErrorMessage('No se pudo registrar el inicio de sesión.');
+      await getSupabaseClient().auth.signOut();
+      setLoading(false);
+      return;
+    }
+    const auditResponse = await fetch(`${apiUrl}/api/v1/auth/audit-login`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${data.session.access_token}` },
+    });
+    if (!auditResponse.ok) {
+      setErrorMessage('No se pudo registrar el inicio de sesión.');
+      await getSupabaseClient().auth.signOut();
+      setLoading(false);
+      return;
+    }
     window.location.href = '/';
   };
 
@@ -65,6 +82,10 @@ export default function LoginPage() {
         <p className="eyebrow">Acceso clínico</p>
         <h1 id="login-title">Inicia sesión</h1>
         <p className="login-description">Ingresa con tu cuenta autorizada para gestionar el registro de vacunas.</p>
+        <div className="login-avatar-preview" aria-live="polite">
+          <UserAvatar seed={email.trim() || 'happy-paws'} label={email.trim() || 'tu perfil'} />
+          <span>{email.trim() ? 'Tu avatar de perfil' : 'Escribe tu correo para ver tu avatar'}</span>
+        </div>
         <form onSubmit={submit}>
           <label className="form-field">
             Correo electrónico

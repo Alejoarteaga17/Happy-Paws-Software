@@ -1,5 +1,6 @@
 export interface Owner {
   id: number;
+  updatedAt: string;
   fullName: string;
   phone: string;
   email: string | null;

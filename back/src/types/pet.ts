@@ -1,6 +1,9 @@
+export type PetSex = 'MALE' | 'FEMALE' | 'UNKNOWN';
+
 export interface Pet {
   id: number;
   createdAt: string;
+  updatedAt: string;
   ownerId: number;
   ownerName: string;
   petTag: string;
@@ -9,6 +12,7 @@ export interface Pet {
   breed: string | null;
   birthDate: string | null;
   weight: number | null;
+  sex: PetSex | null;
 }
 
 export interface CreatePetInput {
@@ -19,6 +23,7 @@ export interface CreatePetInput {
   breed?: string;
   birthDate?: string;
   weight?: number;
+  sex?: PetSex;
 }
 
 export interface UpdatePetInput {
@@ -29,4 +34,5 @@ export interface UpdatePetInput {
   breed?: string | null;
   birthDate?: string | null;
   weight?: number | null;
+  sex?: PetSex | null;
 }

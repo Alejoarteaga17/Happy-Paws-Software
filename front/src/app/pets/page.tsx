@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { getOwners } from '../../services/owner-service';
 import { createPet, deletePet, getPets, updatePet } from '../../services/pet-service';
 import { Owner } from '../../types/owner';
@@ -9,7 +9,7 @@ import AppHeader from '../../components/app-header';
 import RestrictedView from '../../components/restricted-view';
 import { RoleView, useAuth } from '../../context/auth-context';
 
-const emptyForm = { ownerId: '', petTag: '', name: '', species: '', breed: '', birthDate: '', weight: '' };
+const emptyForm = { ownerId: '', petTag: '', name: '', species: '', breed: '', birthDate: '', weight: '', sex: '' };
 
 export default function PetsPage() {
   const { can, loading } = useAuth();
@@ -34,22 +34,22 @@ function PetsManager() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  const loadPets = async () => {
+  const loadPets = useCallback(async () => {
     try {
-      const [loadedPets, loadedOwners] = await Promise.all([getPets(), getOwners()]);
+      const loadedPets = await getPets();
       setPets(loadedPets);
-      setOwners(loadedOwners);
+      if (canManage) setOwners(await getOwners());
       setMessage(null);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'No se pudieron cargar las mascotas');
     } finally {
       setLoading(false);
     }
-  };
+  }, [canManage]);
 
   useEffect(() => {
     void loadPets();
-  }, []);
+  }, [loadPets]);
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -64,6 +64,7 @@ function PetsManager() {
         breed: form.breed || undefined,
         birthDate: form.birthDate || undefined,
         weight: form.weight ? Number(form.weight) : undefined,
+        sex: form.sex ? (form.sex as 'MALE' | 'FEMALE' | 'UNKNOWN') : undefined,
       };
       if (editingId === null) await createPet(input);
       else await updatePet(editingId, input);
@@ -159,6 +160,15 @@ function PetsManager() {
               />
             </label>
             <label>
+              Sexo
+              <select value={form.sex} onChange={(event) => setForm({ ...form, sex: event.target.value })}>
+                <option value="">No especificado</option>
+                <option value="MALE">Macho</option>
+                <option value="FEMALE">Hembra</option>
+                <option value="UNKNOWN">Desconocido</option>
+              </select>
+            </label>
+            <label>
               Peso en kg
               <input
                 min="0.01"
@@ -195,6 +205,9 @@ function PetsManager() {
                     <strong>{pet.name}</strong>
                     <span>
                       {pet.species}
+                      {pet.sex
+                        ? ` · ${pet.sex === 'MALE' ? 'Macho' : pet.sex === 'FEMALE' ? 'Hembra' : 'Desconocido'}`
+                        : ''}
                       {pet.breed ? ` · ${pet.breed}` : ''}
                     </span>
                     <span>
@@ -214,6 +227,7 @@ function PetsManager() {
                           breed: pet.breed ?? '',
                           birthDate: pet.birthDate ?? '',
                           weight: pet.weight ? String(pet.weight) : '',
+                          sex: pet.sex ?? '',
                         });
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}

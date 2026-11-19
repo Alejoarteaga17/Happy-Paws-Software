@@ -7,6 +7,7 @@ const fail = (response: Response, error: unknown, fallback: string): void => {
   const known: Record<string, [number, string]> = {
     OWNER_NOT_FOUND: [404, 'El propietario no existe.'],
     OWNER_ALREADY_LINKED: [409, 'La cuenta ya está vinculada a otro propietario.'],
+    OWNER_STATUS_INVALID: [400, 'El estado del propietario es inválido.'],
   };
   const [status, message] = known[code] ?? [500, 'No se pudo completar la operación.'];
   response.status(status).json({ success: false, data: null, error: { code: known[code] ? code : fallback, message } });
@@ -104,21 +105,26 @@ export const updateOwner = async (request: Request, response: Response): Promise
   }
 };
 
-export const deleteOwner = async (request: Request, response: Response): Promise<void> => {
+export const updateOwnerStatus = async (request: Request, response: Response): Promise<void> => {
   const id = Number(request.params.id);
-  if (!Number.isInteger(id) || id < 1) {
+  if (!Number.isInteger(id) || id < 1 || typeof request.body?.active !== 'boolean') {
     response.status(400).json({
       success: false,
       data: null,
-      error: { code: 'INVALID_OWNER_ID', message: 'El id del propietario es inválido.' },
+      error: { code: 'OWNER_STATUS_INVALID', message: 'El id o el estado del propietario es inválido.' },
     });
     return;
   }
   try {
-    const data = await OwnerService.setDeleted(id, true);
-    await AuditService.record({ actorUserId: request.user!.id, action: 'DELETE', entityName: 'owners', entityId: id });
+    const data = await OwnerService.setActive(id, request.body.active);
+    await AuditService.record({
+      actorUserId: request.user!.id,
+      action: request.body.active ? 'ACTIVATE' : 'DEACTIVATE',
+      entityName: 'owners',
+      entityId: id,
+    });
     response.json({ success: true, data, error: null });
   } catch (error) {
-    fail(response, error, 'OWNER_DELETE_FAILED');
+    fail(response, error, 'OWNER_STATUS_UPDATE_FAILED');
   }
 };

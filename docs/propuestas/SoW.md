@@ -165,10 +165,10 @@ Actualmente, Happy Paws Veterinary Clinic depende de archivos físicos para mant
 El proyecto **Happy Paws Care Central** introduce una solución digital moderna y ligera para eliminar la dependencia del papel, centralizar los registros y agilizar los flujos de trabajo sin sobrecargar al personal con una complejidad innecesaria del sistema.
 
 ### Futuro
-Aunque el MVP inicial se centra estrictamente en los flujos de trabajo internos principales de la clínica, la aplicación está diseñada con una arquitectura escalable para permitir futuras ampliaciones, entre ellas:
+Aunque el MVP se centra en los flujos operativos de la clínica y el portal de consulta OWNER, la aplicación está diseñada con una arquitectura escalable para permitir futuras ampliaciones, entre ellas:
 
 * Activadores de notificaciones automáticas por SMS y correo electrónico para recordatorios de citas de los clientes.
-* Un portal orientado a los propietarios de mascotas para consultar registros de forma remota y solicitar citas.
+* Analítica operativa avanzada, soporte multi-sede y herramientas de migración de datos históricos.
 * Utilidades de importación de datos para digitalizar los archivos históricos en papel.
 * Soporte para múltiples sedes en caso de que la clínica se expanda a nuevas ubicaciones físicas.
 

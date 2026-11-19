@@ -6,6 +6,7 @@
     "build": "tsc",
     "start": "node dist/src/app.js",
     "test": "jest --runInBand",
+    "test:coverage": "jest --runInBand --coverage",
     "lint": "eslint \"src/**/*.{ts,tsx}\" \"tests/**/*.{ts,tsx}\"",
     "lint:fix": "eslint \"src/**/*.{ts,tsx}\" \"tests/**/*.{ts,tsx}\" --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx}\" \"tests/**/*.{ts,tsx,js,jsx}\" \"*.config.{js,ts}\"",
@@ -17,6 +18,11 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
     "express": "^5.1.0"
+  },
+  "overrides": {
+    "body-parser": "2.4.0",
+    "proxy-addr": "2.0.8",
+    "qs": "6.17.1"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",

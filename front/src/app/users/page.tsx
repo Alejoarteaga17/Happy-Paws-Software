@@ -4,16 +4,10 @@ import { useEffect, useState } from 'react';
 import AppHeader from '../../components/app-header';
 import RestrictedView from '../../components/restricted-view';
 import UserAccountForm, { OwnerOption, UserAccountFormValues } from '../../components/user-account-form';
+import UserTable from '../../components/user-table';
 import { getOwners } from '../../services/owner-service';
-import { getSupabaseClient } from '../../services/supabase-client';
-import { UserRole } from '../../context/auth-context';
-
-interface UserRow {
-  id: string;
-  email: string;
-  full_name: string;
-  role: UserRole;
-}
+import { createUser, getUsers, updateUserRole, updateUserStatus, UserRow } from '../../services/user-service';
+import { UserRole, useAuth } from '../../context/auth-context';
 
 export default function UsersPage() {
   return (
@@ -24,6 +18,7 @@ export default function UsersPage() {
 }
 
 function UsersTable() {
+  const { profile } = useAuth();
   const [users, setUsers] = useState<UserRow[]>([]);
   const [owners, setOwners] = useState<OwnerOption[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -31,19 +26,47 @@ function UsersTable() {
   useEffect(() => {
     const loadData = async () => {
       const [{ data, error: queryError }, loadedOwners] = await Promise.all([
-        getSupabaseClient().from('profiles').select('id,email,full_name,role').order('full_name'),
+        getUsers()
+          .then((users) => ({ data: users, error: null }))
+          .catch((loadError: Error) => ({ data: [], error: loadError })),
         getOwners(),
       ]);
       if (queryError) setError(queryError.message);
-      else setUsers((data ?? []) as UserRow[]);
+      else setUsers(data);
       setOwners(loadedOwners);
     };
 
     void loadData().catch((loadError: Error) => setError(loadError.message));
   }, []);
 
-  const handleCreateOwnerAccount = (_values: UserAccountFormValues) => {
-    setFeedback('La cuenta está lista para registrarse. La conexión con Supabase se habilitará en el siguiente paso.');
+  const handleCreateOwnerAccount = async (values: UserAccountFormValues) => {
+    try {
+      await createUser({
+        ...values,
+      });
+      setFeedback('La cuenta fue creada correctamente.');
+      setUsers(await getUsers());
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'No se pudo crear la cuenta');
+    }
+  };
+
+  const changeRole = async (id: string, role: UserRole) => {
+    try {
+      await updateUserRole(id, role);
+      setUsers(await getUsers());
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'No se pudo actualizar el rol');
+    }
+  };
+
+  const changeStatus = async (user: UserRow) => {
+    try {
+      await updateUserStatus(user.id, !user.active);
+      setUsers(await getUsers());
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'No se pudo actualizar el estado');
+    }
   };
 
   return (
@@ -59,33 +82,24 @@ function UsersTable() {
         </header>
         {feedback && <p className="notice summary-error">{feedback}</p>}
         <UserAccountForm
-          role="OWNER"
+          allowedRoles={
+            profile?.role === 'ADMIN' ? ['OWNER', 'VET', 'RECEPTIONIST', 'ADMIN'] : ['OWNER', 'VET', 'RECEPTIONIST']
+          }
           owners={owners}
           existingEmails={users.map((user) => user.email)}
           onSubmit={handleCreateOwnerAccount}
         />
         <section className="summary-panel table-panel">
           {error && <p className="form-error">{error}</p>}
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Correo</th>
-                <th>Rol</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user) => (
-                <tr key={user.id}>
-                  <td>{user.full_name}</td>
-                  <td>{user.email}</td>
-                  <td>
-                    <span className="status status-scheduled">{user.role}</span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <UserTable
+            users={users}
+            allowedRoles={
+              profile?.role === 'ADMIN' ? ['OWNER', 'VET', 'RECEPTIONIST', 'ADMIN'] : ['OWNER', 'VET', 'RECEPTIONIST']
+            }
+            canChangeStatus={profile?.role === 'ADMIN'}
+            onRoleChange={(id, role) => void changeRole(id, role)}
+            onStatusChange={(user) => void changeStatus(user)}
+          />
         </section>
       </section>
     </main>

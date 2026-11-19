@@ -2,8 +2,9 @@
 
 import { FormEvent, useState } from 'react';
 import { Icon } from './ui';
+import { UserRole } from '../context/auth-context';
 
-export type UserAccountRole = 'OWNER' | 'VET' | 'ADMIN';
+export type UserAccountRole = UserRole;
 
 export interface OwnerOption {
   id: number;
@@ -14,18 +15,20 @@ export interface OwnerOption {
 export interface UserAccountFormValues {
   email: string;
   password: string;
+  fullName: string;
   ownerId: number | null;
   role: UserAccountRole;
 }
 
 interface UserAccountFormProps {
-  role: UserAccountRole;
+  allowedRoles: UserAccountRole[];
   owners: OwnerOption[];
   existingEmails?: string[];
   onSubmit: (values: UserAccountFormValues) => void;
 }
 
 interface FormErrors {
+  fullName?: string;
   email?: string;
   ownerId?: string;
   password?: string;
@@ -36,13 +39,16 @@ const roleLabels: Record<UserAccountRole, string> = {
   OWNER: 'Propietario',
   VET: 'Veterinario',
   ADMIN: 'Administrador',
+  RECEPTIONIST: 'Recepcionista',
 };
 
 function isStrongPassword(password: string): boolean {
   return password.length >= 8 && /[A-Z]/.test(password) && /[a-z]/.test(password) && /\d/.test(password);
 }
 
-export default function UserAccountForm({ role, owners, existingEmails = [], onSubmit }: UserAccountFormProps) {
+export default function UserAccountForm({ allowedRoles, owners, existingEmails = [], onSubmit }: UserAccountFormProps) {
+  const [role, setRole] = useState<UserAccountRole>(allowedRoles[0] ?? 'OWNER');
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [ownerId, setOwnerId] = useState('');
   const [password, setPassword] = useState('');
@@ -53,6 +59,7 @@ export default function UserAccountForm({ role, owners, existingEmails = [], onS
     event.preventDefault();
     const nextErrors: FormErrors = {};
 
+    if (!fullName.trim()) nextErrors.fullName = 'Ingresa el nombre completo.';
     const normalizedEmail = email.trim().toLowerCase();
     if (!normalizedEmail || !normalizedEmail.includes('@')) nextErrors.email = 'Ingresa un correo válido.';
     else if (existingEmails.some((existingEmail) => existingEmail.toLowerCase() === normalizedEmail)) {
@@ -70,9 +77,11 @@ export default function UserAccountForm({ role, owners, existingEmails = [], onS
     onSubmit({
       email: normalizedEmail,
       password,
+      fullName: fullName.trim(),
       ownerId: role === 'OWNER' ? Number(ownerId) : null,
       role,
     });
+    setFullName('');
     setEmail('');
     setOwnerId('');
     setPassword('');
@@ -84,17 +93,27 @@ export default function UserAccountForm({ role, owners, existingEmails = [], onS
       <div className="summary-panel-heading">
         <div>
           <p className="eyebrow">Nueva cuenta</p>
-          <h2 id="create-account-title">Crear acceso de {roleLabels[role].toLowerCase()}</h2>
+          <h2 id="create-account-title">Crear acceso de usuario</h2>
         </div>
         <span className="account-form-icon" aria-hidden="true">
           <Icon name="person_add" />
         </span>
       </div>
       <p className="form-description">
-        Asocia un acceso seguro al propietario para que pueda consultar su información desde el portal.
+        Crea un acceso seguro para el personal interno o para un propietario del portal.
       </p>
       <form className="account-form" onSubmit={submit} noValidate>
         <div className="form-grid">
+          <label className="form-field">
+            Rol
+            <select value={role} onChange={(event) => setRole(event.target.value as UserAccountRole)}>
+              {allowedRoles.map((allowedRole) => (
+                <option key={allowedRole} value={allowedRole}>
+                  {roleLabels[allowedRole]}
+                </option>
+              ))}
+            </select>
+          </label>
           {role === 'OWNER' && (
             <label className="form-field">
               Propietario
@@ -114,6 +133,17 @@ export default function UserAccountForm({ role, owners, existingEmails = [], onS
               {errors.ownerId && <span className="field-error">{errors.ownerId}</span>}
             </label>
           )}
+          <label className="form-field">
+            Nombre completo
+            <input
+              required
+              value={fullName}
+              onChange={(event) => setFullName(event.target.value)}
+              autoComplete="name"
+              aria-invalid={Boolean(errors.fullName)}
+            />
+            {errors.fullName && <span className="field-error">{errors.fullName}</span>}
+          </label>
           <label className="form-field">
             Correo de acceso
             <input

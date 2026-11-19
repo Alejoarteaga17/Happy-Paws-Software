@@ -1,4 +1,5 @@
-import type { ReactNode } from 'react';
+import { Blobatar } from '@blobatar/react';
+import React, { type ReactNode } from 'react';
 
 export function BrandMark() {
   return (
@@ -18,4 +19,8 @@ export function Icon({ name, className = '' }: { name: string; className?: strin
 
 export function StatusBadge({ label, tone }: { label: ReactNode; tone: string }) {
   return <span className={`status status-${tone}`}>{label}</span>;
+}
+
+export function UserAvatar({ seed, label }: { seed: string; label: string }) {
+  return <Blobatar name={seed} size={36} className="user-avatar" title={`Avatar de ${label}`} />;
 }

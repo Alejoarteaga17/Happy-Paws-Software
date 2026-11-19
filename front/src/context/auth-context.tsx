@@ -29,12 +29,21 @@ export type Permission =
   | 'manage_vaccinations'
   | 'manage_users'
   | 'view_audit'
-  | 'view_owner_portal';
+  | 'view_owner_portal'
+  | 'search_records'
+  | 'manage_clinical_notes';
 
 const permissions: Record<UserRole, Permission[]> = {
   OWNER: ['view_owner_portal', 'view_appointments'],
-  RECEPTIONIST: ['manage_owners', 'manage_pets', 'manage_appointments', 'view_appointments'],
-  VET: ['edit_pets_basic', 'manage_vaccinations'],
+  RECEPTIONIST: [
+    'manage_owners',
+    'manage_pets',
+    'manage_appointments',
+    'view_appointments',
+    'manage_users',
+    'search_records',
+  ],
+  VET: ['edit_pets_basic', 'manage_vaccinations', 'search_records', 'manage_clinical_notes'],
   ADMIN: [
     'manage_owners',
     'manage_pets',
@@ -43,6 +52,8 @@ const permissions: Record<UserRole, Permission[]> = {
     'manage_vaccinations',
     'manage_users',
     'view_audit',
+    'search_records',
+    'manage_clinical_notes',
   ],
 };
 

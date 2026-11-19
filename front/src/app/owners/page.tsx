@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from 'react';
 import AppHeader from '../../components/app-header';
 import RestrictedView from '../../components/restricted-view';
-import { createOwner, deleteOwner, getOwners, updateOwner } from '../../services/owner-service';
+import { createOwner, getOwners, updateOwner, updateOwnerStatus } from '../../services/owner-service';
 import { Owner, OwnerInput } from '../../types/owner';
 import { RoleView } from '../../context/auth-context';
 
@@ -120,14 +120,14 @@ function OwnersTable() {
                       <button
                         className="text-button danger-button"
                         onClick={() =>
-                          void deleteOwner(owner.id)
+                          void updateOwnerStatus(owner.id, false)
                             .then(load)
                             .catch((reason) =>
                               setError(reason instanceof Error ? reason.message : 'No se pudo eliminar'),
                             )
                         }
                       >
-                        Eliminar
+                        Desactivar
                       </button>
                     </RoleView>
                   </td>
