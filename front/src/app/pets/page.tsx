@@ -34,6 +34,11 @@ function PetsManager() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [birthDateError, setBirthDateError] = useState<string | null>(null);
+
+  const padTimeUnit = (value: number): string => String(value).padStart(2, '0');
+  const today = new Date();
+  const todayValue = `${today.getFullYear()}-${padTimeUnit(today.getMonth() + 1)}-${padTimeUnit(today.getDate())}`;
 
   const loadPets = useCallback(async () => {
     try {
@@ -54,6 +59,11 @@ function PetsManager() {
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (form.birthDate && form.birthDate > todayValue) {
+      setBirthDateError('La fecha de nacimiento no puede ser posterior al día de hoy.');
+      setMessage('No se pudo registrar la mascota: corrige la fecha de nacimiento.');
+      return;
+    }
     setSaving(true);
     setMessage(null);
     try {
@@ -151,12 +161,19 @@ function PetsManager() {
             </label>
             <label>
               Especie
-              <input
+              <select
                 required
                 value={form.species}
                 onChange={(event) => setForm({ ...form, species: event.target.value })}
-                placeholder="Perro o gato"
-              />
+              >
+                <option value="">Selecciona una especie</option>
+                <option value="Perro">Perro</option>
+                <option value="Gato">Gato</option>
+                <option value="Ave">Ave</option>
+                <option value="Conejo">Conejo</option>
+                <option value="Hámster">Hámster</option>
+                <option value="Otra">Otra</option>
+              </select>
             </label>
             <label>
               Raza
@@ -168,10 +185,23 @@ function PetsManager() {
             </label>
             <label>
               Fecha de nacimiento
+              {birthDateError && (
+                <span className="field-error" role="alert">
+                  {birthDateError}
+                </span>
+              )}
               <input
                 type="date"
+                max={todayValue}
                 value={form.birthDate}
-                onChange={(event) => setForm({ ...form, birthDate: event.target.value })}
+                aria-invalid={Boolean(birthDateError)}
+                onChange={(event) => {
+                  const birthDate = event.target.value;
+                  setForm({ ...form, birthDate });
+                  setBirthDateError(
+                    birthDate > todayValue ? 'La fecha de nacimiento no puede ser posterior al día de hoy.' : null,
+                  );
+                }}
               />
             </label>
             <label>
