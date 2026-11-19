@@ -10,7 +10,7 @@ begin
   then
     raise exception 'VET cannot change pet owner or pet_tag'
       using errcode = '42501';
-  end;
+  end if;
   return new;
 end;
 $$;
