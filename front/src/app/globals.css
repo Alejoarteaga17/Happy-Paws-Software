@@ -938,6 +938,18 @@ h3 {
   display: block;
   margin: 18px auto 0;
 }
+.appointment-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.appointment-pagination .text-button {
+  margin: 0;
+}
 .danger-button {
   color: var(--danger);
 }

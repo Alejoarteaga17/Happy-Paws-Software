@@ -326,6 +326,16 @@ function AppointmentsManager() {
                   Mostrar más
                 </button>
               )}
+              {visibleLimit > visiblePageSize && (
+                <div className="appointment-pagination">
+                  <span>
+                    Mostrando {visibleAppointments.length} de {filteredAppointments.length} citas
+                  </span>
+                  <button type="button" className="text-button" onClick={() => setVisibleLimit(visiblePageSize)}>
+                    Mostrar menos
+                  </button>
+                </div>
+              )}
             </>
           )}
         </section>
