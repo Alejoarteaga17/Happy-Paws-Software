@@ -83,7 +83,22 @@ function PetsManager() {
       upsert: false,
       contentType: file.type,
     });
-    if (error) throw new Error('No se pudo cargar la foto de la mascota.');
+    if (error) {
+      const message = error.message.toLowerCase();
+      if (message.includes('bucket') && message.includes('not found')) {
+        throw new Error('No se pudo cargar la foto: el almacén de imágenes no está disponible.');
+      }
+      if (message.includes('not permitted') || message.includes('permission') || message.includes('unauthorized')) {
+        throw new Error('No se pudo cargar la foto: tu sesión no tiene permiso para subir imágenes.');
+      }
+      if (message.includes('size') || message.includes('payload') || message.includes('too large')) {
+        throw new Error('No se pudo cargar la foto: la imagen supera el límite de 5 MB.');
+      }
+      if (message.includes('mime') || message.includes('content type')) {
+        throw new Error('No se pudo cargar la foto: usa JPG, PNG o WEBP.');
+      }
+      throw new Error(`No se pudo cargar la foto de la mascota: ${error.message}`);
+    }
     const { data } = supabase.storage.from('pet-images').getPublicUrl(fileName);
     return data.publicUrl;
   };
