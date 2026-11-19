@@ -13,6 +13,7 @@ export interface Pet {
   birthDate: string | null;
   weight: number | null;
   sex: PetSex | null;
+  photoUrl: string | null;
 }
 
 export interface CreatePetInput {
@@ -24,6 +25,7 @@ export interface CreatePetInput {
   birthDate?: string;
   weight?: number;
   sex?: PetSex;
+  photoUrl?: string | null;
 }
 
 export interface UpdatePetInput {
@@ -35,4 +37,5 @@ export interface UpdatePetInput {
   birthDate?: string | null;
   weight?: number | null;
   sex?: PetSex | null;
+  photoUrl?: string | null;
 }

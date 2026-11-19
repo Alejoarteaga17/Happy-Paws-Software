@@ -62,7 +62,8 @@ export const createPet = async (request: Request, response: Response): Promise<v
     (body.birthDate === undefined ||
       (typeof body.birthDate === 'string' && !Number.isNaN(Date.parse(body.birthDate)))) &&
     (body.weight === undefined || (typeof body.weight === 'number' && body.weight > 0)) &&
-    (body.sex === undefined || isPetSex(body.sex));
+    (body.sex === undefined || isPetSex(body.sex)) &&
+    (body.photoUrl === undefined || body.photoUrl === null || typeof body.photoUrl === 'string');
 
   if (!validCreate) {
     response.status(400).json({
@@ -114,7 +115,8 @@ export const updatePet = async (request: Request, response: Response): Promise<v
       body.birthDate === null ||
       (typeof body.birthDate === 'string' && !Number.isNaN(Date.parse(body.birthDate)))) &&
     (body.weight === undefined || body.weight === null || (typeof body.weight === 'number' && body.weight > 0)) &&
-    (body.sex === undefined || body.sex === null || isPetSex(body.sex));
+    (body.sex === undefined || body.sex === null || isPetSex(body.sex)) &&
+    (body.photoUrl === undefined || body.photoUrl === null || typeof body.photoUrl === 'string');
   if (!valid) {
     response.status(400).json({
       success: false,

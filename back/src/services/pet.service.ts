@@ -13,11 +13,12 @@ interface PetRow {
   birth_date: string | null;
   weight: number | null;
   sex: Pet['sex'];
+  photo_url?: string | null;
   owners: { full_name: string }[] | null;
 }
 
 const petSelect =
-  'id, owner_id, pet_tag, name, species, breed, birth_date, weight, sex, created_at, updated_at, owners(full_name)';
+  'id, owner_id, pet_tag, name, species, breed, birth_date, weight, sex, photo_url, created_at, updated_at, owners(full_name)';
 
 const toPet = (row: PetRow): Pet => ({
   id: row.id,
@@ -32,6 +33,7 @@ const toPet = (row: PetRow): Pet => ({
   birthDate: row.birth_date,
   weight: row.weight,
   sex: row.sex,
+  photoUrl: row.photo_url ?? null,
 });
 
 export class PetService {
@@ -70,6 +72,7 @@ export class PetService {
         birth_date: input.birthDate || null,
         weight: input.weight ?? null,
         sex: input.sex ?? null,
+        photo_url: input.photoUrl?.trim() || null,
       })
       .select(petSelect)
       .single();
@@ -96,6 +99,7 @@ export class PetService {
     if (input.birthDate !== undefined) values.birth_date = input.birthDate || null;
     if (input.weight !== undefined) values.weight = input.weight;
     if (input.sex !== undefined) values.sex = input.sex;
+    if (input.photoUrl !== undefined) values.photo_url = input.photoUrl?.trim() || null;
 
     const { data, error } = await getSupabaseClient()
       .from('pets')

@@ -9,8 +9,21 @@ import AppHeader from '../../components/app-header';
 import RestrictedView from '../../components/restricted-view';
 import { RoleView, useAuth } from '../../context/auth-context';
 import Link from 'next/link';
+import { getSupabaseClient } from '../../services/supabase-client';
 
-const emptyForm = { ownerId: '', petTag: '', name: '', species: '', breed: '', birthDate: '', weight: '', sex: '' };
+const emptyForm = {
+  ownerId: '',
+  petTag: '',
+  name: '',
+  species: '',
+  breed: '',
+  birthDate: '',
+  weight: '',
+  sex: '',
+  photoUrl: '',
+};
+const visiblePageSize = 5;
+const petPlaceholder = '/pet-placeholder.svg';
 
 export default function PetsPage() {
   const { can, loading } = useAuth();
@@ -35,6 +48,10 @@ function PetsManager() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [birthDateError, setBirthDateError] = useState<string | null>(null);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [visibleLimit, setVisibleLimit] = useState(visiblePageSize);
+  const visiblePets = pets.slice(0, visibleLimit);
 
   const padTimeUnit = (value: number): string => String(value).padStart(2, '0');
   const today = new Date();
@@ -57,6 +74,20 @@ function PetsManager() {
     void loadPets();
   }, [loadPets]);
 
+  const uploadPetPhoto = async (file: File): Promise<string> => {
+    const supabase = getSupabaseClient();
+    const extension = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+    const fileName = `${crypto.randomUUID()}.${extension}`;
+    const { error } = await supabase.storage.from('pet-images').upload(fileName, file, {
+      cacheControl: '3600',
+      upsert: false,
+      contentType: file.type,
+    });
+    if (error) throw new Error('No se pudo cargar la foto de la mascota.');
+    const { data } = supabase.storage.from('pet-images').getPublicUrl(fileName);
+    return data.publicUrl;
+  };
+
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (form.birthDate && form.birthDate > todayValue) {
@@ -67,6 +98,7 @@ function PetsManager() {
     setSaving(true);
     setMessage(null);
     try {
+      const photoUrl = photoFile ? await uploadPetPhoto(photoFile) : form.photoUrl || null;
       const basicFields = {
         name: form.name,
         species: form.species,
@@ -74,6 +106,7 @@ function PetsManager() {
         birthDate: form.birthDate || undefined,
         weight: form.weight ? Number(form.weight) : undefined,
         sex: form.sex ? (form.sex as 'MALE' | 'FEMALE' | 'UNKNOWN') : undefined,
+        photoUrl,
       };
       if (editingId === null) {
         await createPet({
@@ -89,6 +122,8 @@ function PetsManager() {
       }
       setForm(emptyForm);
       setEditingId(null);
+      setPhotoFile(null);
+      setPhotoPreview(null);
       setMessage(
         editingId === null ? 'La mascota fue registrada correctamente.' : 'La mascota fue actualizada correctamente.',
       );
@@ -224,6 +259,36 @@ function PetsManager() {
                 placeholder="Opcional"
               />
             </label>
+            <label>
+              Foto de la mascota <span className="field-help">(Opcional)</span>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={(event) => {
+                  const file = event.target.files?.[0] ?? null;
+                  if (!file) {
+                    setPhotoFile(null);
+                    setPhotoPreview(null);
+                    return;
+                  }
+                  if (!file.type.startsWith('image/') || file.size > 5 * 1024 * 1024) {
+                    setMessage('Selecciona una imagen JPG, PNG o WEBP de máximo 5 MB.');
+                    event.target.value = '';
+                    return;
+                  }
+                  setPhotoFile(file);
+                  setPhotoPreview(URL.createObjectURL(file));
+                  setMessage(null);
+                }}
+              />
+              {(photoPreview || form.photoUrl) && (
+                <img
+                  className="pet-photo-preview"
+                  src={photoPreview || form.photoUrl || petPlaceholder}
+                  alt="Vista previa de la mascota"
+                />
+              )}
+            </label>
             <button className="primary-button" disabled={saving}>
               {saving ? 'Guardando...' : editingId === null ? 'Registrar mascota' : 'Guardar cambios'}
             </button>
@@ -243,61 +308,93 @@ function PetsManager() {
           ) : pets.length === 0 ? (
             <p className="empty">No hay mascotas registradas.</p>
           ) : (
-            <ul>
-              {pets.map((pet) => (
-                <li className="appointment-item" key={pet.id}>
-                  <div>
-                    <strong>{pet.name}</strong>
-                    <span>
-                      {pet.species}
-                      {pet.sex
-                        ? ` · ${pet.sex === 'MALE' ? 'Macho' : pet.sex === 'FEMALE' ? 'Hembra' : 'Desconocido'}`
-                        : ''}
-                      {pet.breed ? ` · ${pet.breed}` : ''}
-                    </span>
-                    <span>
-                      Pet tag: {pet.petTag} · Propietario: {pet.ownerName}
-                    </span>
-                  </div>
-                  <div className="appointment-actions">
-                    <button
-                      className="text-button"
-                      onClick={() => {
-                        setEditingId(pet.id);
-                        setForm({
-                          ownerId: String(pet.ownerId),
-                          petTag: pet.petTag,
-                          name: pet.name,
-                          species: pet.species,
-                          breed: pet.breed ?? '',
-                          birthDate: pet.birthDate ?? '',
-                          weight: pet.weight ? String(pet.weight) : '',
-                          sex: pet.sex ?? '',
-                        });
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
+            <>
+              <ul>
+                {visiblePets.map((pet) => (
+                  <li className="appointment-item" key={pet.id}>
+                    <img
+                      className="pet-list-photo"
+                      src={pet.photoUrl || petPlaceholder}
+                      alt={pet.photoUrl ? `Foto de ${pet.name}` : `Imagen predeterminada de ${pet.name}`}
+                      onError={(event) => {
+                        event.currentTarget.src = petPlaceholder;
                       }}
-                    >
-                      Editar
-                    </button>
-                    <RoleView permission="manage_users">
+                    />
+                    <div className="pet-list-copy">
+                      <strong>{pet.name}</strong>
+                      <span>
+                        {pet.species}
+                        {pet.sex
+                          ? ` · ${pet.sex === 'MALE' ? 'Macho' : pet.sex === 'FEMALE' ? 'Hembra' : 'Desconocido'}`
+                          : ''}
+                        {pet.breed ? ` · ${pet.breed}` : ''}
+                      </span>
+                      <span>
+                        Pet tag: {pet.petTag} · Propietario: {pet.ownerName}
+                      </span>
+                    </div>
+                    <div className="appointment-actions">
                       <button
-                        className="text-button danger-button"
-                        onClick={() =>
-                          void deletePet(pet.id)
-                            .then(loadPets)
-                            .catch((reason) =>
-                              setMessage(reason instanceof Error ? reason.message : 'No se pudo eliminar la mascota'),
-                            )
-                        }
+                        className="text-button"
+                        onClick={() => {
+                          setEditingId(pet.id);
+                          setForm({
+                            ownerId: String(pet.ownerId),
+                            petTag: pet.petTag,
+                            name: pet.name,
+                            species: pet.species,
+                            breed: pet.breed ?? '',
+                            birthDate: pet.birthDate ?? '',
+                            weight: pet.weight ? String(pet.weight) : '',
+                            sex: pet.sex ?? '',
+                            photoUrl: pet.photoUrl ?? '',
+                          });
+                          setPhotoFile(null);
+                          setPhotoPreview(null);
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
                       >
-                        Eliminar
+                        Editar
                       </button>
-                    </RoleView>
-                    <span>{pet.weight ? `${pet.weight} kg` : 'Peso no registrado'}</span>
-                  </div>
-                </li>
-              ))}
-            </ul>
+                      <RoleView permission="manage_users">
+                        <button
+                          className="text-button danger-button"
+                          onClick={() =>
+                            void deletePet(pet.id)
+                              .then(loadPets)
+                              .catch((reason) =>
+                                setMessage(reason instanceof Error ? reason.message : 'No se pudo eliminar la mascota'),
+                              )
+                          }
+                        >
+                          Eliminar
+                        </button>
+                      </RoleView>
+                      <span>{pet.weight ? `${pet.weight} kg` : 'Peso no registrado'}</span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              {visibleLimit < pets.length && (
+                <button
+                  type="button"
+                  className="secondary-button owner-show-more"
+                  onClick={() => setVisibleLimit((current) => current + visiblePageSize)}
+                >
+                  Mostrar más
+                </button>
+              )}
+              {visibleLimit > visiblePageSize && (
+                <div className="owner-pagination">
+                  <span>
+                    Mostrando {visiblePets.length} de {pets.length} mascotas
+                  </span>
+                  <button type="button" className="text-button" onClick={() => setVisibleLimit(visiblePageSize)}>
+                    Mostrar menos
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </section>
       </section>

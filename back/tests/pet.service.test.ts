@@ -27,6 +27,7 @@ describe('PetService', () => {
           birth_date: null,
           weight: 4.2,
           sex: 'FEMALE',
+          photo_url: null,
           updated_at: '2026-09-11T10:00:00Z',
           owners: [{ full_name: 'Ana Perez' }],
         },
@@ -49,6 +50,7 @@ describe('PetService', () => {
         birthDate: null,
         weight: 4.2,
         sex: 'FEMALE',
+        photoUrl: null,
         updatedAt: '2026-09-11T10:00:00Z',
       },
     ]);

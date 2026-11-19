@@ -22,6 +22,7 @@ interface PortalRow {
     birth_date: string | null;
     weight: number | null;
     sex: Pet['sex'];
+    photo_url?: string | null;
     created_at: string;
     updated_at: string;
   }>;
@@ -97,6 +98,7 @@ const mapPortal = (row: PortalRow): OwnerPortalData => {
       birthDate: pet.birth_date,
       weight: pet.weight,
       sex: pet.sex,
+      photoUrl: pet.photo_url ?? null,
     })),
     appointments: row.appointments.map((appointment): Appointment => ({
       id: appointment.id,
