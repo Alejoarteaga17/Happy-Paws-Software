@@ -285,7 +285,7 @@ Cada iteración/generación de código del agente debe:
 
 El agente considerará la tarea finalizada únicamente si se cumplen al 100% las siguientes verificaciones:
 
-- [~] **[RF-01 & RF-02] CRUD Propietarios y Mascotas:** Implementado, pero falta resolver `sex` y `updated_at` en el esquema y certificar la base remota.
+- [x] **[RF-01 & RF-02] CRUD Propietarios y Mascotas:** Implementado con `pet_tag`, `sex`, `updated_at`, desactivación lógica y migraciones versionadas.
 - [~] **[RF-03] Búsqueda Rápida:** API y UI implementadas; falta demostrar el SLA de menos de 2 segundos.
 - [x] **[RF-04 & RF-05] Citas y Notas Médicas:** Un recepcionista puede agendar cita; un veterinario asignado puede ingresar y actualizar notas clínicas estandarizadas.
 - [x] **[RF-06] Control de Vacunas:** El sistema calcula estados próximos y vencidos (`OVERDUE`) y los resalta visualmente.
@@ -299,7 +299,7 @@ El agente considerará la tarea finalizada únicamente si se cumplen al 100% las
 - [~] **[RF-12 & RF-13] Dashboard & Auditoría:** Dashboard, auditoría CRUD y login implementados; falta validación formal por rol y completar eventos críticos.
 - [x] **[Infraestructura] Docker:** Dockerfiles y `docker-compose.yml` existen, además de la ejecución directa documentada.
 - [x] **[Documentación] READMEs:** Existen READMEs raíz, backend, frontend y suites de pruebas; se añade la matriz de requisitos.
-- [~] **[Calidad & Pruebas]:** Suites locales pasan; falta medir cobertura crítica, E2E y objetivo de aprobación ≥95 % en staging.
+- [~] **[Calidad & Pruebas]:** Suites locales pasan y no existen vulnerabilidades de producción auditadas; falta alcanzar 90 % de cobertura crítica, E2E y objetivo de aprobación ≥95 % en staging.
 
 ---
 

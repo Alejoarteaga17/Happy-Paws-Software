@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=add_circle,assignment,clinical_notes,contextual_token,event,event_available,group,history,manage_accounts,pending_actions,person_add,pets,search,task_alt,vaccines&display=optional');
+
 :root {
   --ink: #252525;
   --muted: #8a8a8a;
@@ -13,8 +15,8 @@
   --warning-soft: #fff6e6;
   --danger: #b5282d;
   --danger-soft: #ffeded;
-  --display: 'Newsreader', 'Quattrocento', Georgia, serif;
-  --title: 'Quattrocento', Georgia, serif;
+  --display: var(--font-newsreader), 'Quattrocento', Georgia, serif;
+  --title: var(--font-quattrocento), Georgia, serif;
   --body: 'Iosevka Charon Mono', 'SFMono-Regular', Consolas, monospace;
 }
 
@@ -27,9 +29,7 @@ html {
 body {
   margin: 0;
   color: var(--ink);
-  background:
-    radial-gradient(circle at 8% 0%, rgba(220, 232, 251, 0.52), transparent 28rem),
-    var(--background);
+  background: radial-gradient(circle at 8% 0%, rgba(220, 232, 251, 0.52), transparent 28rem), var(--background);
   font-family: var(--body);
   font-size: 14px;
   line-height: 1.4;
@@ -238,8 +238,131 @@ h3 {
   align-items: center;
   gap: 10px;
 }
-.header-profile .text-button {
-  font-size: 10px;
+.header-profile {
+  position: relative;
+}
+.profile-trigger {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px;
+  border: 1px solid transparent;
+  border-radius: 20px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+.profile-trigger:hover,
+.profile-trigger[aria-expanded='true'] {
+  border-color: var(--line);
+  background: var(--paper);
+}
+.profile-trigger:focus-visible {
+  outline: 3px solid rgba(48, 77, 120, 0.28);
+  outline-offset: 3px;
+}
+.profile-chevron {
+  font-size: 17px;
+  transition: transform 0.2s ease;
+}
+.profile-trigger[aria-expanded='true'] .profile-chevron {
+  transform: rotate(180deg);
+}
+.profile-menu {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 14px);
+  right: 0;
+  width: min(310px, calc(100vw - 28px));
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  box-shadow: 0 18px 44px rgba(37, 37, 37, 0.16);
+  animation: profile-menu-in 0.16s ease-out;
+}
+.profile-menu-heading {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 4px 4px 12px;
+  border-bottom: 1px solid var(--line);
+}
+.profile-menu-heading > div {
+  min-width: 0;
+}
+.profile-menu-heading strong,
+.profile-menu-heading span {
+  display: block;
+  overflow-wrap: anywhere;
+}
+.profile-menu-heading strong {
+  color: var(--ink);
+  font-family: var(--title);
+  font-size: 16px;
+}
+.profile-menu-heading span {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.profile-menu-details {
+  margin: 10px 0;
+}
+.profile-menu-details div {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 8px;
+  padding: 5px 4px;
+  font-size: 12px;
+}
+.profile-menu-details dt {
+  color: var(--muted);
+}
+.profile-menu-details dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--ink);
+  font-weight: 700;
+}
+.profile-menu-signout {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 12px;
+  border: 1px solid var(--danger-soft);
+  border-radius: 4px;
+  background: var(--danger-soft);
+  color: var(--danger);
+  font: 700 12px var(--body);
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+.profile-menu-signout:hover {
+  background: #ffe2e2;
+  transform: translateY(-1px);
+}
+.profile-menu-signout:focus-visible {
+  outline: 3px solid rgba(188, 40, 40, 0.2);
+  outline-offset: 2px;
+}
+@keyframes profile-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 .restricted-view {
   min-height: 100vh;
@@ -813,9 +936,7 @@ h3 {
   padding: 28px 32px;
   border: 1px solid #dce8fb;
   border-radius: 8px;
-  background:
-    radial-gradient(circle at 88% 18%, rgba(255, 255, 255, 0.9), transparent 13rem),
-    var(--primary-pale);
+  background: radial-gradient(circle at 88% 18%, rgba(255, 255, 255, 0.9), transparent 13rem), var(--primary-pale);
   box-shadow: 0 10px 26px rgba(48, 77, 120, 0.06);
 }
 .intro h2 {
@@ -993,8 +1114,7 @@ h3 {
   overflow: hidden;
   background:
     radial-gradient(circle at 15% 20%, rgba(220, 232, 251, 0.95), transparent 24rem),
-    radial-gradient(circle at 88% 82%, rgba(235, 255, 248, 0.85), transparent 21rem),
-    var(--background);
+    radial-gradient(circle at 88% 82%, rgba(235, 255, 248, 0.85), transparent 21rem), var(--background);
 }
 .login-shell::before,
 .login-shell::after {
@@ -1126,8 +1246,7 @@ h3 {
     gap: 12px;
     padding: 10px 14px;
   }
-  .header-brand-copy,
-  .header-profile {
+  .header-brand-copy {
     display: none;
   }
   .header-nav-list {

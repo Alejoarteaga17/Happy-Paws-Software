@@ -75,7 +75,7 @@ async function seedVaccinations(): Promise<void> {
   );
 
   if (newSeeds.length === 0) {
-    console.log('Las vacunaciones simuladas ya existen. No se insertaron duplicados.');
+    process.stdout.write('Las vacunaciones simuladas ya existen. No se insertaron duplicados.\n');
     return;
   }
 
@@ -84,14 +84,14 @@ async function seedVaccinations(): Promise<void> {
     throw new Error(`No se pudieron insertar las vacunaciones: ${insertError.message}`);
   }
 
-  console.log(`Se insertaron ${newSeeds.length} vacunaciones simuladas en Supabase.`);
+  process.stdout.write(`Se insertaron ${newSeeds.length} vacunaciones simuladas en Supabase.\n`);
   newSeeds.forEach((seed) => {
     const pet = availablePets.find(({ id }) => id === seed.pet_id);
-    console.log(`- ${pet?.name ?? seed.pet_id}: ${seed.vaccine_name} (${seed.status})`);
+    process.stdout.write(`- ${pet?.name ?? seed.pet_id}: ${seed.vaccine_name} (${seed.status})\n`);
   });
 }
 
 seedVaccinations().catch((error: unknown) => {
-  console.error(error instanceof Error ? error.message : 'Error desconocido al cargar datos');
+  process.stderr.write(`${error instanceof Error ? error.message : 'Error desconocido al cargar datos'}\n`);
   process.exitCode = 1;
 });

@@ -33,7 +33,7 @@ export type Permission =
   | 'search_records'
   | 'manage_clinical_notes';
 
-const permissions: Record<UserRole, Permission[]> = {
+export const permissions: Record<UserRole, Permission[]> = {
   OWNER: ['view_owner_portal', 'view_appointments'],
   RECEPTIONIST: [
     'manage_owners',

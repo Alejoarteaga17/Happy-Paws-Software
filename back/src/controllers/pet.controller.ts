@@ -90,6 +90,17 @@ export const createPet = async (request: Request, response: Response): Promise<v
 export const updatePet = async (request: Request, response: Response): Promise<void> => {
   const id = parsePetId(request, response);
   const body = request.body as Record<string, unknown>;
+  if (request.user?.role === 'VET' && (body.ownerId !== undefined || body.petTag !== undefined)) {
+    response.status(403).json({
+      success: false,
+      data: null,
+      error: {
+        code: 'FORBIDDEN_PET_FIELDS',
+        message: 'Los veterinarios no pueden modificar el propietario ni el pet_tag.',
+      },
+    });
+    return;
+  }
   const valid =
     id !== null &&
     Object.keys(body).length > 0 &&

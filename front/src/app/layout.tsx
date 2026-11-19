@@ -1,5 +1,20 @@
 import './globals.css';
 import { AuthProvider } from '../context/auth-context';
+import { Newsreader, Quattrocento } from 'next/font/google';
+
+const newsreader = Newsreader({
+  subsets: ['latin'],
+  weight: ['400', '500'],
+  variable: '--font-newsreader',
+  display: 'optional',
+});
+
+const quattrocento = Quattrocento({
+  subsets: ['latin'],
+  weight: ['400', '700'],
+  variable: '--font-quattrocento',
+  display: 'optional',
+});
 
 export const metadata = {
   title: 'Happy Paws Care Central',
@@ -11,19 +26,8 @@ export const metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Quattrocento:wght@400;700&display=swap"
-          rel="stylesheet"
-        />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=add_circle,assignment,clinical_notes,contextual_token,event,event_available,group,history,manage_accounts,pending_actions,person_add,pets,search,task_alt,vaccines"
-        />
-      </head>
+    <html lang="es" className={`${newsreader.variable} ${quattrocento.variable}`}>
+      <head />
       <body>
         <AuthProvider>{children}</AuthProvider>
       </body>

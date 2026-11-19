@@ -1,10 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 import { corsOptions } from '../src/config/cors';
 
-type OriginValidator = (
-  origin: string | undefined,
-  callback: (error: Error | null, allowed?: boolean) => void,
-) => void;
+type OriginValidator = (origin: string | undefined, callback: (error: Error | null, allowed?: boolean) => void) => void;
 
 const resolveOrigin = (origin?: string) =>
   new Promise<{ error: Error | null; allowed: boolean | undefined }>((resolve) => {

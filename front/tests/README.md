@@ -11,3 +11,7 @@ npm run test:coverage
 ```
 
 Las pruebas de `error-pages.test.tsx` renderizan las pantallas con `react-dom/server` y verifican sus mensajes y enlaces de recuperación. La cobertura local no sustituye los casos E2E de staging.
+
+Cobertura actual medida con Vitest: 17.63 % global. Los servicios críticos alcanzan 92.03 %;
+`AppHeader` alcanza 94.20 % y `RestrictedView` 89.47 %. Las pantallas completas se validarán con
+Playwright contra staging.
