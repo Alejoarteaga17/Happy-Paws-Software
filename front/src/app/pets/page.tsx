@@ -9,7 +9,6 @@ import AppHeader from '../../components/app-header';
 import RestrictedView from '../../components/restricted-view';
 import { RoleView, useAuth } from '../../context/auth-context';
 import Link from 'next/link';
-import { getSupabaseClient } from '../../services/supabase-client';
 
 const emptyForm = {
   ownerId: '',
@@ -74,34 +73,13 @@ function PetsManager() {
     void loadPets();
   }, [loadPets]);
 
-  const uploadPetPhoto = async (file: File): Promise<string> => {
-    const supabase = getSupabaseClient();
-    const extension = file.name.split('.').pop()?.toLowerCase() || 'jpg';
-    const fileName = `${crypto.randomUUID()}.${extension}`;
-    const { error } = await supabase.storage.from('pet-images').upload(fileName, file, {
-      cacheControl: '3600',
-      upsert: false,
-      contentType: file.type,
+  const readPhotoDataUrl = async (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result));
+      reader.onerror = () => reject(new Error('No se pudo leer la foto seleccionada.'));
+      reader.readAsDataURL(file);
     });
-    if (error) {
-      const message = error.message.toLowerCase();
-      if (message.includes('bucket') && message.includes('not found')) {
-        throw new Error('No se pudo cargar la foto: el almacén de imágenes no está disponible.');
-      }
-      if (message.includes('not permitted') || message.includes('permission') || message.includes('unauthorized')) {
-        throw new Error('No se pudo cargar la foto: tu sesión no tiene permiso para subir imágenes.');
-      }
-      if (message.includes('size') || message.includes('payload') || message.includes('too large')) {
-        throw new Error('No se pudo cargar la foto: la imagen supera el límite de 5 MB.');
-      }
-      if (message.includes('mime') || message.includes('content type')) {
-        throw new Error('No se pudo cargar la foto: usa JPG, PNG o WEBP.');
-      }
-      throw new Error(`No se pudo cargar la foto de la mascota: ${error.message}`);
-    }
-    const { data } = supabase.storage.from('pet-images').getPublicUrl(fileName);
-    return data.publicUrl;
-  };
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -113,7 +91,7 @@ function PetsManager() {
     setSaving(true);
     setMessage(null);
     try {
-      const photoUrl = photoFile ? await uploadPetPhoto(photoFile) : form.photoUrl || null;
+      const photoDataUrl = photoFile ? await readPhotoDataUrl(photoFile) : undefined;
       const basicFields = {
         name: form.name,
         species: form.species,
@@ -121,7 +99,7 @@ function PetsManager() {
         birthDate: form.birthDate || undefined,
         weight: form.weight ? Number(form.weight) : undefined,
         sex: form.sex ? (form.sex as 'MALE' | 'FEMALE' | 'UNKNOWN') : undefined,
-        photoUrl,
+        photoDataUrl,
       };
       if (editingId === null) {
         await createPet({

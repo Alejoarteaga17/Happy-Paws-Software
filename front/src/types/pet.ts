@@ -26,6 +26,7 @@ export interface CreatePetInput {
   weight?: number;
   sex?: PetSex;
   photoUrl?: string | null;
+  photoDataUrl?: string;
 }
 
 export type UpdatePetInput = Partial<CreatePetInput> & {

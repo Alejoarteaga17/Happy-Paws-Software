@@ -7,11 +7,24 @@ const isPetSex = (value: unknown): value is PetSex => value === 'MALE' || value 
 
 const sendError = (response: Response, error: unknown, fallbackCode: string): void => {
   const code = error instanceof Error ? error.message : fallbackCode;
+  if (code.startsWith('PET_PHOTO_UPLOAD_FAILED:')) {
+    response.status(500).json({
+      success: false,
+      data: null,
+      error: {
+        code: 'PET_PHOTO_UPLOAD_FAILED',
+        message: `No se pudo montar la foto: ${code.replace('PET_PHOTO_UPLOAD_FAILED:', '').trim()}`,
+      },
+    });
+    return;
+  }
   const errors: Record<string, { status: number; message: string }> = {
     OWNER_NOT_FOUND: { status: 400, message: 'El propietario indicado no existe.' },
     OWNER_INACTIVE: { status: 400, message: 'No se puede asignar la mascota a un propietario inactivo.' },
     PET_TAG_ALREADY_EXISTS: { status: 409, message: 'El pet_tag ya está registrado.' },
     PET_NOT_FOUND: { status: 404, message: 'La mascota no existe.' },
+    PET_PHOTO_INVALID_TYPE: { status: 400, message: 'La foto debe ser JPG, PNG o WEBP.' },
+    PET_PHOTO_TOO_LARGE: { status: 400, message: 'La foto supera el límite de 5 MB.' },
     PETS_LIST_FAILED: { status: 500, message: 'No se pudieron cargar las mascotas. Intenta nuevamente.' },
   };
 
@@ -64,7 +77,8 @@ export const createPet = async (request: Request, response: Response): Promise<v
       (typeof body.birthDate === 'string' && !Number.isNaN(Date.parse(body.birthDate)))) &&
     (body.weight === undefined || (typeof body.weight === 'number' && body.weight > 0)) &&
     (body.sex === undefined || isPetSex(body.sex)) &&
-    (body.photoUrl === undefined || body.photoUrl === null || typeof body.photoUrl === 'string');
+    (body.photoUrl === undefined || body.photoUrl === null || typeof body.photoUrl === 'string') &&
+    (body.photoDataUrl === undefined || typeof body.photoDataUrl === 'string');
 
   if (!validCreate) {
     response.status(400).json({
@@ -117,7 +131,8 @@ export const updatePet = async (request: Request, response: Response): Promise<v
       (typeof body.birthDate === 'string' && !Number.isNaN(Date.parse(body.birthDate)))) &&
     (body.weight === undefined || body.weight === null || (typeof body.weight === 'number' && body.weight > 0)) &&
     (body.sex === undefined || body.sex === null || isPetSex(body.sex)) &&
-    (body.photoUrl === undefined || body.photoUrl === null || typeof body.photoUrl === 'string');
+    (body.photoUrl === undefined || body.photoUrl === null || typeof body.photoUrl === 'string') &&
+    (body.photoDataUrl === undefined || typeof body.photoDataUrl === 'string');
   if (!valid) {
     response.status(400).json({
       success: false,

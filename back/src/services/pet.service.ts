@@ -1,5 +1,6 @@
 import { getSupabaseClient } from '../config/supabase';
 import { CreatePetInput, Pet, UpdatePetInput } from '../types/pet';
+import { randomUUID } from 'crypto';
 
 interface PetRow {
   id: number;
@@ -44,6 +45,25 @@ const toPet = (row: PetRow): Pet => ({
 });
 
 export class PetService {
+  private static async uploadPhoto(photoDataUrl: string): Promise<string> {
+    const match = /^data:(image\/(?:jpeg|png|webp));base64,(.+)$/s.exec(photoDataUrl);
+    if (!match) throw new Error('PET_PHOTO_INVALID_TYPE');
+    const contentType = match[1];
+    const base64 = match[2];
+    if (base64.length > 6_666_666) throw new Error('PET_PHOTO_TOO_LARGE');
+    const bytes = Buffer.from(base64, 'base64');
+    const extension = contentType === 'image/jpeg' ? 'jpg' : contentType === 'image/png' ? 'png' : 'webp';
+    const path = `pets/${randomUUID()}.${extension}`;
+    const supabase = getSupabaseClient();
+    const { error } = await supabase.storage.from('pet-images').upload(path, new Uint8Array(bytes), {
+      contentType,
+      cacheControl: '3600',
+      upsert: false,
+    });
+    if (error) throw new Error(`PET_PHOTO_UPLOAD_FAILED: ${error.message}`);
+    return supabase.storage.from('pet-images').getPublicUrl(path).data.publicUrl;
+  }
+
   private static async assertActiveOwner(ownerId: number): Promise<void> {
     const { data, error } = await getSupabaseClient()
       .from('owners')
@@ -79,6 +99,9 @@ export class PetService {
 
   static async create(input: CreatePetInput): Promise<Pet> {
     await PetService.assertActiveOwner(input.ownerId);
+    const photoUrl = input.photoDataUrl
+      ? await PetService.uploadPhoto(input.photoDataUrl)
+      : input.photoUrl?.trim() || null;
     const values = {
       owner_id: input.ownerId,
       pet_tag: input.petTag.trim(),
@@ -88,7 +111,7 @@ export class PetService {
       birth_date: input.birthDate || null,
       weight: input.weight ?? null,
       sex: input.sex ?? null,
-      photo_url: input.photoUrl?.trim() || null,
+      photo_url: photoUrl,
     };
     let insertQuery = getSupabaseClient().from('pets').insert(values);
     let firstResult = await insertQuery.select(petSelect).single();
@@ -113,6 +136,7 @@ export class PetService {
 
   static async update(id: number, input: UpdatePetInput): Promise<Pet> {
     const values: Record<string, number | string | null> = {};
+    if (input.photoDataUrl) values.photo_url = await PetService.uploadPhoto(input.photoDataUrl);
     if (input.ownerId !== undefined) {
       await PetService.assertActiveOwner(input.ownerId);
       values.owner_id = input.ownerId;
