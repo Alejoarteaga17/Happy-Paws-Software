@@ -4,7 +4,9 @@ import { FormEvent, useEffect, useState } from 'react';
 import AppHeader from '../../components/app-header';
 import RestrictedView from '../../components/restricted-view';
 import { createOwner, deleteOwner, getOwners, updateOwner } from '../../services/owner-service';
+import { getPets } from '../../services/pet-service';
 import { Owner, OwnerInput } from '../../types/owner';
+import { Pet } from '../../types/pet';
 
 export default function OwnersPage() {
   return (
@@ -16,7 +18,9 @@ export default function OwnersPage() {
 
 function OwnersTable() {
   const visiblePageSize = 5;
+  const petPlaceholder = '/pet-placeholder.svg';
   const [owners, setOwners] = useState<Owner[]>([]);
+  const [pets, setPets] = useState<Pet[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState<OwnerInput>({ fullName: '', phone: '', email: '', address: '' });
   const [error, setError] = useState<string | null>(null);
@@ -27,6 +31,12 @@ function OwnersTable() {
   const [deleting, setDeleting] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<'fullName' | 'phone' | 'email', string>>>({});
   const visibleOwners = owners.slice(0, visibleLimit);
+  const petsByOwner = new Map<number, Pet[]>();
+  pets.forEach((pet) => {
+    const ownerPets = petsByOwner.get(pet.ownerId) ?? [];
+    ownerPets.push(pet);
+    petsByOwner.set(pet.ownerId, ownerPets);
+  });
 
   const validateField = (field: 'fullName' | 'phone' | 'email', value: string): string | undefined => {
     if (field === 'fullName' && value.trim().length < 3) {
@@ -86,8 +96,11 @@ function OwnersTable() {
   };
 
   const load = () =>
-    getOwners()
-      .then(setOwners)
+    Promise.all([getOwners(), getPets()])
+      .then(([loadedOwners, loadedPets]) => {
+        setOwners(loadedOwners);
+        setPets(loadedPets);
+      })
       .catch((reason) => setError(reason instanceof Error ? reason.message : 'No se pudieron cargar los propietarios'));
   useEffect(() => {
     void load();
@@ -206,6 +219,7 @@ function OwnersTable() {
                 <th>Nombre</th>
                 <th>Contacto</th>
                 <th>Correo</th>
+                <th>Mascotas</th>
                 <th>Acciones</th>
               </tr>
             </thead>
@@ -215,6 +229,29 @@ function OwnersTable() {
                   <td>{owner.fullName}</td>
                   <td>{owner.phone}</td>
                   <td>{owner.email ?? '—'}</td>
+                  <td>
+                    <div className="owner-pet-list">
+                      {(petsByOwner.get(owner.id) ?? []).length === 0 ? (
+                        <span className="owner-pet-empty">Sin mascotas</span>
+                      ) : (
+                        (petsByOwner.get(owner.id) ?? []).map((pet) => {
+                          const localPhoto = window.localStorage.getItem(`happy-paws-pet-photo-${pet.id}`);
+                          return (
+                            <div className="owner-pet" key={pet.id} title={pet.name}>
+                              <img
+                                src={pet.photoUrl || localPhoto || petPlaceholder}
+                                alt={`Foto de ${pet.name}`}
+                                onError={(event) => {
+                                  event.currentTarget.src = petPlaceholder;
+                                }}
+                              />
+                              <span>{pet.name}</span>
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+                  </td>
                   <td>
                     <div className="owner-row-actions">
                       <button
