@@ -20,6 +20,8 @@ function OwnersTable() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState<OwnerInput>({ fullName: '', phone: '', email: '', address: '' });
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
   const load = () =>
     getOwners()
       .then(setOwners)
@@ -29,14 +31,26 @@ function OwnersTable() {
   }, []);
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setError(null);
+    setSuccess(null);
+    setSaving(true);
     try {
       if (editingId === null) await createOwner(form);
       else await updateOwner(editingId, form);
       setForm({ fullName: '', phone: '', email: '', address: '' });
       setEditingId(null);
+      setSuccess(editingId === null ? 'Propietario creado correctamente.' : 'Propietario actualizado correctamente.');
       await load();
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : 'No se pudo guardar el propietario');
+      setError(
+        reason instanceof Error
+          ? reason.message
+          : editingId === null
+            ? 'No se pudo crear el propietario.'
+            : 'No se pudo actualizar el propietario.',
+      );
+    } finally {
+      setSaving(false);
     }
   };
   return (
@@ -84,9 +98,22 @@ function OwnersTable() {
                 onChange={(event) => setForm({ ...form, address: event.target.value })}
               />
             </label>
-            <button className="primary-button">{editingId === null ? 'Crear propietario' : 'Guardar cambios'}</button>
+            <button className="primary-button" disabled={saving}>
+              {saving
+                ? editingId === null
+                  ? 'Creando...'
+                  : 'Guardando...'
+                : editingId === null
+                  ? 'Crear propietario'
+                  : 'Guardar cambios'}
+            </button>
           </form>
           {error && <p className="form-error">{error}</p>}
+          {success && (
+            <p className="form-success" role="status">
+              {success}
+            </p>
+          )}
           <table className="data-table">
             <thead>
               <tr>

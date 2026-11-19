@@ -140,6 +140,16 @@ h3 {
   background: var(--danger-soft);
   color: var(--danger);
 }
+.form-success {
+  margin: 12px 0 0;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--success) 22%, transparent);
+  border-radius: 8px;
+  background: var(--success-soft);
+  color: var(--success);
+  font-size: 12px;
+  line-height: 1.5;
+}
 
 .app-header {
   position: fixed;

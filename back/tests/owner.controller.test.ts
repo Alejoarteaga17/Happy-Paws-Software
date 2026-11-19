@@ -60,6 +60,17 @@ describe('owner controller', () => {
     expect(AuditService.record).toHaveBeenCalled();
   });
 
+  it('does not fail owner creation when the audit log fails', async () => {
+    mockedOwner.create.mockResolvedValue({ id: 7 } as never);
+    jest.mocked(AuditService.record).mockRejectedValueOnce(new Error('AUDIT_LOG_FAILED'));
+    const { mock, result } = response();
+    await createOwner(
+      { body: { fullName: 'Ana', phone: '300', email: 'ana@example.com' }, user: { id: 'u1' } } as never,
+      mock as never,
+    );
+    expect(result.statusCode).toBe(201);
+  });
+
   it('updates an owner', async () => {
     mockedOwner.update.mockResolvedValue({ id: 7 } as never);
     const { mock, result } = response();

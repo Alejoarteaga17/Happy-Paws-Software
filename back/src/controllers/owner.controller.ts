@@ -60,12 +60,16 @@ export const createOwner = async (request: Request, response: Response): Promise
       email: typeof body.email === 'string' ? body.email : null,
       address: typeof body.address === 'string' ? body.address : null,
     });
-    await AuditService.record({
-      actorUserId: request.user!.id,
-      action: 'CREATE',
-      entityName: 'owners',
-      entityId: data.id,
-    });
+    try {
+      await AuditService.record({
+        actorUserId: request.user!.id,
+        action: 'CREATE',
+        entityName: 'owners',
+        entityId: data.id,
+      });
+    } catch (auditError) {
+      console.error('Owner creation audit log failed:', auditError);
+    }
     response.status(201).json({ success: true, data, error: null });
   } catch (error) {
     fail(response, error, 'OWNER_CREATE_FAILED');
@@ -90,13 +94,17 @@ export const updateOwner = async (request: Request, response: Response): Promise
       email: body.email === null || typeof body.email === 'string' ? body.email : undefined,
       address: body.address === null || typeof body.address === 'string' ? body.address : undefined,
     });
-    await AuditService.record({
-      actorUserId: request.user!.id,
-      action: 'UPDATE',
-      entityName: 'owners',
-      entityId: id,
-      metadata: { fields: Object.keys(body) },
-    });
+    try {
+      await AuditService.record({
+        actorUserId: request.user!.id,
+        action: 'UPDATE',
+        entityName: 'owners',
+        entityId: id,
+        metadata: { fields: Object.keys(body) },
+      });
+    } catch (auditError) {
+      console.error('Owner update audit log failed:', auditError);
+    }
     response.json({ success: true, data, error: null });
   } catch (error) {
     fail(response, error, 'OWNER_UPDATE_FAILED');
@@ -115,12 +123,16 @@ export const updateOwnerStatus = async (request: Request, response: Response): P
   }
   try {
     const data = await OwnerService.setActive(id, request.body.active);
-    await AuditService.record({
-      actorUserId: request.user!.id,
-      action: request.body.active ? 'ACTIVATE' : 'DEACTIVATE',
-      entityName: 'owners',
-      entityId: id,
-    });
+    try {
+      await AuditService.record({
+        actorUserId: request.user!.id,
+        action: request.body.active ? 'ACTIVATE' : 'DEACTIVATE',
+        entityName: 'owners',
+        entityId: id,
+      });
+    } catch (auditError) {
+      console.error('Owner status audit log failed:', auditError);
+    }
     response.json({ success: true, data, error: null });
   } catch (error) {
     fail(response, error, 'OWNER_STATUS_UPDATE_FAILED');
