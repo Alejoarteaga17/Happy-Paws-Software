@@ -5,7 +5,6 @@ import AppHeader from '../../components/app-header';
 import RestrictedView from '../../components/restricted-view';
 import { createOwner, deleteOwner, getOwners, updateOwner } from '../../services/owner-service';
 import { Owner, OwnerInput } from '../../types/owner';
-import { RoleView } from '../../context/auth-context';
 
 export default function OwnersPage() {
   return (
@@ -206,6 +205,7 @@ function OwnersTable() {
                 <th>Nombre</th>
                 <th>Contacto</th>
                 <th>Correo</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -215,25 +215,25 @@ function OwnersTable() {
                   <td>{owner.phone}</td>
                   <td>{owner.email ?? '—'}</td>
                   <td>
-                    <button
-                      className="text-button"
-                      onClick={() => {
-                        setEditingId(owner.id);
-                        setForm({
-                          fullName: owner.fullName,
-                          phone: owner.phone,
-                          email: owner.email ?? '',
-                          address: owner.address ?? '',
-                        });
-                      }}
-                    >
-                      Editar
-                    </button>
-                    <RoleView permission="manage_users">
+                    <div className="owner-row-actions">
+                      <button
+                        className="text-button"
+                        onClick={() => {
+                          setEditingId(owner.id);
+                          setForm({
+                            fullName: owner.fullName,
+                            phone: owner.phone,
+                            email: owner.email ?? '',
+                            address: owner.address ?? '',
+                          });
+                        }}
+                      >
+                        Editar
+                      </button>
                       <button className="text-button danger-button" onClick={() => setOwnerToDelete(owner)}>
                         Eliminar
                       </button>
-                    </RoleView>
+                    </div>
                   </td>
                 </tr>
               ))}
