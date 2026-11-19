@@ -912,6 +912,32 @@ h3 {
   margin: 12px 0 0 10px;
   padding: 0;
 }
+.appointment-list-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+.appointment-list-controls label {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+.appointment-list-controls select {
+  min-width: 160px;
+  padding: 8px 34px 8px 10px;
+  border: 1px solid #d5dbe3;
+  border-radius: 4px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 12px;
+}
+.appointment-show-more {
+  display: block;
+  margin: 18px auto 0;
+}
 .danger-button {
   color: var(--danger);
 }

@@ -38,6 +38,9 @@ const temporalLabel = (appointment: Appointment): string =>
       ? 'Pendiente'
       : labels[appointment.status];
 
+type AppointmentFilter = 'ALL' | 'SCHEDULED' | 'CANCELLED' | 'MISSED';
+const visiblePageSize = 5;
+
 export default function AppointmentsPage() {
   return (
     <RestrictedView permission="view_appointments">
@@ -55,6 +58,12 @@ function AppointmentsManager() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<AppointmentFilter>('ALL');
+  const [visibleLimit, setVisibleLimit] = useState(visiblePageSize);
+
+  const filteredAppointments =
+    statusFilter === 'ALL' ? appointments : appointments.filter((appointment) => appointment.status === statusFilter);
+  const visibleAppointments = filteredAppointments.slice(0, visibleLimit);
 
   const loadAppointments = async () => {
     try {
@@ -256,41 +265,68 @@ function AppointmentsManager() {
               <p className="eyebrow">Agenda</p>
               <h2>Citas registradas</h2>
             </div>
-            <span>{appointments.length}</span>
+            <span>{filteredAppointments.length}</span>
+          </div>
+          <div className="appointment-list-controls">
+            <label htmlFor="appointment-status-filter">Filtrar por estado</label>
+            <select
+              id="appointment-status-filter"
+              value={statusFilter}
+              onChange={(event) => {
+                setStatusFilter(event.target.value as AppointmentFilter);
+                setVisibleLimit(visiblePageSize);
+              }}
+            >
+              <option value="ALL">Todos</option>
+              <option value="SCHEDULED">Pendiente</option>
+              <option value="CANCELLED">Cancelada</option>
+              <option value="MISSED">No atendida</option>
+            </select>
           </div>
           {message && <p className="notice">{message}</p>}
           {loading ? (
             <p className="empty">Cargando citas...</p>
-          ) : appointments.length === 0 ? (
-            <p className="empty">No hay citas registradas.</p>
+          ) : filteredAppointments.length === 0 ? (
+            <p className="empty">No hay citas para el estado seleccionado.</p>
           ) : (
-            <ul>
-              {appointments.map((appointment) => (
-                <li className="appointment-item" key={appointment.id}>
-                  <div>
-                    <strong>{appointment.petName}</strong>
-                    <span>{formatDate(appointment.scheduledAt)}</span>
-                    <span>{appointment.reason}</span>
-                    {appointment.notes && <span>{appointment.notes}</span>}
-                  </div>
-                  <div className="appointment-actions">
-                    <StatusBadge tone={appointment.status.toLowerCase()} label={temporalLabel(appointment)} />
-                    {appointment.status !== 'CANCELLED' && (
-                      <RoleView permission="manage_appointments">
-                        <>
-                          <button className="text-button" onClick={() => edit(appointment)}>
-                            Modificar
-                          </button>
-                          <button className="text-button danger-button" onClick={() => void cancel(appointment.id)}>
-                            Cancelar
-                          </button>
-                        </>
-                      </RoleView>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <>
+              <ul>
+                {visibleAppointments.map((appointment) => (
+                  <li className="appointment-item" key={appointment.id}>
+                    <div>
+                      <strong>{appointment.petName}</strong>
+                      <span>{formatDate(appointment.scheduledAt)}</span>
+                      <span>{appointment.reason}</span>
+                      {appointment.notes && <span>{appointment.notes}</span>}
+                    </div>
+                    <div className="appointment-actions">
+                      <StatusBadge tone={appointment.status.toLowerCase()} label={temporalLabel(appointment)} />
+                      {appointment.status !== 'CANCELLED' && (
+                        <RoleView permission="manage_appointments">
+                          <>
+                            <button className="text-button" onClick={() => edit(appointment)}>
+                              Modificar
+                            </button>
+                            <button className="text-button danger-button" onClick={() => void cancel(appointment.id)}>
+                              Cancelar
+                            </button>
+                          </>
+                        </RoleView>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              {visibleLimit < filteredAppointments.length && (
+                <button
+                  type="button"
+                  className="secondary-button appointment-show-more"
+                  onClick={() => setVisibleLimit((current) => current + visiblePageSize)}
+                >
+                  Mostrar más
+                </button>
+              )}
+            </>
           )}
         </section>
       </section>
