@@ -8,6 +8,27 @@ export interface OwnerInput {
   authUserId?: string | null;
 }
 
+interface OwnerRow {
+  id: number;
+  auth_user_id?: string | null;
+  full_name?: string;
+  phone?: string;
+  email?: string | null;
+  address?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+const toOwner = (row: OwnerRow) => ({
+  id: row.id,
+  ...(row.full_name !== undefined ? { fullName: row.full_name } : {}),
+  ...(row.phone !== undefined ? { phone: row.phone } : {}),
+  ...(row.email !== undefined ? { email: row.email } : {}),
+  ...(row.address !== undefined ? { address: row.address } : {}),
+  ...(row.auth_user_id !== undefined ? { authUserId: row.auth_user_id } : {}),
+  ...(row.updated_at !== undefined ? { updatedAt: row.updated_at } : {}),
+});
+
 export class OwnerService {
   static async list() {
     const { data, error } = await getSupabaseClient()
@@ -16,7 +37,7 @@ export class OwnerService {
       .is('deleted_at', null)
       .order('full_name');
     if (error) throw new Error(`OWNERS_LIST_FAILED: ${error.message}`);
-    return data ?? [];
+    return (data ?? []).map(toOwner);
   }
 
   static async getById(id: number) {
@@ -28,7 +49,7 @@ export class OwnerService {
       .maybeSingle();
     if (error) throw new Error(`OWNER_LOOKUP_FAILED: ${error.message}`);
     if (!data) throw new Error('OWNER_NOT_FOUND');
-    return data;
+    return toOwner(data);
   }
 
   static async create(input: OwnerInput) {
@@ -44,7 +65,7 @@ export class OwnerService {
       .select('id, auth_user_id, full_name, phone, email, address, created_at, updated_at')
       .single();
     if (error || !data) throw new Error(error?.code === '23505' ? 'OWNER_ALREADY_LINKED' : 'OWNER_CREATE_FAILED');
-    return data;
+    return toOwner(data);
   }
 
   static async update(id: number, input: Partial<OwnerInput>) {
@@ -63,7 +84,7 @@ export class OwnerService {
       .maybeSingle();
     if (error) throw new Error(`OWNER_UPDATE_FAILED: ${error.message}`);
     if (!data) throw new Error('OWNER_NOT_FOUND');
-    return data;
+    return toOwner(data);
   }
 
   static async setActive(id: number, active: boolean) {
@@ -75,6 +96,6 @@ export class OwnerService {
       .maybeSingle();
     if (error) throw new Error(`OWNER_STATUS_UPDATE_FAILED: ${error.message}`);
     if (!data) throw new Error('OWNER_NOT_FOUND');
-    return data;
+    return toOwner(data);
   }
 }

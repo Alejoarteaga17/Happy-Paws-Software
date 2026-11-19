@@ -33,7 +33,15 @@ function UsersTable() {
       ]);
       if (queryError) setError(queryError.message);
       else setUsers(data);
-      setOwners(loadedOwners);
+      setOwners(
+        loadedOwners
+          .filter((owner) => !owner.authUserId)
+          .map((owner) => ({
+            id: owner.id,
+            fullName: owner.fullName,
+            email: owner.email,
+          })),
+      );
     };
 
     void loadData().catch((loadError: Error) => setError(loadError.message));

@@ -15,7 +15,7 @@ export const navigationItems = [
   { href: '/owners', label: 'Propietarios', icon: 'group', roles: ['ADMIN', 'RECEPTIONIST'] },
   { href: '/search', label: 'Buscar', icon: 'search', roles: ['ADMIN', 'RECEPTIONIST', 'VET'] },
   { href: '/clinical-notes', label: 'Notas clínicas', icon: 'clinical_notes', roles: ['ADMIN', 'VET'] },
-  { href: '/users', label: 'Usuarios', icon: 'manage_accounts', roles: ['ADMIN', 'RECEPTIONIST'] },
+  { href: '/users', label: 'Usuarios', icon: 'manage_accounts', roles: ['ADMIN'] },
   { href: '/audit', label: 'Auditoría', icon: 'history', roles: ['ADMIN'] },
 ];
 
