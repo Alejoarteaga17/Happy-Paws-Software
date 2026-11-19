@@ -26,7 +26,17 @@ const request = async <T>(init?: RequestInit): Promise<T> => {
     ...init,
     headers: { ...(await getHeaders()), ...init?.headers },
   });
-  const payload = (await response.json()) as { success: boolean; data: T | null; error: ApiError | null };
+  const responseText = await response.text();
+  let payload: { success: boolean; data: T | null; error: ApiError | null };
+  try {
+    payload = JSON.parse(responseText) as { success: boolean; data: T | null; error: ApiError | null };
+  } catch {
+    throw new Error(
+      response.status === 413
+        ? 'La imagen supera el límite permitido de 5 MB.'
+        : 'No se pudo completar la operación. Intenta nuevamente.',
+    );
+  }
   if (!response.ok || !payload.success || payload.data === null) {
     throw new Error(
       payload.error?.code === 'PET_TAG_ALREADY_EXISTS'
@@ -48,7 +58,13 @@ export const deletePet = async (id: number): Promise<Pet> => {
     cache: 'no-store',
     headers: await getHeaders(),
   });
-  const payload = (await response.json()) as { success: boolean; data: Pet | null; error: ApiError | null };
+  const responseText = await response.text();
+  let payload: { success: boolean; data: Pet | null; error: ApiError | null };
+  try {
+    payload = JSON.parse(responseText) as { success: boolean; data: Pet | null; error: ApiError | null };
+  } catch {
+    throw new Error('No se pudo completar la operación. Intenta nuevamente.');
+  }
   if (!response.ok || !payload.success || payload.data === null)
     throw new Error(payload.error?.message ?? 'No se pudo eliminar');
   return payload.data;
