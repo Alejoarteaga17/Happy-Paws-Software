@@ -14,7 +14,7 @@ interface PetRow {
   weight: number | null;
   sex: Pet['sex'];
   photo_url?: string | null;
-  owners: { full_name: string }[] | null;
+  owners: { full_name: string }[] | { full_name: string } | null;
 }
 
 const petSelect =
@@ -22,12 +22,17 @@ const petSelect =
 const petSelectWithoutPhotos =
   'id, owner_id, pet_tag, name, species, breed, birth_date, weight, sex, created_at, updated_at, owners(full_name)';
 
+const getOwnerName = (owners: PetRow['owners']): string =>
+  Array.isArray(owners)
+    ? (owners[0]?.full_name ?? 'Propietario sin nombre')
+    : (owners?.full_name ?? 'Propietario sin nombre');
+
 const toPet = (row: PetRow): Pet => ({
   id: row.id,
   createdAt: row.created_at,
   updatedAt: row.updated_at,
   ownerId: row.owner_id,
-  ownerName: row.owners?.[0]?.full_name ?? 'Propietario sin nombre',
+  ownerName: getOwnerName(row.owners),
   petTag: row.pet_tag,
   name: row.name,
   species: row.species,

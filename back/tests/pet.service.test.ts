@@ -13,6 +13,32 @@ describe('PetService', () => {
     jest.clearAllMocks();
   });
 
+  it('maps an owner relation returned as an object', async () => {
+    const order = jest.fn(async (..._args: unknown[]) => ({
+      data: [
+        {
+          id: 1,
+          created_at: '2026-09-10T10:00:00Z',
+          owner_id: 7,
+          pet_tag: 'HP-001',
+          name: 'Luna',
+          species: 'Gato',
+          breed: null,
+          birth_date: null,
+          weight: 4.2,
+          sex: 'FEMALE',
+          updated_at: '2026-09-11T10:00:00Z',
+          owners: { full_name: 'Ana Perez' },
+        },
+      ],
+      error: null,
+    }));
+    const select = jest.fn().mockReturnValue({ is: jest.fn().mockReturnValue({ order }) });
+    mockedGetSupabaseClient.mockReturnValue({ from: jest.fn().mockReturnValue({ select }) } as never);
+
+    await expect(PetService.list()).resolves.toMatchObject([{ ownerName: 'Ana Perez' }]);
+  });
+
   it('lists pets ordered by name and maps database fields', async () => {
     const order = jest.fn(async (..._args: unknown[]) => ({
       data: [
