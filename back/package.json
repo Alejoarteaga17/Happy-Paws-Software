@@ -4,6 +4,7 @@
   "scripts": {
     "dev": "tsx watch src/app.ts",
     "build": "tsc",
+    "vercel-build": "npm run build",
     "start": "node dist/src/app.js",
     "test": "jest --runInBand",
     "test:coverage": "jest --runInBand --coverage",

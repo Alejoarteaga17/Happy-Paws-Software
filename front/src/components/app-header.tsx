@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { BrandMark, Icon, UserAvatar } from './ui';
@@ -23,6 +23,8 @@ export default function AppHeader() {
   const pathname = usePathname();
   const { profile, signOut } = useAuth();
   const [hash, setHash] = useState('');
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const updateHash = () => setHash(window.location.hash);
@@ -30,6 +32,41 @@ export default function AppHeader() {
     window.addEventListener('hashchange', updateHash);
     return () => window.removeEventListener('hashchange', updateHash);
   }, []);
+
+  useEffect(() => {
+    setProfileMenuOpen(false);
+  }, [pathname, hash]);
+
+  useEffect(() => {
+    if (!profileMenuOpen) return;
+
+    const closeOnOutsideClick = (event: MouseEvent) => {
+      if (!profileMenuRef.current?.contains(event.target as Node)) setProfileMenuOpen(false);
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setProfileMenuOpen(false);
+    };
+
+    document.addEventListener('mousedown', closeOnOutsideClick);
+    document.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.removeEventListener('mousedown', closeOnOutsideClick);
+      document.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [profileMenuOpen]);
+
+  const roleLabels: Record<UserRole, string> = {
+    OWNER: 'Propietario',
+    VET: 'Veterinario',
+    ADMIN: 'Administrador',
+    RECEPTIONIST: 'Recepcionista',
+  };
+
+  const handleSignOut = () => {
+    void signOut().then(() => {
+      window.location.href = '/login';
+    });
+  };
 
   return (
     <header className="app-header">
@@ -62,20 +99,46 @@ export default function AppHeader() {
             })}
         </ul>
       </nav>
-      <div className="header-profile">
-        <a href={profile?.role === 'OWNER' ? '/portal' : '/users'} aria-label="Abrir perfil de usuario" title="Perfil">
-          <UserAvatar seed={profile?.email || profile?.id || 'happy-paws'} label={profile?.fullName ?? 'Happy Paws'} />
-        </a>
-        {profile && (
+      {profile && (
+        <div className="header-profile" ref={profileMenuRef}>
           <button
-            className="text-button"
+            className="profile-trigger"
             type="button"
-            onClick={() => void signOut().then(() => (window.location.href = '/login'))}
+            aria-label={`Abrir perfil de ${profile.fullName}`}
+            aria-expanded={profileMenuOpen}
+            aria-controls="profile-menu"
+            onClick={() => setProfileMenuOpen((open) => !open)}
           >
-            Salir
+            <UserAvatar seed={profile.email || profile.id} label={profile.fullName} />
+            <Icon name="keyboard_arrow_down" className="profile-chevron" />
           </button>
-        )}
-      </div>
+          {profileMenuOpen && (
+            <section className="profile-menu" id="profile-menu" aria-label="Perfil de usuario">
+              <div className="profile-menu-heading">
+                <UserAvatar seed={profile.email || profile.id} label={profile.fullName} />
+                <div>
+                  <strong>{profile.fullName}</strong>
+                  <span>{roleLabels[profile.role]}</span>
+                </div>
+              </div>
+              <dl className="profile-menu-details">
+                <div>
+                  <dt>Correo</dt>
+                  <dd>{profile.email}</dd>
+                </div>
+                <div>
+                  <dt>Rol</dt>
+                  <dd>{roleLabels[profile.role]}</dd>
+                </div>
+              </dl>
+              <button className="profile-menu-signout" type="button" onClick={handleSignOut}>
+                <Icon name="logout" />
+                <span>Cerrar sesión</span>
+              </button>
+            </section>
+          )}
+        </div>
+      )}
     </header>
   );
 }

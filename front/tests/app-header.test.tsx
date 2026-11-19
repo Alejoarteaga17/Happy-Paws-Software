@@ -22,5 +22,7 @@ describe('AppHeader role navigation', () => {
     expect(markup).toContain('Mi portal');
     expect(markup).not.toContain('Propietarios');
     expect(markup).not.toContain('Notas clínicas');
+    expect(markup).toContain('Abrir perfil de Ana');
+    expect(markup).toContain('profile-trigger');
   });
 });
