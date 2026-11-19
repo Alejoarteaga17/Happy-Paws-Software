@@ -50,15 +50,13 @@ export default function LoginPage() {
       setLoading(false);
       return;
     }
-    const auditResponse = await fetch(`${apiUrl}/api/v1/auth/audit-login`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${data.session.access_token}` },
-    });
-    if (!auditResponse.ok) {
-      setErrorMessage('No se pudo registrar el inicio de sesión.');
-      await getSupabaseClient().auth.signOut();
-      setLoading(false);
-      return;
+    try {
+      await fetch(`${apiUrl}/api/v1/auth/audit-login`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${data.session.access_token}` },
+      });
+    } catch (error) {
+      console.warn('No se pudo registrar el inicio de sesión en la auditoría:', error);
     }
     window.location.href = '/';
   };
