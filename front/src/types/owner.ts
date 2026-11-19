@@ -5,6 +5,7 @@ export interface Owner {
   phone: string;
   email: string | null;
   address?: string | null;
+  authUserId?: string | null;
 }
 
 export interface OwnerInput {

@@ -119,7 +119,15 @@ export default function UserAccountForm({ allowedRoles, owners, existingEmails =
               Propietario
               <select
                 value={ownerId}
-                onChange={(event) => setOwnerId(event.target.value)}
+                onChange={(event) => {
+                  const nextOwnerId = event.target.value;
+                  setOwnerId(nextOwnerId);
+                  const selectedOwner = owners.find((owner) => String(owner.id) === nextOwnerId);
+                  if (selectedOwner) {
+                    setFullName(selectedOwner.fullName);
+                    setEmail(selectedOwner.email ?? '');
+                  }
+                }}
                 aria-invalid={Boolean(errors.ownerId)}
               >
                 <option value="">Selecciona un propietario</option>

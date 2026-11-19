@@ -3,7 +3,7 @@ import { createUser, getUser, listUsers, updateUserRole, updateUserStatus } from
 import { requireAuth, requireRoles } from '../middlewares/auth.middleware';
 
 export const userRouter = Router();
-userRouter.use(requireAuth, requireRoles('ADMIN', 'RECEPTIONIST'));
+userRouter.use(requireAuth, requireRoles('ADMIN'));
 userRouter.get('/', listUsers);
 userRouter.get('/:id', getUser);
 userRouter.post('/', createUser);

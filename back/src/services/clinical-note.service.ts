@@ -50,7 +50,11 @@ export class ClinicalNoteService {
     return (data as ClinicalNoteRow[]).map(toClinicalNote);
   }
 
-  static async create(input: CreateClinicalNoteInput, veterinarianId: string): Promise<ClinicalNote> {
+  static async create(
+    input: CreateClinicalNoteInput,
+    veterinarianId: string,
+    canCreateForAppointment = false,
+  ): Promise<ClinicalNote> {
     const { data: appointment, error: appointmentError } = await getSupabaseClient()
       .from('appointments')
       .select('id, vet_id')
@@ -58,13 +62,22 @@ export class ClinicalNoteService {
       .maybeSingle();
     if (appointmentError) throw new Error(`APPOINTMENT_LOOKUP_FAILED: ${appointmentError.message}`);
     if (!appointment) throw new Error('APPOINTMENT_NOT_FOUND');
-    if (appointment.vet_id && appointment.vet_id !== veterinarianId) throw new Error('APPOINTMENT_NOT_ASSIGNED');
+    if (
+      !canCreateForAppointment &&
+      appointment.vet_id &&
+      appointment.vet_id !== veterinarianId
+    ) {
+      throw new Error('APPOINTMENT_NOT_ASSIGNED');
+    }
+
+    const noteVeterinarianId =
+      canCreateForAppointment && appointment.vet_id ? appointment.vet_id : veterinarianId;
 
     const { data, error } = await getSupabaseClient()
       .from('clinical_notes')
       .insert({
         appointment_id: input.appointmentId,
-        veterinarian_id: veterinarianId,
+        veterinarian_id: noteVeterinarianId,
         diagnosis: input.diagnosis.trim(),
         treatment: input.treatment.trim(),
         observations: input.observations?.trim() || null,

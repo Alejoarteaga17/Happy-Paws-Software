@@ -35,14 +35,7 @@ export type Permission =
 
 export const permissions: Record<UserRole, Permission[]> = {
   OWNER: ['view_owner_portal', 'view_appointments'],
-  RECEPTIONIST: [
-    'manage_owners',
-    'manage_pets',
-    'manage_appointments',
-    'view_appointments',
-    'manage_users',
-    'search_records',
-  ],
+  RECEPTIONIST: ['manage_owners', 'manage_pets', 'manage_appointments', 'view_appointments', 'search_records'],
   VET: ['edit_pets_basic', 'manage_vaccinations', 'search_records', 'manage_clinical_notes'],
   ADMIN: [
     'manage_owners',

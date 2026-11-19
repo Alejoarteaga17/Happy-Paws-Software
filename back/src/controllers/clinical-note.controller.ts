@@ -33,15 +33,16 @@ export const createClinicalNote = async (request: Request, response: Response): 
     return;
   }
   try {
-    const data = await ClinicalNoteService.create(
-      {
-        appointmentId: body.appointmentId as number,
-        diagnosis: body.diagnosis as string,
-        treatment: body.treatment as string,
-        observations: body.observations as string | null | undefined,
-      },
-      request.user.id,
-    );
+    const clinicalNoteInput = {
+      appointmentId: body.appointmentId as number,
+      diagnosis: body.diagnosis as string,
+      treatment: body.treatment as string,
+      observations: body.observations as string | null | undefined,
+    };
+    const data =
+      request.user.role === 'ADMIN'
+        ? await ClinicalNoteService.create(clinicalNoteInput, request.user.id, true)
+        : await ClinicalNoteService.create(clinicalNoteInput, request.user.id);
     await AuditService.record({
       actorUserId: request.user.id,
       action: 'CREATE',

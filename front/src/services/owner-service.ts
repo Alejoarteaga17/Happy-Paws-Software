@@ -12,6 +12,29 @@ const getApiUrl = (): string => {
   return `${apiUrl}/api/v1/owners`;
 };
 
+interface OwnerApiRow {
+  id: number;
+  auth_user_id?: string | null;
+  authUserId?: string | null;
+  full_name?: string;
+  fullName?: string;
+  phone?: string;
+  email?: string | null;
+  address?: string | null;
+  updated_at?: string;
+  updatedAt?: string;
+}
+
+const normalizeOwner = (row: OwnerApiRow): Owner => ({
+  id: row.id,
+  fullName: row.fullName ?? row.full_name ?? '',
+  phone: row.phone ?? '',
+  email: row.email ?? null,
+  address: row.address ?? null,
+  updatedAt: row.updatedAt ?? row.updated_at ?? '',
+  authUserId: row.authUserId ?? row.auth_user_id ?? null,
+});
+
 const getHeaders = async (): Promise<HeadersInit> => {
   if (!isSupabaseConfigured) throw new Error('Configura Supabase e inicia sesión para gestionar propietarios');
   const { data, error } = await getSupabaseClient().auth.getSession();
@@ -33,7 +56,7 @@ const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
   return payload.data;
 };
 
-export const getOwners = (): Promise<Owner[]> => request<Owner[]>('');
+export const getOwners = async (): Promise<Owner[]> => (await request<OwnerApiRow[]>('')).map(normalizeOwner);
 export const createOwner = (input: OwnerInput): Promise<Owner> =>
   request<Owner>('', { method: 'POST', body: JSON.stringify(input) });
 export const updateOwner = (id: number, input: Partial<OwnerInput>): Promise<Owner> =>

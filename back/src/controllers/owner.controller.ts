@@ -59,7 +59,6 @@ export const createOwner = async (request: Request, response: Response): Promise
       phone: body.phone,
       email: typeof body.email === 'string' ? body.email : null,
       address: typeof body.address === 'string' ? body.address : null,
-      authUserId: typeof body.authUserId === 'string' ? body.authUserId : null,
     });
     await AuditService.record({
       actorUserId: request.user!.id,
@@ -90,7 +89,6 @@ export const updateOwner = async (request: Request, response: Response): Promise
       phone: typeof body.phone === 'string' ? body.phone : undefined,
       email: body.email === null || typeof body.email === 'string' ? body.email : undefined,
       address: body.address === null || typeof body.address === 'string' ? body.address : undefined,
-      authUserId: body.authUserId === null || typeof body.authUserId === 'string' ? body.authUserId : undefined,
     });
     await AuditService.record({
       actorUserId: request.user!.id,
