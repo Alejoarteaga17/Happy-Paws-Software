@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createOwner, getOwners, updateOwner } from '../src/services/owner-service';
+import { createOwner, deleteOwner, getOwners, updateOwner } from '../src/services/owner-service';
 
 vi.mock('../src/services/supabase-client', () => ({
   isSupabaseConfigured: true,
@@ -51,5 +51,22 @@ describe('owner service', () => {
     );
 
     await expect(createOwner({ fullName: 'Ana', phone: '300' })).rejects.toThrow('Duplicado');
+  });
+
+  it('deletes an owner through the API', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            success: true,
+            data: { id: 7, fullName: 'Ana', deletedPets: 2 },
+            error: null,
+          }),
+        ),
+      ),
+    );
+
+    await expect(deleteOwner(7)).resolves.toEqual({ id: 7, fullName: 'Ana', deletedPets: 2 });
   });
 });

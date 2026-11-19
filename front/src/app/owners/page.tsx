@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from 'react';
 import AppHeader from '../../components/app-header';
 import RestrictedView from '../../components/restricted-view';
-import { createOwner, getOwners, updateOwner, updateOwnerStatus } from '../../services/owner-service';
+import { createOwner, deleteOwner, getOwners, updateOwner } from '../../services/owner-service';
 import { Owner, OwnerInput } from '../../types/owner';
 import { RoleView } from '../../context/auth-context';
 
@@ -24,6 +24,8 @@ function OwnersTable() {
   const [success, setSuccess] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [visibleLimit, setVisibleLimit] = useState(visiblePageSize);
+  const [ownerToDelete, setOwnerToDelete] = useState<Owner | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<'fullName' | 'phone' | 'email', string>>>({});
   const visibleOwners = owners.slice(0, visibleLimit);
 
@@ -58,6 +60,29 @@ function OwnersTable() {
   const updateField = (field: 'fullName' | 'phone' | 'email', value: string) => {
     setForm((current) => ({ ...current, [field]: value }));
     setFieldErrors((current) => ({ ...current, [field]: validateField(field, value) }));
+  };
+
+  const confirmDelete = async () => {
+    if (!ownerToDelete) return;
+    setDeleting(true);
+    setError(null);
+    setSuccess(null);
+    try {
+      const result = await deleteOwner(ownerToDelete.id);
+      setOwnerToDelete(null);
+      setSuccess(
+        `Propietario eliminado correctamente. También se eliminaron ${result.deletedPets} mascota(s) asociada(s).`,
+      );
+      if (editingId === ownerToDelete.id) {
+        setEditingId(null);
+        setForm({ fullName: '', phone: '', email: '', address: '' });
+      }
+      await load();
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'No se pudo eliminar el propietario.');
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const load = () =>
@@ -205,17 +230,8 @@ function OwnersTable() {
                       Editar
                     </button>
                     <RoleView permission="manage_users">
-                      <button
-                        className="text-button danger-button"
-                        onClick={() =>
-                          void updateOwnerStatus(owner.id, false)
-                            .then(load)
-                            .catch((reason) =>
-                              setError(reason instanceof Error ? reason.message : 'No se pudo eliminar'),
-                            )
-                        }
-                      >
-                        Desactivar
+                      <button className="text-button danger-button" onClick={() => setOwnerToDelete(owner)}>
+                        Eliminar
                       </button>
                     </RoleView>
                   </td>
@@ -245,6 +261,42 @@ function OwnersTable() {
           {!owners.length && !error && <p className="empty">No hay propietarios disponibles.</p>}
         </section>
       </section>
+      {ownerToDelete && (
+        <div className="owner-delete-overlay" role="presentation">
+          <section
+            className="owner-delete-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="owner-delete-title"
+            aria-describedby="owner-delete-description"
+          >
+            <p className="eyebrow">Confirmar eliminación</p>
+            <h2 id="owner-delete-title">¿Eliminar a {ownerToDelete.fullName}?</h2>
+            <p id="owner-delete-description">
+              Esta acción eliminará permanentemente al propietario y todas las mascotas asociadas, junto con sus citas y
+              registros vinculados. Esta acción no se puede deshacer.
+            </p>
+            <div className="owner-delete-actions">
+              <button
+                type="button"
+                className="secondary-button"
+                disabled={deleting}
+                onClick={() => setOwnerToDelete(null)}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="danger-button-solid"
+                disabled={deleting}
+                onClick={() => void confirmDelete()}
+              >
+                {deleting ? 'Eliminando...' : 'Sí, eliminar'}
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
     </main>
   );
 }

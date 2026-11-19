@@ -1,11 +1,25 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { AuditService } from '../src/services/audit.service';
 import { OwnerService } from '../src/services/owner.service';
-import { createOwner, getOwner, listOwners, updateOwner, updateOwnerStatus } from '../src/controllers/owner.controller';
+import {
+  createOwner,
+  deleteOwner,
+  getOwner,
+  listOwners,
+  updateOwner,
+  updateOwnerStatus,
+} from '../src/controllers/owner.controller';
 
 jest.mock('../src/services/audit.service', () => ({ AuditService: { record: jest.fn() } }));
 jest.mock('../src/services/owner.service', () => ({
-  OwnerService: { list: jest.fn(), getById: jest.fn(), create: jest.fn(), update: jest.fn(), setActive: jest.fn() },
+  OwnerService: {
+    list: jest.fn(),
+    getById: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    setActive: jest.fn(),
+    delete: jest.fn(),
+  },
 }));
 
 const mockedOwner = jest.mocked(OwnerService);
@@ -110,5 +124,17 @@ describe('owner controller', () => {
       mock as never,
     );
     expect(result.statusCode).toBe(200);
+  });
+
+  it('deletes an owner and reports associated pets', async () => {
+    mockedOwner.delete.mockResolvedValue({ id: 7, fullName: 'Ana', deletedPets: 2 } as never);
+    const { mock, result } = response();
+    await deleteOwner({ params: { id: '7' }, user: { id: 'u1' } } as never, mock as never);
+    expect(result.statusCode).toBe(200);
+    expect(result.body).toEqual(
+      expect.objectContaining({
+        data: expect.objectContaining({ deletedPets: 2 }),
+      }),
+    );
   });
 });

@@ -63,3 +63,5 @@ export const updateOwner = (id: number, input: Partial<OwnerInput>): Promise<Own
   request<Owner>(`/${id}`, { method: 'PUT', body: JSON.stringify(input) });
 export const updateOwnerStatus = (id: number, active: boolean): Promise<Owner> =>
   request<Owner>(`/${id}/status`, { method: 'PATCH', body: JSON.stringify({ active }) });
+export const deleteOwner = (id: number): Promise<{ id: number; fullName: string; deletedPets: number }> =>
+  request<{ id: number; fullName: string; deletedPets: number }>(`/${id}`, { method: 'DELETE' });

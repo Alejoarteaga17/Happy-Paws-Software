@@ -98,4 +98,40 @@ export class OwnerService {
     if (!data) throw new Error('OWNER_NOT_FOUND');
     return toOwner(data);
   }
+
+  static async delete(id: number) {
+    const supabase = getSupabaseClient();
+    const { data: owner, error: ownerLookupError } = await supabase
+      .from('owners')
+      .select('id, auth_user_id, full_name')
+      .eq('id', id)
+      .maybeSingle();
+    if (ownerLookupError) throw new Error(`OWNER_DELETE_FAILED: ${ownerLookupError.message}`);
+    if (!owner) throw new Error('OWNER_NOT_FOUND');
+
+    const { count, error: petCountError } = await supabase
+      .from('pets')
+      .select('id', { count: 'exact', head: true })
+      .eq('owner_id', id);
+    if (petCountError) throw new Error(`OWNER_DELETE_FAILED: ${petCountError.message}`);
+
+    const { error: petDeleteError } = await supabase.from('pets').delete().eq('owner_id', id);
+    if (petDeleteError) throw new Error(`OWNER_DELETE_FAILED: ${petDeleteError.message}`);
+
+    const { data: deletedOwner, error: ownerDeleteError } = await supabase
+      .from('owners')
+      .delete()
+      .eq('id', id)
+      .select('id')
+      .maybeSingle();
+    if (ownerDeleteError) throw new Error(`OWNER_DELETE_FAILED: ${ownerDeleteError.message}`);
+    if (!deletedOwner) throw new Error('OWNER_NOT_FOUND');
+
+    if (owner.auth_user_id) {
+      const { error: authDeleteError } = await supabase.auth.admin.deleteUser(owner.auth_user_id);
+      if (authDeleteError) console.error('Linked owner auth account deletion failed:', authDeleteError.message);
+    }
+
+    return { id, fullName: owner.full_name as string, deletedPets: count ?? 0 };
+  }
 }
