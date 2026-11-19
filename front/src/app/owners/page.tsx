@@ -63,16 +63,17 @@ function OwnersTable() {
 
   const confirmDelete = async () => {
     if (!ownerToDelete) return;
+    const ownerBeingDeleted = ownerToDelete;
+    setOwnerToDelete(null);
     setDeleting(true);
     setError(null);
     setSuccess(null);
     try {
-      const result = await deleteOwner(ownerToDelete.id);
-      setOwnerToDelete(null);
+      const result = await deleteOwner(ownerBeingDeleted.id);
       setSuccess(
         `Propietario eliminado correctamente. También se eliminaron ${result.deletedPets} mascota(s) asociada(s).`,
       );
-      if (editingId === ownerToDelete.id) {
+      if (editingId === ownerBeingDeleted.id) {
         setEditingId(null);
         setForm({ fullName: '', phone: '', email: '', address: '' });
       }
