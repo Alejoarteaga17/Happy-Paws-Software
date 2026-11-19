@@ -56,9 +56,7 @@ function PetsManager() {
     setSaving(true);
     setMessage(null);
     try {
-      const input = {
-        ownerId: Number(form.ownerId),
-        petTag: form.petTag,
+      const basicFields = {
         name: form.name,
         species: form.species,
         breed: form.breed || undefined,
@@ -66,8 +64,18 @@ function PetsManager() {
         weight: form.weight ? Number(form.weight) : undefined,
         sex: form.sex ? (form.sex as 'MALE' | 'FEMALE' | 'UNKNOWN') : undefined,
       };
-      if (editingId === null) await createPet(input);
-      else await updatePet(editingId, input);
+      if (editingId === null) {
+        await createPet({
+          ownerId: Number(form.ownerId),
+          petTag: form.petTag,
+          ...basicFields,
+        });
+      } else {
+        await updatePet(editingId, {
+          ...basicFields,
+          ...(canManage ? { ownerId: Number(form.ownerId), petTag: form.petTag } : {}),
+        });
+      }
       setForm(emptyForm);
       setEditingId(null);
       setMessage(

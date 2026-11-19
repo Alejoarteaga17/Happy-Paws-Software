@@ -35,6 +35,7 @@ Se seleccionó **Node.js** como entorno de ejecución y **Express.js** como fram
 ### Base de Datos: PostgreSQL
 
 Se seleccionó **PostgreSQL** como sistema de gestión de bases de datos relacional para almacenar toda la información operativa del sistema.
+En la implementación actual, PostgreSQL se consume mediante **Supabase PostgreSQL gestionado** y el cliente `@supabase/supabase-js`; no se utiliza una instancia local ni Prisma ORM.
 
 **Justificación:**
 

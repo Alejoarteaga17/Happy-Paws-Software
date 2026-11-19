@@ -11,6 +11,7 @@ Las lecturas de vacunaciones no son anónimas. `GET /api/v1/portal/me` es la ún
 ## Rutas
 
 - Mascotas: `GET /api/v1/pets`, `POST /api/v1/pets` (consulta staff; creación ADMIN/RECEPTIONIST).
+- Actualización de mascotas: VET puede editar datos básicos, pero no `ownerId` ni `petTag`.
 - Citas: CRUD en `/api/v1/appointments` (staff).
 - Vacunaciones: `GET/POST /api/v1/vaccinations` (consulta staff; escritura ADMIN/VET).
 - Propietarios: `GET/POST/PUT /api/v1/owners`, `PATCH /api/v1/owners/:id/status` (staff; escritura ADMIN/RECEPTIONIST; desactivación ADMIN).

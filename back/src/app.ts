@@ -37,5 +37,5 @@ app.use('/api/v1/search', searchRouter);
 
 if (require.main === module) {
   const port = Number(process.env.PORT ?? 4000);
-  app.listen(port, () => console.log(`Happy Paws API listening on port ${port}`));
+  app.listen(port, () => process.stdout.write(`Happy Paws API listening on port ${port}\n`));
 }

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=add_circle,assignment,clinical_notes,contextual_token,event,event_available,group,history,manage_accounts,pending_actions,person_add,pets,search,task_alt,vaccines&display=optional');
+
 :root {
   --ink: #252525;
   --muted: #8a8a8a;
@@ -13,8 +15,8 @@
   --warning-soft: #fff6e6;
   --danger: #b5282d;
   --danger-soft: #ffeded;
-  --display: 'Newsreader', 'Quattrocento', Georgia, serif;
-  --title: 'Quattrocento', Georgia, serif;
+  --display: var(--font-newsreader), 'Quattrocento', Georgia, serif;
+  --title: var(--font-quattrocento), Georgia, serif;
   --body: 'Iosevka Charon Mono', 'SFMono-Regular', Consolas, monospace;
 }
 
@@ -27,9 +29,7 @@ html {
 body {
   margin: 0;
   color: var(--ink);
-  background:
-    radial-gradient(circle at 8% 0%, rgba(220, 232, 251, 0.52), transparent 28rem),
-    var(--background);
+  background: radial-gradient(circle at 8% 0%, rgba(220, 232, 251, 0.52), transparent 28rem), var(--background);
   font-family: var(--body);
   font-size: 14px;
   line-height: 1.4;
@@ -813,9 +813,7 @@ h3 {
   padding: 28px 32px;
   border: 1px solid #dce8fb;
   border-radius: 8px;
-  background:
-    radial-gradient(circle at 88% 18%, rgba(255, 255, 255, 0.9), transparent 13rem),
-    var(--primary-pale);
+  background: radial-gradient(circle at 88% 18%, rgba(255, 255, 255, 0.9), transparent 13rem), var(--primary-pale);
   box-shadow: 0 10px 26px rgba(48, 77, 120, 0.06);
 }
 .intro h2 {
@@ -993,8 +991,7 @@ h3 {
   overflow: hidden;
   background:
     radial-gradient(circle at 15% 20%, rgba(220, 232, 251, 0.95), transparent 24rem),
-    radial-gradient(circle at 88% 82%, rgba(235, 255, 248, 0.85), transparent 21rem),
-    var(--background);
+    radial-gradient(circle at 88% 82%, rgba(235, 255, 248, 0.85), transparent 21rem), var(--background);
 }
 .login-shell::before,
 .login-shell::after {

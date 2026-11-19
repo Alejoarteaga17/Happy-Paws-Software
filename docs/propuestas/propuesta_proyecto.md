@@ -113,11 +113,11 @@ El desarrollo de **Happy Paws Care Central** sigue un ciclo Agile iterativo estr
 | ID del Hito | Fecha Objetivo | Nombre del Hito | Descripción y Entregable Principal |
 | :---: | :---: | :--- | :--- |
 | **M1** | **20 de agosto de 2026** | **Configuración y Arquitectura** | **Completo local.** Repositorio, arquitectura, ERD y configuración documentada. |
-| **M2** | **03 de septiembre de 2026** | **Módulo de Mascotas y Propietarios** | **Parcial.** CRUD y búsqueda implementados; faltan `sex`, `updated_at` y medición < 2 s. |
+| **M2** | **03 de septiembre de 2026** | **Módulo de Mascotas y Propietarios** | **Parcial.** CRUD, `sex`, `updated_at` y búsqueda implementados; falta aplicar migraciones y medir < 2 s en staging. |
 | **M3** | **17 de septiembre de 2026** | **Registro de Consultas Clínicas** | **Completo local.** Notas estandarizadas vinculadas a cita, mascota y veterinario. |
 | **M4** | **01 de octubre de 2026** | **Seguimiento de Vacunaciones** | **Completo local.** Panel e indicadores de estado implementados y probados. |
 | **M5** | **08 de octubre de 2026** | **Portal de Propietarios y RBAC** | **Parcial.** Flujos implementados; falta certificación RLS y aislamiento en Supabase. |
-| **M6** | **23 de octubre de 2026** | **Staging y Finalización de QA** | **Pendiente externo.** Falta staging, E2E y aprobación ≥95 %. |
+| **M6** | **23 de octubre de 2026** | **Staging y Finalización de QA** | **Pendiente externo.** El entorno local pasa 64 pruebas backend y 28 frontend; faltan staging, E2E y aprobación ≥95 %. |
 | **M7** | **05 de noviembre de 2026** | **Entrega Final del Proyecto** | **Pendiente externo.** Falta UAT, aprobación del cliente y acta de aceptación. |
 
 La matriz detallada y la evidencia por requisito se mantienen en [`estado-requisitos.md`](./estado-requisitos.md).

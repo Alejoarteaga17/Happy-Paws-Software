@@ -1,3 +1,5 @@
+> **Documento histórico:** los prompts conservados más abajo representan iteraciones reales realizadas durante el diseño. El stack implementado actualmente es Next.js/React con CSS global, Express/TypeScript y Supabase/PostgreSQL gestionado; no Prisma ni Tailwind. Los criterios se deben contrastar con `docs/propuestas/estado-requisitos.md`.
+
 ## promt 1
 ### puntaje: 1/8
 Haz el sistema de gestión de citas, mascotas y vacunación para la clínica veterinaria Happy Paws Care Central.

@@ -387,6 +387,7 @@ El backend registra estas superficies autenticadas adicionales:
 - `GET /api/v1/portal/me`: dashboard aislado al OWNER autenticado.
 - El portal incluye `clinicalNotes`, pero solo para notas vinculadas a citas de mascotas del propietario autenticado; no permite mutaciones.
 - `GET /api/v1/users`, `GET /api/v1/users/:id`, `POST /api/v1/users`: administración ADMIN y RECEPTIONIST. `PATCH /api/v1/users/:id/role` y `PATCH /api/v1/users/:id/status` quedan reservados a ADMIN. La creación recibe `email`, `password`, `fullName`, `role` y, para propietarios, `ownerId`; el estado permite activar o desactivar el acceso.
+- `PUT /api/v1/pets/:id`: los VET pueden modificar datos básicos de la mascota, pero no `ownerId` ni `petTag`; la reasignación de propietario y el cambio de identificador quedan reservados a ADMIN y RECEPTIONIST.
 - `GET /api/v1/audit`: consulta de auditoría ADMIN, con `limit` opcional entre 1 y 200.
 - `GET /api/v1/search?q=...`: búsqueda global autenticada para ADMIN, VET y RECEPTIONIST. `q` debe tener entre 2 y 100 caracteres y devuelve resultados de propietarios y mascotas.
 - `GET /api/v1/clinical-notes`: consulta de notas clínicas autenticada para ADMIN, VET y RECEPTIONIST.

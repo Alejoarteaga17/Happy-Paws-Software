@@ -21,7 +21,7 @@ Esta política aplica a datos de propietarios, cuentas de usuario, mascotas, cit
 |---|---|
 | ADMIN | Gestión completa operativa, usuarios, auditoría y desactivación. |
 | RECEPTIONIST | Propietarios, mascotas, citas, búsqueda y creación/edición de usuarios permitidos; no cambia roles, desactiva usuarios ni administra notas clínicas. |
-| VET | Citas asignadas, notas clínicas propias, mascotas básicas y vacunaciones. |
+| VET | Citas asignadas, notas clínicas propias, mascotas básicas y vacunaciones. No puede reasignar propietario ni cambiar el `petTag`. |
 | OWNER | Solo lectura de sus mascotas, citas, vacunas y notas clínicas autorizadas. |
 
 ## Verificación antes de producción
