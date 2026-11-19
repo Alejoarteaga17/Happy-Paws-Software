@@ -8,12 +8,24 @@ const isPetSex = (value: unknown): value is PetSex => value === 'MALE' || value 
 const sendError = (response: Response, error: unknown, fallbackCode: string): void => {
   const code = error instanceof Error ? error.message : fallbackCode;
   if (code.startsWith('PET_PHOTO_UPLOAD_FAILED:')) {
+    const detail = code.replace('PET_PHOTO_UPLOAD_FAILED:', '').trim();
+    const lowerDetail = detail.toLowerCase();
+    const friendlyDetail =
+      lowerDetail.includes('row-level security') || lowerDetail.includes('policy')
+        ? 'el almacenamiento no tiene permisos configurados.'
+        : lowerDetail.includes('bucket') || lowerDetail.includes('not found')
+          ? 'el almacén de imágenes no está disponible.'
+          : lowerDetail.includes('mime') || lowerDetail.includes('content type')
+            ? 'usa una imagen JPG, PNG o WEBP.'
+            : lowerDetail.includes('size') || lowerDetail.includes('too large')
+              ? 'la imagen supera el límite de 5 MB.'
+              : detail;
     response.status(500).json({
       success: false,
       data: null,
       error: {
         code: 'PET_PHOTO_UPLOAD_FAILED',
-        message: `No se pudo montar la foto: ${code.replace('PET_PHOTO_UPLOAD_FAILED:', '').trim()}`,
+        message: `No se pudo cargar la foto: ${friendlyDetail}`,
       },
     });
     return;

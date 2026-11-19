@@ -46,12 +46,38 @@ const toPet = (row: PetRow): Pet => ({
 
 export class PetService {
   private static async uploadPhoto(photoDataUrl: string): Promise<string> {
-    const match = /^data:(image\/(?:jpeg|png|webp));base64,(.+)$/s.exec(photoDataUrl);
-    if (!match) throw new Error('PET_PHOTO_INVALID_TYPE');
-    const contentType = match[1];
-    const base64 = match[2];
-    if (base64.length > 6_666_666) throw new Error('PET_PHOTO_TOO_LARGE');
-    const bytes = Buffer.from(base64, 'base64');
+    const commaIndex = photoDataUrl.indexOf(',');
+    if (!photoDataUrl.startsWith('data:image/') || commaIndex < 0) {
+      throw new Error('PET_PHOTO_INVALID_TYPE');
+    }
+    const base64 = photoDataUrl.slice(commaIndex + 1).replace(/\s/g, '');
+    if (!base64 || !/^[A-Za-z0-9+/]*={0,2}$/.test(base64)) {
+      throw new Error('PET_PHOTO_INVALID_TYPE');
+    }
+    let bytes: Buffer;
+    try {
+      bytes = Buffer.from(base64, 'base64');
+    } catch {
+      throw new Error('PET_PHOTO_INVALID_TYPE');
+    }
+    if (bytes.length > 5 * 1024 * 1024) throw new Error('PET_PHOTO_TOO_LARGE');
+    const isPng =
+      bytes.length >= 8 &&
+      bytes[0] === 0x89 &&
+      bytes[1] === 0x50 &&
+      bytes[2] === 0x4e &&
+      bytes[3] === 0x47 &&
+      bytes[4] === 0x0d &&
+      bytes[5] === 0x0a &&
+      bytes[6] === 0x1a &&
+      bytes[7] === 0x0a;
+    const isJpeg = bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+    const isWebp =
+      bytes.length >= 12 &&
+      bytes.subarray(0, 4).toString('ascii') === 'RIFF' &&
+      bytes.subarray(8, 12).toString('ascii') === 'WEBP';
+    if (!isPng && !isJpeg && !isWebp) throw new Error('PET_PHOTO_INVALID_TYPE');
+    const contentType = isPng ? 'image/png' : isJpeg ? 'image/jpeg' : 'image/webp';
     const extension = contentType === 'image/jpeg' ? 'jpg' : contentType === 'image/png' ? 'png' : 'webp';
     const path = `pets/${randomUUID()}.${extension}`;
     const supabase = getSupabaseClient();
