@@ -10,6 +10,10 @@ const sendError = (response: Response, error: unknown, fallbackCode: string): vo
   const message = error instanceof Error ? error.message : 'Error interno';
   const errors: Record<string, { status: number; message: string }> = {
     APPOINTMENT_NOT_FOUND: { status: 404, message: 'La cita no existe.' },
+    APPOINTMENT_TIME_IN_PAST: {
+      status: 400,
+      message: 'La fecha y hora de la cita deben ser actuales o futuras.',
+    },
     VET_NOT_FOUND: {
       status: 400,
       message: 'No hay un veterinario disponible. Configura un perfil con rol VET en Supabase.',

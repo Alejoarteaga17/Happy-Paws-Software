@@ -9,7 +9,7 @@ const appointmentRow = {
   id: 4,
   pet_id: 2,
   vet_id: 'vet-1',
-  scheduled_at: '2026-09-11T14:00:00Z',
+  scheduled_at: '2099-09-11T14:00:00Z',
   reason: 'Control',
   notes: null,
   status: 'SCHEDULED',
@@ -76,7 +76,7 @@ describe('AppointmentService', () => {
 
     await AppointmentService.create({
       petId: 2,
-      scheduledAt: '2026-09-11T14:00',
+      scheduledAt: '2099-09-11T14:00',
       reason: 'Control',
       vetId: 'vet-2',
     });
@@ -84,7 +84,7 @@ describe('AppointmentService', () => {
     expect(insert).toHaveBeenCalledWith(
       expect.objectContaining({
         vet_id: 'vet-2',
-        scheduled_at: new Date('2026-09-11T14:00').toISOString(),
+        scheduled_at: new Date('2099-09-11T14:00').toISOString(),
       }),
     );
   });
@@ -101,6 +101,16 @@ describe('AppointmentService', () => {
     } as never);
 
     await expect(AppointmentService.getById(999)).rejects.toThrow('APPOINTMENT_NOT_FOUND');
+  });
+
+  it('rejects appointments scheduled in the past', async () => {
+    const from = jest.fn();
+    mockedGetSupabaseClient.mockReturnValue({ from } as never);
+
+    await expect(
+      AppointmentService.create({ petId: 2, scheduledAt: '2000-09-11T14:00:00Z', reason: 'Control' }),
+    ).rejects.toThrow('APPOINTMENT_TIME_IN_PAST');
+    expect(from).not.toHaveBeenCalled();
   });
 
   it('marks past scheduled appointments as missed before listing them', async () => {

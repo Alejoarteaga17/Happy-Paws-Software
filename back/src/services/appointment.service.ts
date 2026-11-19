@@ -20,6 +20,12 @@ export interface AvailableVet {
 
 const appointmentSelect = 'id, pet_id, vet_id, scheduled_at, reason, notes, status, pets(name)';
 
+const ensureScheduledAtIsCurrentOrFuture = (scheduledAt: string): void => {
+  if (new Date(scheduledAt).getTime() < Date.now()) {
+    throw new Error('APPOINTMENT_TIME_IN_PAST');
+  }
+};
+
 const getPetName = (pets: AppointmentRow['pets']): string | undefined =>
   Array.isArray(pets) ? pets[0]?.name : pets?.name;
 
@@ -85,6 +91,7 @@ export class AppointmentService {
 
   static async create(input: CreateAppointmentInput): Promise<Appointment> {
     const supabase = getSupabaseClient();
+    ensureScheduledAtIsCurrentOrFuture(input.scheduledAt);
     const { vetId: requestedVetId } = input;
     let vetId = requestedVetId;
 
@@ -144,7 +151,10 @@ export class AppointmentService {
   static async update(id: number, input: UpdateAppointmentInput): Promise<Appointment> {
     const updateData: Record<string, number | string | null> = {};
     if (input.petId !== undefined) updateData.pet_id = input.petId;
-    if (input.scheduledAt !== undefined) updateData.scheduled_at = new Date(input.scheduledAt).toISOString();
+    if (input.scheduledAt !== undefined) {
+      ensureScheduledAtIsCurrentOrFuture(input.scheduledAt);
+      updateData.scheduled_at = new Date(input.scheduledAt).toISOString();
+    }
     if (input.reason !== undefined) updateData.reason = input.reason;
     if (input.notes !== undefined) updateData.notes = input.notes.trim() || null;
     if (input.vetId !== undefined) updateData.vet_id = input.vetId;

@@ -24,6 +24,11 @@ const labels: Record<AppointmentStatus, string> = {
   MISSED: 'No atendida',
 };
 const emptyForm: AppointmentInput = { petId: 0, scheduledAt: '', reason: '', notes: '', status: 'SCHEDULED' };
+const padTimeUnit = (value: number): string => String(value).padStart(2, '0');
+const toDateTimeLocalValue = (date: Date): string =>
+  `${date.getFullYear()}-${padTimeUnit(date.getMonth() + 1)}-${padTimeUnit(date.getDate())}T${padTimeUnit(
+    date.getHours(),
+  )}:${padTimeUnit(date.getMinutes())}`;
 const formatDate = (value: string) =>
   new Intl.DateTimeFormat('es-CO', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
 const temporalLabel = (appointment: Appointment): string =>
@@ -82,6 +87,15 @@ function AppointmentsManager() {
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const scheduledAtIsPast = new Date(form.scheduledAt).getTime() < Date.now();
+    if (scheduledAtIsPast) {
+      setMessage(
+        editingId === null
+          ? 'No se pudo crear la cita: selecciona una fecha y hora posteriores a la actual.'
+          : 'No se pudo actualizar la cita: selecciona una fecha y hora posteriores a la actual.',
+      );
+      return;
+    }
     setSaving(true);
     try {
       if (editingId === null) await createAppointment(form);
@@ -90,8 +104,8 @@ function AppointmentsManager() {
       setEditingId(null);
       setMessage('La cita fue guardada correctamente.');
       await loadAppointments();
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'No se pudo guardar la cita');
+    } catch {
+      setMessage(editingId === null ? 'No se pudo crear la cita.' : 'No se pudo actualizar la cita.');
     } finally {
       setSaving(false);
     }
@@ -155,9 +169,15 @@ function AppointmentsManager() {
             </label>
             <label>
               Fecha y hora
+              {form.scheduledAt && new Date(form.scheduledAt).getTime() < Date.now() && (
+                <span className="field-error" role="alert">
+                  Debes agendar la cita en una fecha y hora posteriores a la actual.
+                </span>
+              )}
               <input
                 type="datetime-local"
                 required
+                min={toDateTimeLocalValue(new Date())}
                 value={form.scheduledAt}
                 onChange={(event) => setForm({ ...form, scheduledAt: event.target.value })}
               />
