@@ -25,7 +25,7 @@ const sendError = (response: Response, error: unknown, fallbackCode: string): vo
     data: null,
     error: {
       code: mappedError ? message : fallbackCode,
-      message: mappedError?.message ?? 'No se pudo completar la operación. Intenta nuevamente.',
+      message: mappedError?.message ?? message,
     },
   });
 };
@@ -84,12 +84,16 @@ export const createAppointment = async (request: Request, response: Response): P
   }
   try {
     const data = await AppointmentService.create(body as unknown as CreateAppointmentInput);
-    await AuditService.record({
-      actorUserId: request.user!.id,
-      action: 'CREATE',
-      entityName: 'appointments',
-      entityId: data.id,
-    });
+    try {
+      await AuditService.record({
+        actorUserId: request.user!.id,
+        action: 'CREATE',
+        entityName: 'appointments',
+        entityId: data.id,
+      });
+    } catch (auditError) {
+      console.error('Appointment audit log failed:', auditError);
+    }
     response.status(201).json({ success: true, data, error: null });
   } catch (error) {
     sendError(response, error, 'APPOINTMENT_CREATE_FAILED');
