@@ -146,12 +146,16 @@ export const cancelAppointment = async (request: Request, response: Response): P
   }
   try {
     const data = await AppointmentService.cancel(id);
-    await AuditService.record({
-      actorUserId: request.user!.id,
-      action: 'CANCEL',
-      entityName: 'appointments',
-      entityId: id,
-    });
+    try {
+      await AuditService.record({
+        actorUserId: request.user!.id,
+        action: 'CANCEL',
+        entityName: 'appointments',
+        entityId: id,
+      });
+    } catch (auditError) {
+      console.error('Appointment cancellation audit log failed:', auditError);
+    }
     response.json({ success: true, data, error: null });
   } catch (error) {
     sendError(response, error, 'APPOINTMENT_CANCEL_FAILED');
