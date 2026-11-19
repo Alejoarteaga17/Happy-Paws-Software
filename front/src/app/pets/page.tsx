@@ -94,7 +94,6 @@ function PetsManager() {
       <AppHeader />
       <header className="appointment-header">
         <div>
-          <p className="eyebrow">RF-01 · Pacientes</p>
           <h1>Registro de mascotas</h1>
           <p>Vincula cada paciente con su propietario para mantener su historia clínica organizada.</p>
         </div>

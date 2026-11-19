@@ -148,7 +148,6 @@ function AppointmentsManager() {
       <AppHeader />
       <header className="appointment-header">
         <div>
-          <p className="eyebrow">RF-04 · Agenda clínica</p>
           <h1>Gestión de citas</h1>
           <p>Organiza la atención veterinaria y conserva el historial de cada visita.</p>
         </div>
