@@ -12,6 +12,7 @@ const sendError = (response: Response, error: unknown, fallbackCode: string): vo
     OWNER_INACTIVE: { status: 400, message: 'No se puede asignar la mascota a un propietario inactivo.' },
     PET_TAG_ALREADY_EXISTS: { status: 409, message: 'El pet_tag ya está registrado.' },
     PET_NOT_FOUND: { status: 404, message: 'La mascota no existe.' },
+    PETS_LIST_FAILED: { status: 500, message: 'No se pudieron cargar las mascotas. Intenta nuevamente.' },
   };
 
   const mappedError = errors[code];

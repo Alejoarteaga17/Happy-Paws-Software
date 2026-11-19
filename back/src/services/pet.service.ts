@@ -19,6 +19,8 @@ interface PetRow {
 
 const petSelect =
   'id, owner_id, pet_tag, name, species, breed, birth_date, weight, sex, photo_url, created_at, updated_at, owners(full_name)';
+const petSelectWithoutPhotos =
+  'id, owner_id, pet_tag, name, species, breed, birth_date, weight, sex, created_at, updated_at, owners(full_name)';
 
 const toPet = (row: PetRow): Pet => ({
   id: row.id,
@@ -49,11 +51,22 @@ export class PetService {
   }
 
   static async list(): Promise<Pet[]> {
-    const { data, error } = await getSupabaseClient()
+    const firstResult = await getSupabaseClient()
       .from('pets')
       .select(petSelect)
       .is('deleted_at', null)
       .order('name', { ascending: true });
+    let data: unknown = firstResult.data;
+    let error = firstResult.error;
+    if (error?.code === '42703') {
+      const fallbackResult = await getSupabaseClient()
+        .from('pets')
+        .select(petSelectWithoutPhotos)
+        .is('deleted_at', null)
+        .order('name', { ascending: true });
+      data = fallbackResult.data;
+      error = fallbackResult.error;
+    }
 
     if (error) throw new Error(`PETS_LIST_FAILED: ${error.message}`);
     return (data as PetRow[]).map(toPet);
@@ -61,21 +74,28 @@ export class PetService {
 
   static async create(input: CreatePetInput): Promise<Pet> {
     await PetService.assertActiveOwner(input.ownerId);
-    const { data, error } = await getSupabaseClient()
-      .from('pets')
-      .insert({
-        owner_id: input.ownerId,
-        pet_tag: input.petTag.trim(),
-        name: input.name.trim(),
-        species: input.species.trim(),
-        breed: input.breed?.trim() || null,
-        birth_date: input.birthDate || null,
-        weight: input.weight ?? null,
-        sex: input.sex ?? null,
-        photo_url: input.photoUrl?.trim() || null,
-      })
-      .select(petSelect)
-      .single();
+    const values = {
+      owner_id: input.ownerId,
+      pet_tag: input.petTag.trim(),
+      name: input.name.trim(),
+      species: input.species.trim(),
+      breed: input.breed?.trim() || null,
+      birth_date: input.birthDate || null,
+      weight: input.weight ?? null,
+      sex: input.sex ?? null,
+      photo_url: input.photoUrl?.trim() || null,
+    };
+    let insertQuery = getSupabaseClient().from('pets').insert(values);
+    let firstResult = await insertQuery.select(petSelect).single();
+    let data: unknown = firstResult.data;
+    let error = firstResult.error;
+    if (error?.code === '42703') {
+      const { photo_url: _photoUrl, ...valuesWithoutPhoto } = values;
+      insertQuery = getSupabaseClient().from('pets').insert(valuesWithoutPhoto);
+      const fallbackResult = await insertQuery.select(petSelectWithoutPhotos).single();
+      data = fallbackResult.data;
+      error = fallbackResult.error;
+    }
 
     if (error || !data) {
       if (error?.code === '23503') throw new Error('OWNER_NOT_FOUND');
@@ -101,13 +121,21 @@ export class PetService {
     if (input.sex !== undefined) values.sex = input.sex;
     if (input.photoUrl !== undefined) values.photo_url = input.photoUrl?.trim() || null;
 
-    const { data, error } = await getSupabaseClient()
-      .from('pets')
-      .update(values)
-      .eq('id', id)
-      .is('deleted_at', null)
-      .select(petSelect)
-      .maybeSingle();
+    let updateQuery = getSupabaseClient().from('pets').update(values);
+    let firstResult = await updateQuery.eq('id', id).is('deleted_at', null).select(petSelect).maybeSingle();
+    let data: unknown = firstResult.data;
+    let error = firstResult.error;
+    if (error?.code === '42703') {
+      const { photo_url: _photoUrl, ...valuesWithoutPhoto } = values;
+      updateQuery = getSupabaseClient().from('pets').update(valuesWithoutPhoto);
+      const fallbackResult = await updateQuery
+        .eq('id', id)
+        .is('deleted_at', null)
+        .select(petSelectWithoutPhotos)
+        .maybeSingle();
+      data = fallbackResult.data;
+      error = fallbackResult.error;
+    }
     if (error) {
       if (error.code === '23503') throw new Error('OWNER_NOT_FOUND');
       if (error.code === '23505') throw new Error('PET_TAG_ALREADY_EXISTS');
@@ -118,12 +146,24 @@ export class PetService {
   }
 
   static async setDeleted(id: number, deleted: boolean): Promise<Pet> {
-    const { data, error } = await getSupabaseClient()
+    const firstResult = await getSupabaseClient()
       .from('pets')
       .update({ deleted_at: deleted ? new Date().toISOString() : null })
       .eq('id', id)
       .select(petSelect)
       .maybeSingle();
+    let data: unknown = firstResult.data;
+    let error = firstResult.error;
+    if (error?.code === '42703') {
+      const fallbackResult = await getSupabaseClient()
+        .from('pets')
+        .update({ deleted_at: deleted ? new Date().toISOString() : null })
+        .eq('id', id)
+        .select(petSelectWithoutPhotos)
+        .maybeSingle();
+      data = fallbackResult.data;
+      error = fallbackResult.error;
+    }
     if (error) throw new Error(`PET_DELETE_FAILED: ${error.message}`);
     if (!data) throw new Error('PET_NOT_FOUND');
     return toPet(data as PetRow);
