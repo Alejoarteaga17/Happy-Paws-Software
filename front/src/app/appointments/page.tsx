@@ -151,9 +151,6 @@ function AppointmentsManager() {
           <h1>Gestión de citas</h1>
           <p>Organiza la atención veterinaria y conserva el historial de cada visita.</p>
         </div>
-        <a className="back-link" href="/vaccinations">
-          Ver vacunaciones
-        </a>
       </header>
       <section className="appointment-layout">
         <RoleView permission="manage_appointments">

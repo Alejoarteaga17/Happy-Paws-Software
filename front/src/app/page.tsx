@@ -210,43 +210,45 @@ export default function SummaryPage() {
                   </div>
                 )}
               </section>
-              <section className="summary-panel summary-care">
-                <div className="summary-panel-heading">
-                  <div>
-                    <p className="eyebrow">Control preventivo</p>
-                    <h2>Cuidados pendientes</h2>
+              <RoleView permission="manage_vaccinations">
+                <section className="summary-panel summary-care">
+                  <div className="summary-panel-heading">
+                    <div>
+                      <p className="eyebrow">Control preventivo</p>
+                      <h2>Cuidados pendientes</h2>
+                    </div>
+                    <a href="/vaccinations">Módulo</a>
                   </div>
-                  <a href="/vaccinations">Módulo</a>
-                </div>
-                {upcomingCare.length ? (
-                  <ul>
-                    {upcomingCare.map((vaccination) => (
-                      <li className="summary-list-row" key={vaccination.id}>
-                        <span className={`care-icon ${vaccination.status === 'OVERDUE' ? 'overdue' : ''}`}>
-                          <span className="material-symbols-outlined">vaccines</span>
-                        </span>
-                        <div>
-                          <strong>{vaccination.petName}</strong>
-                          <span>{vaccination.vaccineName}</span>
-                          <span>{formatShortDate(vaccination.nextDueDate)}</span>
-                        </div>
-                        <span
-                          className={`status ${vaccination.status === 'OVERDUE' ? 'status-overdue' : 'status-pending'}`}
-                        >
-                          {vaccination.status === 'OVERDUE' ? 'Vencida' : 'Próxima'}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <div className="summary-empty">
-                    <span className="material-symbols-outlined">task_alt</span>
-                    <strong>Todo está al día</strong>
-                    <span>No hay cuidados pendientes.</span>
-                  </div>
-                )}
-                <p className="summary-note">Los recordatorios automáticos por SMS/email quedan fuera del MVP.</p>
-              </section>
+                  {upcomingCare.length ? (
+                    <ul>
+                      {upcomingCare.map((vaccination) => (
+                        <li className="summary-list-row" key={vaccination.id}>
+                          <span className={`care-icon ${vaccination.status === 'OVERDUE' ? 'overdue' : ''}`}>
+                            <span className="material-symbols-outlined">vaccines</span>
+                          </span>
+                          <div>
+                            <strong>{vaccination.petName}</strong>
+                            <span>{vaccination.vaccineName}</span>
+                            <span>{formatShortDate(vaccination.nextDueDate)}</span>
+                          </div>
+                          <span
+                            className={`status ${vaccination.status === 'OVERDUE' ? 'status-overdue' : 'status-pending'}`}
+                          >
+                            {vaccination.status === 'OVERDUE' ? 'Vencida' : 'Próxima'}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div className="summary-empty">
+                      <span className="material-symbols-outlined">task_alt</span>
+                      <strong>Todo está al día</strong>
+                      <span>No hay cuidados pendientes.</span>
+                    </div>
+                  )}
+                  <p className="summary-note">Los recordatorios automáticos por SMS/email quedan fuera del MVP.</p>
+                </section>
+              </RoleView>
             </section>
           </>
         )}

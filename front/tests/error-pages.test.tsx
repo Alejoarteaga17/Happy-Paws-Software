@@ -21,7 +21,7 @@ describe('error pages', () => {
     expect(markup).toContain('Error 404');
     expect(markup).toContain('Esta huella se perdió');
     expect(markup).toContain('href="/"');
-    expect(markup).toContain('href="/vaccinations"');
+    expect(markup).not.toContain('href="/vaccinations"');
   });
 
   it('renders the runtime error recovery actions', () => {

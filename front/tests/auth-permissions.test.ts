@@ -20,5 +20,6 @@ describe('role permission matrix', () => {
     expect(navigationItems.find((item) => item.href === '/audit')?.roles).toEqual(['ADMIN']);
     expect(navigationItems.find((item) => item.href === '/users')?.roles).toEqual(['ADMIN']);
     expect(navigationItems.find((item) => item.href === '/appointments')?.roles).not.toContain('OWNER');
+    expect(navigationItems.find((item) => item.href === '/vaccinations')?.roles).not.toContain('RECEPTIONIST');
   });
 });

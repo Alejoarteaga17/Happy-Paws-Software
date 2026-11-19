@@ -11,7 +11,7 @@ export const navigationItems = [
   { href: '/portal', label: 'Mi portal', icon: 'pets', roles: ['OWNER'] },
   { href: '/pets', label: 'Pacientes', icon: 'pets', roles: ['ADMIN', 'RECEPTIONIST', 'VET'] },
   { href: '/appointments', label: 'Agenda', icon: 'assignment', roles: ['ADMIN', 'RECEPTIONIST', 'VET'] },
-  { href: '/vaccinations', label: 'Vacunaciones', icon: 'vaccines', roles: ['ADMIN', 'VET', 'RECEPTIONIST'] },
+  { href: '/vaccinations', label: 'Vacunaciones', icon: 'vaccines', roles: ['ADMIN', 'VET'] },
   { href: '/owners', label: 'Propietarios', icon: 'group', roles: ['ADMIN', 'RECEPTIONIST'] },
   { href: '/search', label: 'Buscar', icon: 'search', roles: ['ADMIN', 'RECEPTIONIST', 'VET'] },
   { href: '/clinical-notes', label: 'Notas clínicas', icon: 'clinical_notes', roles: ['ADMIN', 'VET'] },
@@ -110,7 +110,9 @@ export default function AppHeader() {
             onClick={() => setProfileMenuOpen((open) => !open)}
           >
             <UserAvatar seed={profile.email || profile.id} label={profile.fullName} />
-            <span className="profile-chevron" aria-hidden="true">▼</span>
+            <span className="profile-chevron" aria-hidden="true">
+              ▼
+            </span>
           </button>
           {profileMenuOpen && (
             <section className="profile-menu" id="profile-menu" aria-label="Perfil de usuario">

@@ -17,9 +17,6 @@ export default function NotFound() {
           <Link className="primary-button" href="/">
             Volver al panel
           </Link>
-          <Link className="secondary-button" href="/vaccinations">
-            Ver vacunaciones
-          </Link>
         </div>
       </section>
     </main>

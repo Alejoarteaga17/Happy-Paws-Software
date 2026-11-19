@@ -9,6 +9,7 @@ import { Pet } from '../types/pet';
 import AppHeader from './app-header';
 import { Icon, StatusBadge } from './ui';
 import { RoleView } from '../context/auth-context';
+import RestrictedView from './restricted-view';
 
 const statusLabels: Record<VaccinationStatus, string> = {
   ADMINISTERED: 'Aplicada',
@@ -46,7 +47,7 @@ function VaccinationRow({ vaccination }: { vaccination: Vaccination }) {
   );
 }
 
-export default function VaccinationDashboard() {
+function VaccinationDashboardContent() {
   const [vaccinations, setVaccinations] = useState<Vaccination[]>([]);
   const [pets, setPets] = useState<Pet[]>([]);
   const [filter, setFilter] = useState<'ALL' | VaccinationStatus>('ALL');
@@ -314,5 +315,13 @@ export default function VaccinationDashboard() {
         </div>
       )}
     </main>
+  );
+}
+
+export default function VaccinationDashboard() {
+  return (
+    <RestrictedView permission="manage_vaccinations">
+      <VaccinationDashboardContent />
+    </RestrictedView>
   );
 }
