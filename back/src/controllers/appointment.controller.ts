@@ -125,13 +125,17 @@ export const updateAppointment = async (request: Request, response: Response): P
   }
   try {
     const data = await AppointmentService.update(id, body as UpdateAppointmentInput);
-    await AuditService.record({
-      actorUserId: request.user!.id,
-      action: 'UPDATE',
-      entityName: 'appointments',
-      entityId: id,
-      metadata: { fields: Object.keys(body) },
-    });
+    try {
+      await AuditService.record({
+        actorUserId: request.user!.id,
+        action: 'UPDATE',
+        entityName: 'appointments',
+        entityId: id,
+        metadata: { fields: Object.keys(body) },
+      });
+    } catch (auditError) {
+      console.error('Appointment update audit log failed:', auditError);
+    }
     response.json({ success: true, data, error: null });
   } catch (error) {
     sendError(response, error, 'APPOINTMENT_UPDATE_FAILED');

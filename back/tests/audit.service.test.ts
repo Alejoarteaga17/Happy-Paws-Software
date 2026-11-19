@@ -20,6 +20,7 @@ describe('AuditService', () => {
     expect(insert).toHaveBeenCalledWith({
       actor_user_id: 'admin-1',
       action: 'UPDATE_ROLE',
+      table_name: 'profiles',
       entity_name: 'profiles',
       entity_id: '7',
       metadata: {},

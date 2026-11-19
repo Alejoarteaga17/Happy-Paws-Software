@@ -15,6 +15,7 @@ export class AuditService {
       .insert({
         actor_user_id: entry.actorUserId,
         action: entry.action,
+        table_name: entry.entityName,
         entity_name: entry.entityName,
         entity_id: entry.entityId === undefined ? null : String(entry.entityId),
         metadata: entry.metadata ?? {},
