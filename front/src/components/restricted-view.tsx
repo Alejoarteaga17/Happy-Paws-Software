@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import AppHeader from './app-header';
 import { Permission, useAuth } from '../context/auth-context';
 

@@ -59,8 +59,9 @@ Los issues de GitHub relacionados continúan abiertos; esta matriz registra el e
 
 En el repositorio pasan actualmente:
 
-- Backend: 64 pruebas y build TypeScript; ESLint, Prettier y audit de producción sin vulnerabilidades.
-- Frontend: 28 pruebas y build Next.js; ESLint y Prettier sin warnings ni errores; audit de producción sin vulnerabilidades.
+- Backend: 84 pruebas, build TypeScript y cobertura global medida de 75.32 %.
+- Frontend: 36 pruebas y build Next.js; cobertura global medida de 17.63 % y 92.03 % en servicios críticos.
+- Las pantallas Next tienen cobertura limitada por las suites unitarias actuales; Playwright cubrirá los flujos completos contra staging.
 - Playwright: 2 casos RBAC descubiertos; su ejecución requiere navegador instalado, URL de staging y credenciales sintéticas.
 
 La cobertura no cumple todavía el objetivo documental de 90 % para código crítico. Los warnings existentes de fuentes y `console` no bloquean la validación, pero deben limpiarse antes de la entrega final si el criterio de calidad exige cero warnings.

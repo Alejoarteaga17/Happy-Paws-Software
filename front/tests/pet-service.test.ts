@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createPet, getPets } from '../src/services/pet-service';
+import { createPet, deletePet, getPets, updatePet } from '../src/services/pet-service';
 
 vi.mock('../src/services/supabase-client', () => ({
   isSupabaseConfigured: true,
@@ -53,5 +53,20 @@ describe('pet service', () => {
         body: JSON.stringify({ ownerId: 1, petTag: 'HP-1', name: 'Luna', species: 'Gato' }),
       }),
     );
+  });
+
+  it('serializes sex when updating and deleting a pet', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({ success: true, data: { id: 1, sex: 'MALE' }, error: null })),
+        )
+        .mockResolvedValueOnce(new Response(JSON.stringify({ success: true, data: { id: 1 }, error: null }))),
+    );
+
+    await expect(updatePet(1, { sex: 'MALE' })).resolves.toEqual({ id: 1, sex: 'MALE' });
+    await expect(deletePet(1)).resolves.toEqual({ id: 1 });
   });
 });

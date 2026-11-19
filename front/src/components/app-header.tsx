@@ -1,11 +1,12 @@
 'use client';
 
+import React from 'react';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { BrandMark, Icon, UserAvatar } from './ui';
 import { useAuth, UserRole } from '../context/auth-context';
 
-const navigationItems = [
+export const navigationItems = [
   { href: '/', label: 'Resumen', icon: 'contextual_token', roles: ['ADMIN', 'VET', 'RECEPTIONIST'] },
   { href: '/portal', label: 'Mi portal', icon: 'pets', roles: ['OWNER'] },
   { href: '/pets', label: 'Pacientes', icon: 'pets', roles: ['ADMIN', 'RECEPTIONIST', 'VET'] },

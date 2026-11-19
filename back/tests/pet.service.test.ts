@@ -26,6 +26,8 @@ describe('PetService', () => {
           breed: null,
           birth_date: null,
           weight: 4.2,
+          sex: 'FEMALE',
+          updated_at: '2026-09-11T10:00:00Z',
           owners: [{ full_name: 'Ana Perez' }],
         },
       ],
@@ -46,6 +48,8 @@ describe('PetService', () => {
         breed: null,
         birthDate: null,
         weight: 4.2,
+        sex: 'FEMALE',
+        updatedAt: '2026-09-11T10:00:00Z',
       },
     ]);
     expect(order).toHaveBeenCalledWith('name', { ascending: true });
@@ -64,6 +68,8 @@ describe('PetService', () => {
         breed: null,
         birth_date: null,
         weight: null,
+        sex: 'MALE',
+        updated_at: '2026-09-11T10:00:00Z',
         owners: [{ full_name: 'Ana Perez' }],
       },
       error: null,
