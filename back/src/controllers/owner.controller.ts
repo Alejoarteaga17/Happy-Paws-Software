@@ -40,24 +40,48 @@ export const getOwner = async (request: Request, response: Response): Promise<vo
 
 export const createOwner = async (request: Request, response: Response): Promise<void> => {
   const body = request.body as Record<string, unknown>;
-  if (
-    typeof body.fullName !== 'string' ||
-    !body.fullName.trim() ||
-    typeof body.phone !== 'string' ||
-    !body.phone.trim()
-  ) {
+  const fullName = typeof body.fullName === 'string' ? body.fullName.trim() : '';
+  const phone = typeof body.phone === 'string' ? body.phone.trim() : '';
+  const email = typeof body.email === 'string' ? body.email.trim() : '';
+  const phoneDigits = phone.replace(/\D/g, '');
+  if (!fullName || fullName.length < 3) {
     response.status(400).json({
       success: false,
       data: null,
-      error: { code: 'INVALID_OWNER', message: 'Nombre y teléfono son obligatorios.' },
+      error: {
+        code: 'INVALID_OWNER',
+        message: 'No se pudo crear el propietario: el nombre debe tener al menos 3 caracteres.',
+      },
+    });
+    return;
+  }
+  if (!phone || phoneDigits.length < 7 || phoneDigits.length > 15) {
+    response.status(400).json({
+      success: false,
+      data: null,
+      error: {
+        code: 'INVALID_OWNER',
+        message: 'No se pudo crear el propietario: ingresa un teléfono válido entre 7 y 15 dígitos.',
+      },
+    });
+    return;
+  }
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    response.status(400).json({
+      success: false,
+      data: null,
+      error: {
+        code: 'INVALID_OWNER',
+        message: 'No se pudo crear el propietario: el correo electrónico no tiene un formato válido.',
+      },
     });
     return;
   }
   try {
     const data = await OwnerService.create({
-      fullName: body.fullName,
-      phone: body.phone,
-      email: typeof body.email === 'string' ? body.email : null,
+      fullName,
+      phone,
+      email: email || null,
       address: typeof body.address === 'string' ? body.address : null,
     });
     try {
@@ -84,6 +108,42 @@ export const updateOwner = async (request: Request, response: Response): Promise
       success: false,
       data: null,
       error: { code: 'INVALID_OWNER', message: 'Datos de propietario inválidos.' },
+    });
+    return;
+  }
+  if (typeof body.fullName === 'string' && body.fullName.trim().length > 0 && body.fullName.trim().length < 3) {
+    response.status(400).json({
+      success: false,
+      data: null,
+      error: {
+        code: 'INVALID_OWNER',
+        message: 'No se pudo actualizar el propietario: el nombre debe tener al menos 3 caracteres.',
+      },
+    });
+    return;
+  }
+  if (typeof body.phone === 'string') {
+    const phoneDigits = body.phone.replace(/\D/g, '');
+    if (phoneDigits.length < 7 || phoneDigits.length > 15) {
+      response.status(400).json({
+        success: false,
+        data: null,
+        error: {
+          code: 'INVALID_OWNER',
+          message: 'No se pudo actualizar el propietario: ingresa un teléfono válido entre 7 y 15 dígitos.',
+        },
+      });
+      return;
+    }
+  }
+  if (typeof body.email === 'string' && body.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email.trim())) {
+    response.status(400).json({
+      success: false,
+      data: null,
+      error: {
+        code: 'INVALID_OWNER',
+        message: 'No se pudo actualizar el propietario: el correo electrónico no tiene un formato válido.',
+      },
     });
     return;
   }

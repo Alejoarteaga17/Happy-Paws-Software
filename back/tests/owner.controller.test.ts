@@ -28,6 +28,7 @@ const response = () => {
 describe('owner controller', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.mocked(AuditService.record).mockReset();
   });
 
   it('lists owners', async () => {
@@ -49,11 +50,25 @@ describe('owner controller', () => {
     expect(result.statusCode).toBe(400);
   });
 
+  it('rejects an invalid owner email with an explicit message', async () => {
+    const { mock, result } = response();
+    await createOwner(
+      { body: { fullName: 'Ana Perez', phone: '3001234567', email: 'correo-invalido' }, user: { id: 'u1' } } as never,
+      mock as never,
+    );
+    expect(result.statusCode).toBe(400);
+    expect(result.body).toEqual(
+      expect.objectContaining({
+        error: expect.objectContaining({ message: expect.stringContaining('correo electrónico') }),
+      }),
+    );
+  });
+
   it('creates an owner and audits it', async () => {
     mockedOwner.create.mockResolvedValue({ id: 7 } as never);
     const { mock, result } = response();
     await createOwner(
-      { body: { fullName: 'Ana', phone: '300', email: 'ana@example.com' }, user: { id: 'u1' } } as never,
+      { body: { fullName: 'Ana', phone: '3001234567', email: 'ana@example.com' }, user: { id: 'u1' } } as never,
       mock as never,
     );
     expect(result.statusCode).toBe(201);
@@ -65,7 +80,7 @@ describe('owner controller', () => {
     jest.mocked(AuditService.record).mockRejectedValueOnce(new Error('AUDIT_LOG_FAILED'));
     const { mock, result } = response();
     await createOwner(
-      { body: { fullName: 'Ana', phone: '300', email: 'ana@example.com' }, user: { id: 'u1' } } as never,
+      { body: { fullName: 'Ana', phone: '3001234567', email: 'ana@example.com' }, user: { id: 'u1' } } as never,
       mock as never,
     );
     expect(result.statusCode).toBe(201);
@@ -74,7 +89,10 @@ describe('owner controller', () => {
   it('updates an owner', async () => {
     mockedOwner.update.mockResolvedValue({ id: 7 } as never);
     const { mock, result } = response();
-    await updateOwner({ params: { id: '7' }, body: { phone: '301' }, user: { id: 'u1' } } as never, mock as never);
+    await updateOwner(
+      { params: { id: '7' }, body: { phone: '3007654321' }, user: { id: 'u1' } } as never,
+      mock as never,
+    );
     expect(result.statusCode).toBe(200);
   });
 

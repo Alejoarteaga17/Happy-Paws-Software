@@ -866,6 +866,10 @@ h3 {
   border-color: #6d91c5;
   box-shadow: 0 0 0 3px var(--primary-soft);
 }
+.appointment-form input[aria-invalid='true'] {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px var(--danger-soft);
+}
 .appointment-form textarea {
   resize: vertical;
 }
