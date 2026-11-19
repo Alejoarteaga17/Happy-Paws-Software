@@ -134,7 +134,9 @@ export class AppointmentService {
         throw new Error('VET_NOT_FOUND');
       }
 
-      throw new Error('APPOINTMENT_CREATE_FAILED');
+      throw new Error(
+        `APPOINTMENT_CREATE_FAILED: ${error?.code ?? 'UNKNOWN'} ${error?.message ?? 'No se pudo insertar la cita'}`,
+      );
     }
     return toAppointment(data as AppointmentRow);
   }
