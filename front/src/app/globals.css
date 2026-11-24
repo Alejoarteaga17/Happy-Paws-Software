@@ -538,6 +538,12 @@ h3 {
   .admin-grid {
     grid-template-columns: 1fr;
   }
+  .pet-details-grid {
+    grid-template-columns: 1fr;
+  }
+  .pet-details-modal {
+    padding: 22px 18px;
+  }
   .header-profile .text-button {
     display: none;
   }
@@ -1048,6 +1054,34 @@ h3 {
   gap: 18px;
   padding: 18px 0;
 }
+.portal-pet-trigger {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+.portal-pet-trigger:hover {
+  background: linear-gradient(90deg, var(--primary-pale), transparent);
+}
+.portal-pet-trigger:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
+}
+.portal-pet-trigger .material-symbols-outlined {
+  color: var(--primary);
+}
+.portal-pet-weight {
+  flex-shrink: 0;
+  color: var(--muted);
+  font-size: 11px;
+}
 .appointment-item:last-child,
 .vaccination-row:last-child {
   border-bottom: 0;
@@ -1274,6 +1308,45 @@ h3 {
   border-radius: 8px;
   background: var(--paper);
   box-shadow: 0 20px 60px rgba(37, 37, 37, 0.2);
+}
+.pet-details-modal {
+  animation: panel-enter 0.25s ease both;
+  width: min(100%, 560px);
+  max-height: min(90vh, 760px);
+  overflow: auto;
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  box-shadow: 0 20px 60px rgba(37, 37, 37, 0.2);
+}
+.pet-details-content {
+  display: grid;
+  gap: 22px;
+  margin-top: 24px;
+}
+.pet-details-photo {
+  width: 120px;
+  height: 120px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+.pet-details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 24px;
+  margin: 0;
+}
+.pet-details-grid dt {
+  margin-bottom: 5px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.pet-details-grid dd {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--title);
+  font-size: 17px;
 }
 .modal-header {
   display: flex;

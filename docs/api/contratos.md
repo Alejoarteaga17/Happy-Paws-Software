@@ -310,7 +310,7 @@ Registra una vacunación para una mascota existente.
 
 Los servicios del frontend están en `front/src/services` y usan `fetch`. La URL base se normaliza quitando la barra final y cada servicio conserva el envoltorio de respuesta de la API.
 
-La pantalla de resumen (`/`) compone los datos de `GET /api/v1/appointments`, `GET /api/v1/pets` y `GET /api/v1/vaccinations` para calcular las tarjetas, la agenda del día y los cuidados pendientes. El módulo completo de vacunaciones se encuentra en `/vaccinations`.
+La pantalla de resumen (`/`) compone los datos de `GET /api/v1/appointments` y `GET /api/v1/pets` para todo el personal. ADMIN y VET también consultan `GET /api/v1/vaccinations` para las métricas y los cuidados pendientes; RECEPTIONIST no consulta ni muestra esas métricas porque no tiene permiso para ver vacunaciones. El módulo completo de vacunaciones se encuentra en `/vaccinations`.
 
 Los estados de cita vigentes siguen siendo `SCHEDULED`, `COMPLETED` y `CANCELLED`; etiquetas visuales como “Check-in” o “En consulta” no se persisten ni se agregan al enum hasta que exista un flujo de negocio para diferenciarlas.
 

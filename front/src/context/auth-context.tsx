@@ -34,9 +34,9 @@ export type Permission =
   | 'manage_clinical_notes';
 
 export const permissions: Record<UserRole, Permission[]> = {
-  OWNER: ['view_owner_portal', 'view_appointments'],
+  OWNER: ['view_owner_portal'],
   RECEPTIONIST: ['manage_owners', 'manage_pets', 'manage_appointments', 'view_appointments', 'search_records'],
-  VET: ['edit_pets_basic', 'manage_vaccinations', 'search_records', 'manage_clinical_notes'],
+  VET: ['edit_pets_basic', 'view_appointments', 'manage_vaccinations', 'search_records', 'manage_clinical_notes'],
   ADMIN: [
     'manage_owners',
     'manage_pets',

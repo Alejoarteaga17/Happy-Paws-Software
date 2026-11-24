@@ -52,15 +52,21 @@ export const createClinicalNote = async (request: Request, response: Response): 
     response.status(201).json({ success: true, data, error: null });
   } catch (error) {
     const code = error instanceof Error ? error.message : 'CLINICAL_NOTE_CREATE_FAILED';
-    let status = 500;
-    if (code === 'APPOINTMENT_NOT_FOUND') status = 404;
-    if (code === 'APPOINTMENT_NOT_ASSIGNED') status = 403;
+    const knownErrors: Record<string, { status: number; message: string }> = {
+      APPOINTMENT_NOT_FOUND: { status: 404, message: 'La cita seleccionada no existe.' },
+      APPOINTMENT_NOT_ASSIGNED: {
+        status: 403,
+        message: 'Solo puedes registrar notas para citas asignadas a tu perfil.',
+      },
+    };
+    const knownError = knownErrors[code];
+    const status = knownError?.status ?? 500;
     response.status(status).json({
       success: false,
       data: null,
       error: {
-        code: status === 404 ? code : 'CLINICAL_NOTE_CREATE_FAILED',
-        message: 'No se pudo guardar la nota clínica.',
+        code: knownError ? code : 'CLINICAL_NOTE_CREATE_FAILED',
+        message: knownError?.message ?? 'No se pudo guardar la nota clínica.',
       },
     });
   }

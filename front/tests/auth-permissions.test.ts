@@ -3,10 +3,22 @@ import { permissions, UserRole } from '../src/context/auth-context';
 import { navigationItems } from '../src/components/app-header';
 
 const roleCases: Array<[UserRole, string[], string[]]> = [
-  ['ADMIN', ['manage_owners', 'manage_pets', 'manage_users', 'view_audit'], []],
+  [
+    'ADMIN',
+    ['manage_owners', 'manage_pets', 'manage_appointments', 'view_appointments', 'manage_users', 'view_audit'],
+    [],
+  ],
   ['RECEPTIONIST', ['manage_owners', 'manage_pets', 'search_records'], ['manage_users', 'view_audit']],
-  ['VET', ['edit_pets_basic', 'manage_vaccinations', 'manage_clinical_notes'], ['manage_owners', 'manage_users']],
-  ['OWNER', ['view_owner_portal'], ['manage_owners', 'manage_pets', 'view_audit', 'search_records']],
+  [
+    'VET',
+    ['edit_pets_basic', 'view_appointments', 'manage_vaccinations', 'manage_clinical_notes'],
+    ['manage_owners', 'manage_appointments', 'manage_users'],
+  ],
+  [
+    'OWNER',
+    ['view_owner_portal'],
+    ['manage_owners', 'manage_pets', 'view_appointments', 'view_audit', 'search_records'],
+  ],
 ];
 
 describe('role permission matrix', () => {

@@ -178,7 +178,8 @@ No crear badges o icon wrappers nuevos por pantalla. Extender los componentes co
 | Ruta | Referencia Figma | Responsabilidad |
 | --- | --- | --- |
 | `/login` | `Inicio de Sesion` | Autenticación con Supabase |
-| `/` | `Example Page` | Resumen operativo |
+| `/` | `Example Page` | Resumen operativo para el equipo clínico; los propietarios se redirigen a `/portal` |
+| `/portal` | Patrones de cards y paneles | Mascotas y atención de salud del propietario autenticado |
 | `/appointments` | Patrones de `COMPONENTS` y `Example Page` | Crear, editar y cancelar citas |
 | `/pets` | Patrones de cards y formularios | Registrar y listar mascotas |
 | `/vaccinations` | Patrones de `COMPONENTS` | Seguimiento y registro de vacunas |

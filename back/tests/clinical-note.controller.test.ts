@@ -61,6 +61,24 @@ describe('clinical note controllers', () => {
     expect(AuditService.record).toHaveBeenCalled();
   });
 
+  it('explains when a veterinarian selects an appointment assigned to someone else', async () => {
+    const { responseMock, result } = response();
+    mockedCreate.mockRejectedValueOnce(new Error('APPOINTMENT_NOT_ASSIGNED'));
+
+    await createClinicalNote(
+      vetRequest({ appointmentId: 4, diagnosis: 'Dermatitis', treatment: 'Baño' }) as never,
+      responseMock as never,
+    );
+
+    expect(result.statusCode).toBe(403);
+    expect(result.body).toMatchObject({
+      error: {
+        code: 'APPOINTMENT_NOT_ASSIGNED',
+        message: 'Solo puedes registrar notas para citas asignadas a tu perfil.',
+      },
+    });
+  });
+
   it('forwards ownership restrictions as forbidden responses', async () => {
     const { responseMock, result } = response();
     mockedUpdate.mockRejectedValue(new Error('CLINICAL_NOTE_NOT_FOUND'));

@@ -39,7 +39,7 @@ La referencia visual del frontend está documentada en [docs/frontend/figma-desi
 
 La skill del proyecto para implementar nuevas vistas siguiendo este sistema está en `.github/skills/happy-paws-figma-design-system/SKILL.md`.
 
-El resumen usa `createdAt` de las mascotas para calcular las registradas durante el mes actual. Las tarjetas y listas muestran estados vacíos y carga mientras esperan los tres endpoints.
+El resumen usa `createdAt` de las mascotas para calcular las registradas durante el mes actual. Todos los roles de personal consultan citas y mascotas; solo ADMIN y VET consultan vacunaciones, de acuerdo con sus permisos.
 
 ## Pruebas
 

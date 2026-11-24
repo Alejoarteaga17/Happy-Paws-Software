@@ -7,6 +7,7 @@ import { createClinicalNote, getClinicalNotes } from '../../services/clinical-no
 import { getAppointments } from '../../services/appointment-service';
 import { Appointment } from '../../types/appointment';
 import { ClinicalNote } from '../../types/clinical-note';
+import { useAuth } from '../../context/auth-context';
 
 export default function ClinicalNotesPage() {
   return (
@@ -17,10 +18,14 @@ export default function ClinicalNotesPage() {
 }
 
 function ClinicalNotesView() {
+  const { profile } = useAuth();
   const [notes, setNotes] = useState<ClinicalNote[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [form, setForm] = useState({ appointmentId: '', diagnosis: '', treatment: '', observations: '' });
   const [error, setError] = useState<string | null>(null);
+
+  const selectableAppointments =
+    profile?.role === 'VET' ? appointments.filter((appointment) => appointment.vetId === profile.id) : appointments;
 
   const load = async () => {
     const [loadedNotes, loadedAppointments] = await Promise.all([getClinicalNotes(), getAppointments()]);
@@ -72,12 +77,15 @@ function ClinicalNotesView() {
                 onChange={(event) => setForm({ ...form, appointmentId: event.target.value })}
               >
                 <option value="">Selecciona una cita</option>
-                {appointments.map((appointment) => (
+                {selectableAppointments.map((appointment) => (
                   <option key={appointment.id} value={appointment.id}>
                     #{appointment.id} · {appointment.petName} · {appointment.reason}
                   </option>
                 ))}
               </select>
+              {profile?.role === 'VET' && selectableAppointments.length === 0 && (
+                <span className="field-help">No tienes citas asignadas para registrar una nota clínica.</span>
+              )}
             </label>
             <label>
               Diagnóstico
@@ -102,7 +110,7 @@ function ClinicalNotesView() {
                 onChange={(event) => setForm({ ...form, observations: event.target.value })}
               />
             </label>
-            <button className="primary-button" type="submit">
+            <button className="primary-button" type="submit" disabled={selectableAppointments.length === 0}>
               Guardar nota
             </button>
           </form>

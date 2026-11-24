@@ -10,7 +10,7 @@ import { Appointment } from '../types/appointment';
 import { Pet } from '../types/pet';
 import { Vaccination } from '../types/vaccination';
 import { Icon, StatusBadge } from '../components/ui';
-import { RoleView } from '../context/auth-context';
+import { RoleView, useAuth } from '../context/auth-context';
 
 const formatLongDate = (date: Date) =>
   new Intl.DateTimeFormat('es-CO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(date);
@@ -43,12 +43,14 @@ function AppointmentStatus({ appointment }: { appointment: Appointment }) {
 }
 
 export default function SummaryPage() {
+  const { profile, loading: authLoading, can } = useAuth();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [pets, setPets] = useState<Pet[]>([]);
-  const [vaccinations, setVaccinations] = useState<Vaccination[]>([]);
+  const [vaccinations, setVaccinations] = useState<Vaccination[] | null>(null);
   const [userName, setUserName] = useState('equipo Happy Paws');
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const canViewVaccinations = can('manage_vaccinations');
   const today = useMemo(() => new Date(), []);
   const todayStart = startOfDay(today);
   const tomorrowStart = new Date(todayStart);
@@ -58,6 +60,12 @@ export default function SummaryPage() {
   const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
 
   useEffect(() => {
+    if (authLoading) return;
+    if (profile?.role === 'OWNER') {
+      window.location.replace('/portal');
+      return;
+    }
+
     const loadSummary = async () => {
       try {
         if (!isSupabaseConfigured) throw new Error('Configura Supabase para consultar el resumen');
@@ -72,7 +80,7 @@ export default function SummaryPage() {
         const [appointmentData, petData, vaccinationData] = await Promise.all([
           getAppointments(),
           getPets(),
-          getVaccinations(),
+          canViewVaccinations ? getVaccinations() : Promise.resolve(null),
         ]);
         setAppointments(appointmentData);
         setPets(petData);
@@ -84,27 +92,39 @@ export default function SummaryPage() {
       }
     };
     void loadSummary();
-  }, []);
+  }, [authLoading, canViewVaccinations, profile?.role]);
 
   const todaysAppointments = appointments.filter(({ scheduledAt, status }) => {
     const date = new Date(scheduledAt);
     return date >= todayStart && date < tomorrowStart && status !== 'CANCELLED';
   });
-  const upcomingCare = vaccinations
-    .filter(({ status }) => status === 'PENDING' || status === 'OVERDUE')
-    .sort((a, b) => a.nextDueDate.localeCompare(b.nextDueDate))
-    .slice(0, 5);
+  const upcomingCare =
+    vaccinations
+      ?.filter(({ status }) => status === 'PENDING' || status === 'OVERDUE')
+      .sort((a, b) => a.nextDueDate.localeCompare(b.nextDueDate))
+      .slice(0, 5) ?? [];
   const activePetsThisMonth = pets.filter(({ createdAt }) => createdAt && new Date(createdAt) >= monthStart).length;
-  const weeklyFollowUps =
-    appointments.filter(({ scheduledAt, status }) => {
-      const date = new Date(scheduledAt);
-      return date >= todayStart && date < weekEnd && status === 'SCHEDULED';
-    }).length +
-    vaccinations.filter(({ nextDueDate, status }) => {
+  const weeklyAppointments = appointments.filter(({ scheduledAt, status }) => {
+    const date = new Date(scheduledAt);
+    return date >= todayStart && date < weekEnd && status === 'SCHEDULED';
+  });
+  const weeklyVaccinations =
+    vaccinations?.filter(({ nextDueDate, status }) => {
       const date = new Date(`${nextDueDate}T00:00:00`);
       return date >= todayStart && date < weekEnd && status === 'PENDING';
-    }).length;
+    }) ?? [];
+  const weeklyFollowUps = weeklyAppointments.length + weeklyVaccinations.length;
   const petsById = useMemo(() => new Map(pets.map((pet) => [pet.id, pet])), [pets]);
+
+  if (authLoading || profile?.role === 'OWNER') {
+    return (
+      <main className="summary-page">
+        <p className="restricted-view" role="status">
+          Cargando tu portal...
+        </p>
+      </main>
+    );
+  }
 
   return (
     <main className="summary-page">
@@ -157,21 +177,25 @@ export default function SummaryPage() {
                 <strong>{pets.length}</strong>
                 <small>+{activePetsThisMonth} este mes</small>
               </article>
-              <article className="summary-stat-alert">
-                <span className="summary-stat-icon">
-                  <Icon name="vaccines" />
-                </span>
-                <span className="stat-label">Vacunas vencidas</span>
-                <strong>{vaccinations.filter(({ status }) => status === 'OVERDUE').length}</strong>
-                <small>requieren seguimiento</small>
-              </article>
+              {canViewVaccinations && (
+                <article className="summary-stat-alert">
+                  <span className="summary-stat-icon">
+                    <Icon name="vaccines" />
+                  </span>
+                  <span className="stat-label">Vacunas vencidas</span>
+                  <strong>{vaccinations?.filter(({ status }) => status === 'OVERDUE').length ?? 0}</strong>
+                  <small>requieren seguimiento</small>
+                </article>
+              )}
               <article>
                 <span className="summary-stat-icon">
                   <Icon name="pending_actions" />
                 </span>
-                <span className="stat-label">Seguimientos esta semana</span>
+                <span className="stat-label">
+                  {canViewVaccinations ? 'Seguimientos esta semana' : 'Citas esta semana'}
+                </span>
                 <strong>{weeklyFollowUps}</strong>
-                <small>sin asignar</small>
+                <small>{canViewVaccinations ? 'citas y vacunas pendientes' : 'agendadas'}</small>
               </article>
             </section>
             <section className="summary-columns">

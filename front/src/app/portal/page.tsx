@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import { useEffect, useRef, useState } from 'react';
 import AppHeader from '../../components/app-header';
 import RestrictedView from '../../components/restricted-view';
 import { useAuth } from '../../context/auth-context';
@@ -9,7 +10,7 @@ import { Appointment } from '../../types/appointment';
 import { Pet } from '../../types/pet';
 import { Vaccination } from '../../types/vaccination';
 import { ClinicalNote } from '../../types/clinical-note';
-import { StatusBadge } from '../../components/ui';
+import { Icon, StatusBadge } from '../../components/ui';
 
 export default function OwnerPortalPage() {
   return (
@@ -22,10 +23,12 @@ export default function OwnerPortalPage() {
 function OwnerPortal() {
   const { profile } = useAuth();
   const [pets, setPets] = useState<Pet[]>([]);
+  const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [vaccinations, setVaccinations] = useState<Vaccination[]>([]);
   const [clinicalNotes, setClinicalNotes] = useState<ClinicalNote[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     getOwnerPortal()
@@ -44,6 +47,28 @@ function OwnerPortal() {
       )
       .catch((reason) => setError(reason instanceof Error ? reason.message : 'No se pudo cargar el portal'));
   }, []);
+
+  useEffect(() => {
+    if (!selectedPet) return;
+
+    const previouslyFocused = document.activeElement;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    closeButtonRef.current?.focus();
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setSelectedPet(null);
+    };
+    document.addEventListener('keydown', closeOnEscape);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', closeOnEscape);
+      if (previouslyFocused instanceof HTMLElement) previouslyFocused.focus();
+    };
+  }, [selectedPet]);
+
+  const closePetDetails = () => setSelectedPet(null);
 
   return (
     <main className="summary-page">
@@ -69,13 +94,22 @@ function OwnerPortal() {
               <ul>
                 {pets.map((pet) => (
                   <li className="appointment-item" key={pet.id}>
-                    <div>
-                      <strong>{pet.name}</strong>
+                    <button
+                      className="portal-pet-trigger"
+                      type="button"
+                      aria-haspopup="dialog"
+                      aria-label={`Ver detalles de ${pet.name}`}
+                      onClick={() => setSelectedPet(pet)}
+                    >
                       <span>
-                        {pet.species} · {pet.petTag}
+                        <strong>{pet.name}</strong>
+                        <span>
+                          {pet.species} · {pet.petTag}
+                        </span>
                       </span>
-                    </div>
-                    <span>{pet.weight ? `${pet.weight} kg` : 'Sin peso'}</span>
+                      <span className="portal-pet-weight">{pet.weight ? `${pet.weight} kg` : 'Sin peso'}</span>
+                      <Icon name="chevron_right" />
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -166,6 +200,83 @@ function OwnerPortal() {
           </section>
         </div>
       </section>
+      {selectedPet && (
+        <div
+          className="modal-backdrop"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) closePetDetails();
+          }}
+        >
+          <section className="pet-details-modal" role="dialog" aria-modal="true" aria-labelledby="pet-details-title">
+            <div className="modal-header">
+              <div>
+                <p className="eyebrow">Ficha de mascota</p>
+                <h2 id="pet-details-title">{selectedPet.name}</h2>
+              </div>
+              <button
+                ref={closeButtonRef}
+                className="close-button"
+                type="button"
+                aria-label={`Cerrar detalles de ${selectedPet.name}`}
+                onClick={closePetDetails}
+              >
+                <Icon name="close" />
+              </button>
+            </div>
+            <div className="pet-details-content">
+              {selectedPet.photoUrl && (
+                <Image
+                  className="pet-details-photo"
+                  src={selectedPet.photoUrl}
+                  alt={selectedPet.name}
+                  width={120}
+                  height={120}
+                  unoptimized
+                />
+              )}
+              <dl className="pet-details-grid">
+                <div>
+                  <dt>Identificación</dt>
+                  <dd>{selectedPet.petTag}</dd>
+                </div>
+                <div>
+                  <dt>Especie</dt>
+                  <dd>{selectedPet.species}</dd>
+                </div>
+                <div>
+                  <dt>Raza</dt>
+                  <dd>{selectedPet.breed || 'Sin registrar'}</dd>
+                </div>
+                <div>
+                  <dt>Fecha de nacimiento</dt>
+                  <dd>
+                    {selectedPet.birthDate
+                      ? new Intl.DateTimeFormat('es-CO', { dateStyle: 'long' }).format(
+                          new Date(
+                            selectedPet.birthDate.includes('T')
+                              ? selectedPet.birthDate
+                              : `${selectedPet.birthDate}T00:00:00`,
+                          ),
+                        )
+                      : 'Sin registrar'}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Sexo</dt>
+                  <dd>
+                    {selectedPet.sex === 'MALE' ? 'Macho' : selectedPet.sex === 'FEMALE' ? 'Hembra' : 'Sin registrar'}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Peso</dt>
+                  <dd>{selectedPet.weight ? `${selectedPet.weight} kg` : 'Sin registrar'}</dd>
+                </div>
+              </dl>
+            </div>
+          </section>
+        </div>
+      )}
     </main>
   );
 }
