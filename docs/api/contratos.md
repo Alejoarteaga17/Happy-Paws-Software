@@ -391,7 +391,7 @@ El backend registra estas superficies autenticadas adicionales:
 - `GET /api/v1/audit`: consulta de auditoría ADMIN, con `limit` opcional entre 1 y 200.
 - `GET /api/v1/search?q=...`: búsqueda global autenticada para ADMIN, VET y RECEPTIONIST. `q` debe tener entre 2 y 100 caracteres y devuelve resultados de propietarios y mascotas.
 - `GET /api/v1/clinical-notes`: consulta de notas clínicas autenticada para ADMIN, VET y RECEPTIONIST.
-- `POST /api/v1/clinical-notes`: registra una nota clínica para ADMIN o VET. Recibe `appointmentId`, `diagnosis`, `treatment` y `observations` opcional; el veterinario responsable se toma del usuario autenticado.
+- `POST /api/v1/clinical-notes`: registra una nota clínica para ADMIN o VET. Recibe `appointmentId`, `diagnosis`, `treatment` y `observations` opcional; al guardarla, la cita asociada cambia a `COMPLETED` en la misma transacción.
 - `PUT /api/v1/clinical-notes/:id`: actualiza diagnóstico, tratamiento u observaciones. ADMIN puede actualizar cualquier nota y VET solo notas propias.
 - `POST /api/v1/auth/audit-login`: registra el inicio de sesión confirmado por Supabase Auth.
 
